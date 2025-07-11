@@ -1,0 +1,30 @@
+# Integrations Service Dependencies
+
+# Core FastAPI
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# HTTP requests
+httpx==0.25.2
+requests==2.31.0
+
+# XML processing (for AADE)
+lxml==4.9.3
+xmltodict==0.13.0
+
+# QR code generation
+qrcode[pil]==7.4.2
+
+# Environment
+python-dotenv==1.0.0
+
+# Date and time
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Encryption (for API keys)
+cryptography==41.0.7
+
+# Greek business
+phonenumbers==8.13.26 

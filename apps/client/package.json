@@ -1,0 +1,31 @@
+{
+  "name": "@erp/client-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@erp/shared-auth": "*",
+    "@erp/shared-ui": "*",
+    "@erp/shared-voice": "*",
+    "@erp/shared-ai": "*",
+    "@erp/standard-dashboard": "*",
+    "@erp/standard-crm": "*",
+    "@erp/standard-erp": "*",
+    "@erp/standard-reports": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "15.0.0"
+  }
+}

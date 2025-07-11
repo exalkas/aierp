@@ -1,0 +1,11 @@
+{
+  "name": "@erp/voice-service",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "python src/main.py",
+    "dev": "python -m watchdog src/main.py",
+    "build": "echo 'Building voice service...'"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,31 @@
+{
+  "name": "greek-erp-crm",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/shared/*",
+    "packages/standard-modules/*",
+    "packages/ai-services/*",
+    "packages/custom-modules/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
+    "dev:client": "cd apps/client && npm run dev",
+    "dev:admin": "cd apps/admin && npm run dev",
+    "dev:user-support": "cd apps/user-support && npm run dev",
+    "dev:staff-support": "cd apps/staff-support && npm run dev",
+    "dev:setup": "cd apps/setup && npm run dev",
+    "dev:api": "cd services/api && uvicorn main:app --reload",
+    "build": "npm run build:packages && npm run build:apps",
+    "build:packages": "npm run build --workspaces --if-present",
+    "build:apps": "npm run build --workspace=apps/*",
+    "test": "npm run test --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

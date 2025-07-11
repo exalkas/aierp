@@ -1,0 +1,22 @@
+{
+  "name": "@erp/admin-analytics",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "@erp/shared-auth": "*",
+    "@erp/shared-ui": "*",
+    "@erp/shared-utils": "*",
+    "recharts": "^2.0.0",
+    "lucide-react": "^0.400.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0"
+  }
+}
