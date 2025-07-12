@@ -1,16 +1,40 @@
-# Greek ERP/CRM Backend Setup Script
-# Sets up Python virtual environments for all backend services
-# Includes dependency fixes and error handling
+# Greek ERP/CRM Hybrid Monorepo Setup Script
+# Sets up Poetry workspace for all Python services + npm workspaces
+# Modern unified dependency management approach
 
-Write-Host "Greek ERP/CRM Backend Setup Starting..." -ForegroundColor Green
-Write-Host "=========================================" -ForegroundColor Green
+Write-Host "Greek ERP/CRM Hybrid Monorepo Setup Starting..." -ForegroundColor Green
+Write-Host "================================================" -ForegroundColor Green
 
 # Check if Python is available
 try {
     $pythonVersion = python --version 2>&1
     Write-Host "✓ Python found: $pythonVersion" -ForegroundColor Green
 } catch {
-    Write-Host "✗ Python not found. Please install Python 3.8+ and add to PATH" -ForegroundColor Red
+    Write-Host "✗ Python not found. Please install Python 3.11+ and add to PATH" -ForegroundColor Red
+    exit 1
+}
+
+# Check if Poetry is available
+try {
+    $poetryVersion = poetry --version 2>&1
+    Write-Host "✓ Poetry found: $poetryVersion" -ForegroundColor Green
+} catch {
+    Write-Host "✗ Poetry not found. Installing Poetry..." -ForegroundColor Yellow
+    try {
+        pip install poetry
+        Write-Host "✓ Poetry installed successfully" -ForegroundColor Green
+    } catch {
+        Write-Host "✗ Failed to install Poetry. Please install manually: pip install poetry" -ForegroundColor Red
+        exit 1
+    }
+}
+
+# Check if npm is available
+try {
+    $npmVersion = npm --version 2>&1
+    Write-Host "✓ npm found: $npmVersion" -ForegroundColor Green
+} catch {
+    Write-Host "✗ npm not found. Please install Node.js 18+ and add to PATH" -ForegroundColor Red
     exit 1
 }
 
@@ -18,134 +42,130 @@ try {
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
-# Service paths and names
+Write-Host ""
+Write-Host "Setting up hybrid monorepo architecture..." -ForegroundColor Yellow
+Write-Host "✓ npm workspaces for JavaScript/TypeScript" -ForegroundColor Gray
+Write-Host "✓ Poetry workspace for Python services" -ForegroundColor Gray
+
+# Verify pyproject.toml exists
+if (-not (Test-Path "pyproject.toml")) {
+    Write-Host "✗ pyproject.toml not found. Poetry workspace not configured." -ForegroundColor Red
+    exit 1
+}
+
+# Install JavaScript dependencies (npm workspaces)
+Write-Host ""
+Write-Host "1. Installing JavaScript dependencies (npm workspaces)..." -ForegroundColor Blue
+try {
+    npm run install:js
+    Write-Host "✓ JavaScript dependencies installed successfully" -ForegroundColor Green
+} catch {
+    Write-Host "✗ Failed to install JavaScript dependencies" -ForegroundColor Red
+    Write-Host "Please run: npm install" -ForegroundColor Yellow
+}
+
+# Install Python dependencies (Poetry workspace)
+Write-Host ""
+Write-Host "2. Installing Python dependencies (Poetry workspace)..." -ForegroundColor Blue
+try {
+    poetry install --no-root
+    Write-Host "✓ Poetry workspace created successfully" -ForegroundColor Green
+} catch {
+    Write-Host "✗ Failed to create Poetry workspace" -ForegroundColor Red
+    Write-Host "Please run: poetry install --no-root" -ForegroundColor Yellow
+}
+
+# Verify Poetry workspace
+Write-Host ""
+Write-Host "3. Verifying Poetry workspace..." -ForegroundColor Blue
+try {
+    $poetryEnv = poetry env info --path 2>&1
+    Write-Host "✓ Poetry environment: $poetryEnv" -ForegroundColor Green
+    
+    # Test shared dependencies
+    $fastApiVersion = poetry run python -c "import fastapi; print(fastapi.__version__)" 2>&1
+    Write-Host "✓ FastAPI: $fastApiVersion" -ForegroundColor Green
+    
+    $sqlAlchemyVersion = poetry run python -c "import sqlalchemy; print(sqlalchemy.__version__)" 2>&1
+    Write-Host "✓ SQLAlchemy: $sqlAlchemyVersion" -ForegroundColor Green
+    
+} catch {
+    Write-Host "✗ Poetry workspace verification failed" -ForegroundColor Red
+    Write-Host "Run 'poetry env info' to debug" -ForegroundColor Yellow
+}
+
+# Verify service structure
+Write-Host ""
+Write-Host "4. Verifying service structure..." -ForegroundColor Blue
+
 $services = @(
     @{Path = "services\api"; Name = "API Service"; Port = 8000},
     @{Path = "services\auth"; Name = "Auth Service"; Port = 8001},
     @{Path = "services\files"; Name = "Files Service"; Port = 8002},
     @{Path = "services\integrations"; Name = "Integrations Service"; Port = 8003},
-    @{Path = "packages\ai-services\voice-service"; Name = "Voice AI Service"; Port = 8004},
-    @{Path = "packages\ai-services\ai-support-service"; Name = "AI Support Service"; Port = 8005}
+    @{Path = "packages\ai-services\ai-support-service"; Name = "AI Support Service"; Port = 8004},
+    @{Path = "packages\ai-services\voice-service"; Name = "Voice AI Service"; Port = 8005}
 )
 
-$failedServices = @()
+$missingServices = @()
 
-# Process each service
 foreach ($service in $services) {
     $servicePath = $service.Path
     $serviceName = $service.Name
     
-    Write-Host ""
-    Write-Host "Setting up $serviceName..." -ForegroundColor Yellow
-    Write-Host "Path: $servicePath" -ForegroundColor Gray
-    
-    if (-not (Test-Path $servicePath)) {
-        Write-Host "✗ Service directory not found: $servicePath" -ForegroundColor Red
-        $failedServices += $serviceName
-        continue
-    }
-    
-    # Create virtual environment
-    $venvPath = "$servicePath\venv"
-    if (Test-Path $venvPath) {
-        Write-Host "  Virtual environment already exists" -ForegroundColor Yellow
-    } else {
-        Write-Host "  Creating virtual environment..." -ForegroundColor Blue
-        try {
-            python -m venv $venvPath
-            Write-Host "  ✓ Virtual environment created" -ForegroundColor Green
-        } catch {
-            Write-Host "  ✗ Failed to create virtual environment" -ForegroundColor Red
-            $failedServices += $serviceName
-            continue
-        }
-    }
-    
-    # Install dependencies
-    $requirementsPath = "$servicePath\requirements.txt"
-    if (Test-Path $requirementsPath) {
-        Write-Host "  Installing dependencies..." -ForegroundColor Blue
-        try {
-            # Upgrade pip first
-            & "$venvPath\Scripts\python.exe" -m pip install --upgrade pip
-            
-            # Install requirements with error handling
-            $installResult = & "$venvPath\Scripts\pip.exe" install -r $requirementsPath 2>&1
-            
-            # Check for specific dependency issues and fix them
-            if ($installResult -match "locale.*0\.1\.0") {
-                Write-Host "  ⚠ Fixing locale dependency issue..." -ForegroundColor Yellow
-                & "$venvPath\Scripts\pip.exe" uninstall -y locale
-            }
-            
-            if ($installResult -match "torch.*2\.1\.1") {
-                Write-Host "  ⚠ Fixing torch dependency issue..." -ForegroundColor Yellow
-                & "$venvPath\Scripts\pip.exe" install torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
-            }
-            
-            if ($installResult -match "polyglot.*encoding") {
-                Write-Host "  ⚠ Fixing polyglot encoding issue..." -ForegroundColor Yellow
-                & "$venvPath\Scripts\pip.exe" uninstall -y polyglot
-                & "$venvPath\Scripts\pip.exe" install polyglot --no-deps
-            }
-            
-            # Ensure uvicorn is properly installed
-            Write-Host "  Ensuring uvicorn is properly installed..." -ForegroundColor Blue
-            & "$venvPath\Scripts\pip.exe" install uvicorn[standard] --force-reinstall
-            
-            # Install fastapi if missing (for AI services)
-            if ($serviceName -match "AI|Voice") {
-                Write-Host "  Installing FastAPI for AI service..." -ForegroundColor Blue
-                & "$venvPath\Scripts\pip.exe" install fastapi python-multipart
-            }
-            
-            Write-Host "  ✓ Dependencies installed successfully" -ForegroundColor Green
-        } catch {
-            Write-Host "  ✗ Failed to install dependencies: $($_.Exception.Message)" -ForegroundColor Red
-            $failedServices += $serviceName
-            continue
+    if (Test-Path $servicePath) {
+        Write-Host "✓ $serviceName ($servicePath)" -ForegroundColor Green
+        
+        # Check for pyproject.toml
+        $pyprojectPath = "$servicePath\pyproject.toml"
+        if (Test-Path $pyprojectPath) {
+            Write-Host "  ✓ pyproject.toml found" -ForegroundColor Green
+        } else {
+            Write-Host "  ⚠ pyproject.toml missing (service-specific deps not configured)" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "  ⚠ No requirements.txt found" -ForegroundColor Yellow
+        Write-Host "✗ $serviceName ($servicePath) - directory missing" -ForegroundColor Red
+        $missingServices += $serviceName
     }
-    
-    # Verify installation
-    Write-Host "  Verifying installation..." -ForegroundColor Blue
-    try {
-        $uvicornCheck = & "$venvPath\Scripts\uvicorn.exe" --version 2>&1
-        Write-Host "  ✓ Uvicorn: $uvicornCheck" -ForegroundColor Green
-    } catch {
-        Write-Host "  ✗ Uvicorn verification failed" -ForegroundColor Red
-        $failedServices += $serviceName
-    }
-    
-    Write-Host "  ✓ $serviceName setup complete" -ForegroundColor Green
 }
 
 # Summary
 Write-Host ""
-Write-Host "Backend Setup Summary:" -ForegroundColor Blue
-Write-Host "=====================" -ForegroundColor Blue
+Write-Host "Hybrid Monorepo Setup Summary:" -ForegroundColor Blue
+Write-Host "==============================" -ForegroundColor Blue
 
-$successCount = $services.Count - $failedServices.Count
-Write-Host "✓ Successful: $successCount/$($services.Count) services" -ForegroundColor Green
+$foundServices = $services.Count - $missingServices.Count
+Write-Host "npm workspaces: JavaScript/TypeScript ecosystem" -ForegroundColor Green
+Write-Host "Poetry workspace: Python services ($foundServices/$($services.Count) services found)" -ForegroundColor Green
 
-if ($failedServices.Count -gt 0) {
-    Write-Host "✗ Failed services:" -ForegroundColor Red
-    foreach ($failed in $failedServices) {
-        Write-Host "  - $failed" -ForegroundColor Red
+if ($missingServices.Count -gt 0) {
+    Write-Host "⚠ Missing services:" -ForegroundColor Yellow
+    foreach ($missing in $missingServices) {
+        Write-Host "  - $missing" -ForegroundColor Yellow
     }
     Write-Host ""
-    Write-Host "Please check the errors above and retry setup for failed services." -ForegroundColor Yellow
+    Write-Host "Missing services will be skipped but won't prevent development." -ForegroundColor Gray
 } else {
-    Write-Host "🎉 All services set up successfully!" -ForegroundColor Green
+    Write-Host "All services found and configured!" -ForegroundColor Green
 }
+
+Write-Host ""
+Write-Host "Development Commands:" -ForegroundColor Blue
+Write-Host "===================" -ForegroundColor Blue
+Write-Host "npm run dev:all           # Start all services (frontend + backend)" -ForegroundColor Gray
+Write-Host "npm run dev:js            # Start frontend applications" -ForegroundColor Gray  
+Write-Host "npm run dev:python        # Start backend services" -ForegroundColor Gray
+Write-Host "npm run dev:api           # Start individual API service" -ForegroundColor Gray
+Write-Host "npm run test              # Run all tests (JS + Python)" -ForegroundColor Gray
+Write-Host "npm run format            # Format all code (JS + Python)" -ForegroundColor Gray
+Write-Host "npm run lint              # Lint all code (JS + Python)" -ForegroundColor Gray
 
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Blue
 Write-Host "1. Run setup-database-windows.ps1 to set up PostgreSQL" -ForegroundColor Gray
-Write-Host "2. Configure .env files in each service directory" -ForegroundColor Gray
-Write-Host "3. Run create-superuser.py to create admin user" -ForegroundColor Gray
-Write-Host "4. Start services with start-all-services.ps1" -ForegroundColor Gray
+Write-Host "2. Configure .env files (shared and service-specific)" -ForegroundColor Gray
+Write-Host "3. Run 'poetry run python create-superuser.py' to create admin user" -ForegroundColor Gray
+Write-Host "4. Start development with 'npm run dev:all'" -ForegroundColor Gray
 Write-Host ""
-Write-Host "For detailed setup instructions, see README-SETUP.md" -ForegroundColor Gray 
+Write-Host "For detailed workflow, see DEVELOPER-WORKFLOW.md" -ForegroundColor Gray
+Write-Host "For setup instructions, see README-SETUP.md" -ForegroundColor Gray 

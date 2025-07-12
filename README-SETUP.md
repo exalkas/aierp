@@ -1,26 +1,46 @@
 # Greek ERP/CRM System Setup Guide
 
-Complete setup guide for developers to get the Greek ERP/CRM system running locally.
+Complete setup guide for developers to get the **hybrid Poetry + npm workspace** system running locally.
+
+## 🏗️ **Hybrid Monorepo Architecture**
+
+This system uses a **modern hybrid monorepo** approach:
+
+- **📦 npm workspaces** - JavaScript/TypeScript frontend applications and shared packages
+- **🐍 Poetry workspace** - Python backend services with unified dependency management
+- **🔄 Single Poetry environment** - Replaces 6 separate virtual environments
+- **⚡ Unified commands** - One interface for both JavaScript and Python ecosystems
+
+### **Key Benefits:**
+
+- ✅ **Dependency consolidation** - Common Python packages installed once
+- ✅ **Simplified development** - Single environment for all Python services
+- ✅ **Faster setup** - Unified installation process
+- ✅ **Better orchestration** - npm scripts manage both ecosystems
+- ✅ **Consistent tooling** - Shared linting, formatting, and testing
 
 ## 🚀 Quick Start
 
 **For experienced developers:**
 
 ```bash
-# 1. Setup backend services
-powershell -ExecutionPolicy Bypass -File scripts/setup-backend.ps1
+# 1. Install Poetry (if not installed)
+pip install poetry
 
-# 2. Setup database (Windows)
+# 2. Install all dependencies (JavaScript + Python)
+npm run install:both
+
+# 3. Setup database (Windows)
 powershell -ExecutionPolicy Bypass -File scripts/setup-database-windows.ps1
 
-# 3. Initialize database schema
+# 4. Initialize database schema
 psql -U greek_erp_user -d greek_erp_master -f scripts/database-init.sql
 
-# 4. Create superuser
-python create-superuser.py
+# 5. Create superuser
+poetry run python create-superuser.py
 
-# 5. Start all services
-powershell -ExecutionPolicy Bypass -File scripts/start-all-services.ps1
+# 6. Start all services
+npm run dev:all
 ```
 
 ## 📋 Prerequisites
@@ -28,8 +48,9 @@ powershell -ExecutionPolicy Bypass -File scripts/start-all-services.ps1
 ### System Requirements
 
 - **Windows 10/11** (for development)
-- **Python 3.8+** with pip
-- **Node.js 16+** (for frontend)
+- **Python 3.11+** with pip
+- **Poetry** (Python dependency management) - `pip install poetry`
+- **Node.js 18+** (for frontend and npm workspaces)
 - **PostgreSQL 12+** (will be installed automatically)
 - **Git** (for version control)
 
@@ -48,50 +69,75 @@ git clone <repository-url>
 cd greek-erp-crm
 ```
 
-### Step 2: Backend Setup
+### Step 2: Dependencies Setup
 
-#### Windows Setup
+#### **Install All Dependencies (Recommended)**
 
-```powershell
-# Navigate to project directory
-cd greek-erp-crm
-
-# Run backend setup script
-powershell -ExecutionPolicy Bypass -File scripts/setup-backend.ps1
+```bash
+# Install both JavaScript and Python dependencies
+npm run install:both
 ```
 
-**What this script does:**
+#### **Manual Installation**
 
-- ✅ Checks Python installation
-- ✅ Creates virtual environments for all services
-- ✅ Installs Python dependencies
-- ✅ Fixes common dependency conflicts
-- ✅ Installs uvicorn and FastAPI
-- ✅ Verifies all installations
+```bash
+# 1. Install JavaScript dependencies (frontend apps + packages)
+npm run install:js
+
+# 2. Install Python dependencies (Poetry workspace)
+npm run install:python
+
+# 3. Verify Poetry workspace
+poetry env info
+```
+
+**What this does:**
+
+- ✅ **JavaScript ecosystem**: Installs all npm workspace dependencies
+- ✅ **Python ecosystem**: Creates single Poetry workspace for all 6 services
+- ✅ **Shared dependencies**: FastAPI, SQLAlchemy, PyJWT installed once
+- ✅ **Service-specific deps**: Each service gets its specialized packages
+- ✅ **Development tools**: Black, MyPy, pytest configured
+- ✅ **No virtual env conflicts**: Single unified Poetry environment
 
 **Expected output:**
 
-```
-Greek ERP/CRM Backend Setup Starting...
-=========================================
-✓ Python found: Python 3.11.0
-Setting up API Service...
-✓ Virtual environment created
-✓ Dependencies installed successfully
-✓ Uvicorn: uvicorn 0.24.0
-✓ API Service setup complete
-... (repeats for all services)
-🎉 All services set up successfully!
+```bash
+> npm run install:both
+
+> greek-erp-crm@1.0.0 install:both
+> npm run install:js && npm run install:python
+
+✓ JavaScript dependencies installed
+✓ Poetry workspace created: greek-erp-monorepo-L_BTagln-py3.12
+✓ Python dependencies installed
+✓ All 6 services configured in Poetry workspace
+🎉 Hybrid monorepo setup complete!
 ```
 
-#### Troubleshooting Backend Setup
+#### **Verify Installation**
 
-| Issue                | Solution                            |
-| -------------------- | ----------------------------------- |
-| Python not found     | Install Python 3.8+ and add to PATH |
-| Permission denied    | Run PowerShell as Administrator     |
-| Dependency conflicts | Script handles automatically        |
-| uvicorn not found    | Script reinstalls uvicorn           |
+```bash
+# Test Poetry environment
+poetry run python --version
+# Python 3.12.1
+
+# Test shared dependencies
+poetry run python -c "import fastapi; print(fastapi.__version__)"
+# 0.104.1
+
+# Check workspace info
+poetry env info
+```
+
+#### Troubleshooting Dependencies
+
+| Issue                  | Solution                              |
+| ---------------------- | ------------------------------------- |
+| Poetry not found       | `pip install poetry`, add to PATH     |
+| npm not found          | Install Node.js 18+ and add to PATH   |
+| Permission denied      | Run PowerShell as Administrator       |
+| Poetry workspace error | `poetry env remove python` then retry |
 
 ### Step 3: Database Setup
 
@@ -166,7 +212,8 @@ psql -U greek_erp_user -d greek_erp_master -f scripts/database-init.sql
 ### Step 5: Create Superuser Account
 
 ```bash
-python create-superuser.py
+# Use Poetry to run the superuser creation script
+poetry run python create-superuser.py
 ```
 
 **Interactive setup:**
@@ -203,19 +250,39 @@ Greek ERP/CRM Superuser Creation
 
 ### Step 6: Start Services
 
-```powershell
-# Start all services
-powershell -ExecutionPolicy Bypass -File scripts/start-all-services.ps1
+#### **Start All Services (Recommended)**
+
+```bash
+# Start all frontend and backend services
+npm run dev:all
 ```
 
-**Services started:**
+#### **Start Services Separately**
 
-- 🔐 **Auth Service** (port 8001) - Authentication and authorization
-- 📡 **API Service** (port 8000) - Main business logic
-- 📁 **Files Service** (port 8002) - File upload and management
-- 🔌 **Integrations Service** (port 8003) - AADE and external integrations
-- 🎤 **Voice AI Service** (port 8004) - Voice recognition and processing
-- 🤖 **AI Support Service** (port 8005) - AI-powered support features
+```bash
+# Start all frontend apps
+npm run dev:js
+
+# Start all backend services
+npm run dev:python
+
+# Or start individual services
+npm run dev:api            # Main API (port 8000)
+npm run dev:auth           # Auth service (port 8001)
+npm run dev:files          # File service (port 8002)
+npm run dev:integrations   # Integrations (port 8003)
+npm run dev:ai-support     # AI Support (port 8004)
+npm run dev:voice          # Voice AI (port 8005)
+```
+
+**Services started via Poetry workspace:**
+
+- 📡 **API Service** (port 8000) - Main business logic with Poetry
+- 🔐 **Auth Service** (port 8001) - Authentication via Poetry
+- 📁 **Files Service** (port 8002) - File management via Poetry
+- 🔌 **Integrations Service** (port 8003) - AADE integration via Poetry
+- 🤖 **AI Support Service** (port 8004) - AI assistance via Poetry
+- 🎤 **Voice AI Service** (port 8005) - Voice commands via Poetry
 
 ### Step 7: Verify Installation
 

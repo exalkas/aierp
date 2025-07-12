@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "voice-service"
+version = "0.1.0"
+description = "Greek ERP/CRM Voice AI Service"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "voice_service"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# Voice-specific dependencies (not in root)
+speechrecognition = "^3.10.0"
+pydub = "^0.25.1"
+pyaudio = "^0.2.11"
+transformers = "^4.36.0"
+torch = "^2.2.0"
+# polyglot = "^16.7.4"  # Greek language support - disabled due to Windows compatibility issues
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 

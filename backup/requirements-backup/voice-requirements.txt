@@ -1,0 +1,28 @@
+# Voice AI Service Dependencies
+
+# Core FastAPI
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Voice processing
+speechrecognition==3.10.0
+pydub==0.25.1
+pyaudio==0.2.11
+
+# AI/ML
+openai==1.3.7
+transformers==4.36.0
+torch==2.2.0
+
+# File handling
+python-multipart==0.0.6
+
+# Environment
+python-dotenv==1.0.0
+
+# HTTP requests
+httpx==0.25.2
+
+# Greek language support
+polyglot==16.7.4 

@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "api-service"
+version = "0.1.0"
+description = "Greek ERP/CRM API Service"
+authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+# API-specific dependencies (not in root)
+requests = "^2.31.0"
+babel = "^2.13.1"  # Greek locale support
+emails = "^0.6"
+python-magic = "^0.4.27"
+Pillow = "^10.1.0"
+validators = "^0.22.0"
+python-slugify = "^8.0.1"
+structlog = "^23.2.0"
+
+[tool.poetry.group.dev.dependencies]
+# API-specific testing dependencies
+pytest-postgresql = "^5.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 

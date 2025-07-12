@@ -83,36 +83,93 @@ BusinessEntity {
 
 ### Prerequisites
 
-- Node.js 18+
-- Python 3.11+
-- Docker & Docker Compose (for AI services)
-- NVIDIA GPU (for AI voice commands)
+- **Node.js 18+** (for frontend and npm workspaces)
+- **Python 3.11+** (for backend services)
+- **Poetry** (for Python dependency management)
+- **PostgreSQL 12+** (for database)
+- **Docker & Docker Compose** (for AI services)
+- **NVIDIA GPU** (optional, for AI voice commands)
+
+### 🏗️ **Hybrid Monorepo Architecture**
+
+This project uses a **hybrid monorepo** approach combining the best of both ecosystems:
+
+- **📦 npm workspaces** - JavaScript/TypeScript frontend apps and packages
+- **🐍 Poetry workspace** - Python backend services with shared dependencies
+- **🔄 Unified orchestration** - Single command interface for both ecosystems
 
 ### Installation
 
-1. **Install dependencies**
+#### **🚀 Quick Setup (Recommended)**
 
-   ```bash
-   npm install
-   ```
-2. **Start development servers**
+```bash
+# Install both JavaScript and Python dependencies
+npm run install:both
+```
 
-   ```bash
-   # Start all applications
-   npm run dev
+#### **📋 Manual Setup**
 
-   # Or start individual applications
-   npm run dev:client         # Main business app (port 3000)
-   npm run dev:admin          # Admin interface (port 3001)
-   npm run dev:user-support   # Customer support (port 3002)
-   npm run dev:staff-support  # Staff support (port 3003)
-   npm run dev:setup          # Setup wizard (port 3004)
-   ```
-3. **Start AI services** (requires GPU)
+```bash
+# 1. Install JavaScript dependencies (frontend apps + packages)
+npm run install:js
 
-   ```bash
-   docker-compose -f docker-compose.ai-services.yml up -d
-   ```
+# 2. Install Python dependencies (backend services)
+npm run install:python
+
+# 3. Verify Poetry workspace
+poetry env info
+```
+
+### Development Workflow
+
+#### **Start All Services**
+
+```bash
+# Start all applications (frontend + backend)
+npm run dev:all
+
+# Or start frontend and backend separately
+npm run dev:js      # All frontend apps
+npm run dev:python  # All backend services
+```
+
+#### **Individual Services**
+
+```bash
+# Frontend Applications
+npm run dev:client         # Main business app (port 3000)
+npm run dev:admin          # Admin interface (port 3001)
+npm run dev:user-support   # Customer support (port 3002)
+npm run dev:staff-support  # Staff support (port 3003)
+npm run dev:setup          # Setup wizard (port 3004)
+
+# Backend Services (via Poetry)
+npm run dev:api            # Main API (port 8000)
+npm run dev:auth           # Auth service (port 8001)
+npm run dev:files          # File service (port 8002)
+npm run dev:integrations   # Integrations (port 8003)
+npm run dev:ai-support     # AI Support (port 8004)
+npm run dev:voice          # Voice AI (port 8005)
+```
+
+#### **Code Quality & Testing**
+
+```bash
+# Run all tests (JS + Python)
+npm run test
+
+# Format code (JS + Python)
+npm run format
+
+# Lint code (JS + Python)
+npm run lint
+```
+
+#### **AI Services** (requires GPU)
+
+```bash
+docker-compose -f docker-compose.ai-services.yml up -d
+```
 
 ## 🎯 Applications
 
@@ -271,4 +328,4 @@ npm run test:business-entities
 
 **🎯 Revolutionizing Greek Business Management - One Unified Relationship at a Time**
 
-*Built with ❤️ for Greek businesses who deserve better than fragmented systems*
+_Built with ❤️ for Greek businesses who deserve better than fragmented systems_
