@@ -1,641 +1,312 @@
-# CRM Features - Comprehensive Screen & Logic Specification
+# Unified CRM+ERP Features - 360° Business Management System
 
 ## Document Information
 
-- **Version**: 1.0
+- **Version**: 2.0 (Unified Architecture)
 - **Date**: January 2025
-- **Module**: Customer Relationship Management (CRM)
+- **Module**: Unified CRM+ERP Business Management
 - **Implementation Phase**: Phase 1 (Months 1-6) - Core Foundation
 - **Priority**: Critical - Core Business Foundation
 - **Dependencies**: Authentication, Core Infrastructure, Greek Compliance Engine
+- **Competitive Advantage**: Eliminates CRM/ERP silos with 360° business view
 
 ## Executive Summary
 
-The CRM module serves as the foundational customer management system, combining EspoCRM-style customization with Greek market specialization. This specification defines all screens, logic, and user interfaces needed to deliver a comprehensive CRM solution that rivals international platforms while serving Greek business needs.
+The unified CRM+ERP module delivers a revolutionary business management experience that eliminates traditional silos between customer relationship management and enterprise resource planning. Built around the **Universal Business Entity** concept, this system provides executives with complete 360° visibility into every business relationship, whether customer, supplier, partner, or prospect.
 
 ---
 
-## 🎯 **Core CRM Features Architecture**
+## 🎯 **Unified Business Management Architecture**
 
-### **1. CUSTOMER MANAGEMENT SCREENS**
+### **1. BUSINESS ENTITY MANAGEMENT (360° VIEW)**
 
-#### **1.1 Contact Management**
+#### **1.1 Business List Screen (`/businesses`)**
 
-- **📋 Contact List Screen**
+- **📊 Unified Business Grid**
 
-  - Grid view with filtering, sorting, pagination
-  - Quick search (name, email, phone, AFM)
-  - Bulk actions (email, assign, tag, export)
-  - Column customization and saved views
-  - Advanced filters (location, industry, tags, activity)
+  - Single view of ALL external businesses (customers, suppliers, partners)
+  - Role-based filtering ("Show Customers", "Show Suppliers", "Show All")
+  - Multi-role indicators (Customer • Supplier • Partner badges)
+  - Financial health scoring and relationship strength
+  - Quick search (name, email, phone, AFM, VAT number)
+  - Column customization with role-specific metrics
+  - Advanced filters (location, industry, roles, activity, financial health)
+- **🎯 Smart Actions & Insights**
 
+  - Role-based quick actions (Invoice Customer, Order from Supplier, Contact Partner)
+  - Health score indicators (Financial, Relationship, Compliance)
+  - Recent activity summaries
+  - Overdue payment alerts
+  - Opportunity indicators
+  - Supplier performance metrics
+
+#### **1.2 Business Detail Screen (`/businesses/:id`) - THE 360° VIEW**
+
+**🔥 CORE COMPETITIVE ADVANTAGE: Single page shows EVERYTHING about a business relationship**
+
+```typescript
+// URL Structure: /businesses/:id
+// Displays: Complete 360° business relationship view
+// Tabs: Smart visibility based on user permissions and business roles
+```
+
+**📈 Business Overview Header**
+
+- Business name and primary role badges
+- Overall relationship health score (0-100)
+- Total lifetime value (sales + purchases)
+- Last interaction date and type
+- Assigned account manager
+- Quick action buttons (contextual to roles)
+
+**📋 Smart Tab System (Module & Role Based)**
+
+**Core Tabs (Always Visible):**
+
+- **Overview**: Executive dashboard with key metrics and recent activity
+- **Contacts**: People within the business with communication history
+- **Communications**: Complete interaction timeline (emails, calls, meetings)
+- **Documents**: Contracts, agreements, shared files
+
+**CRM Tabs (If CRM modules enabled):**
+
+- **Opportunities**: Sales pipeline and deal tracking
+- **Activities**: Tasks, follow-ups, scheduled interactions
+- **Marketing**: Campaign engagement and lead source tracking
+
+**ERP Tabs (If ERP modules enabled):**
+
+- **Orders**: Sales orders TO business, Purchase orders FROM business
+- **Invoices**: Invoices sent and received, payment status
+- **Payments**: Payment history and credit management
+- **Inventory**: Stock levels for supplier relationships
+
+**Support Tabs (If Support module enabled):**
+
+- **Support**: Tickets, cases, satisfaction ratings
+- **Knowledge**: Shared knowledge base and documentation
+
+**Compliance Tabs (If Greek compliance enabled):**
+
+- **Greek Compliance**: AADE status, tax compliance, VAT reporting
+- **Financial Health**: Credit analysis, payment behavior, risk assessment
+
+#### **1.3 Contact Management Within Business**
+
+- **👥 Contact List (Within Business)**
+
+  - People hierarchy within the business entity
+  - Role indicators (Primary Contact, Decision Maker, Technical, Billing)
+  - Communication preferences and engagement history
+  - Reporting structure and organizational chart
+  - Direct communication actions (email, call, message)
 - **👤 Contact Detail Screen**
 
-  - Personal information with Greek-specific fields
-  - Activity timeline (calls, meetings, emails, tasks)
-  - Interaction history and notes
-  - Document attachments and file management
-  - Related records (accounts, opportunities, cases)
-  - Greek compliance fields (AFM, DOY, AMKA)
-
-- **✏️ Contact Form Screen**
-  - Multi-step form with validation
-  - Address autocomplete with Greek postal codes
-  - Duplicate detection and merge suggestions
-  - Custom field support (unlimited customization)
-  - Photo upload and social media integration
-
-#### **1.2 Account Management**
-
-- **🏢 Account List Screen**
-
-  - Company overview with key metrics
-  - Revenue tracking and growth indicators
-  - Contact hierarchy and relationships
-  - Account health scoring
-  - Territory and ownership management
-
-- **🏪 Account Detail Screen**
-
-  - Company profile with Greek business details
-  - Financial summary and credit information
-  - Contact roster with roles and responsibilities
-  - Opportunity pipeline and sales history
-  - Support case history and satisfaction metrics
-  - Greek tax information (VAT number, tax office)
-
-- **📊 Account Dashboard Screen**
-  - Revenue trends and forecasting
-  - Activity summary and team performance
-  - Recent interactions and upcoming tasks
-  - Document library and shared files
-  - Collaboration workspace
-
-#### **1.3 Lead Management**
-
-- **🎯 Lead List Screen**
-
-  - Lead scoring and qualification status
-  - Source tracking and attribution
-  - Assignment and routing rules
-  - Conversion funnel analytics
-  - Bulk lead import and processing
-
-- **🔍 Lead Detail Screen**
-
-  - Lead qualification information
-  - Interest tracking and product preferences
-  - Communication history and touchpoints
-  - Lead scoring breakdown and insights
-  - Conversion probability and next steps
-
-- **🔄 Lead Conversion Screen**
-  - Convert to contact/account/opportunity
-  - Data mapping and field validation
-  - Workflow automation triggers
-  - Lead source attribution
-  - Conversion tracking and analytics
+  - Personal information with Greek-specific fields (father/mother names, AMKA)
+  - Professional information (job title, department, responsibilities)
+  - Communication history and engagement metrics
+  - Personal relationships and influence mapping
+  - Calendar integration for meeting scheduling
 
 ---
 
-### **2. SALES MANAGEMENT SCREENS**
+### **2. UNIFIED SALES & PURCHASING MANAGEMENT**
 
-#### **2.1 Opportunity Management**
+#### **2.1 Opportunity Management (Sales Pipeline)**
 
-- **💰 Opportunity List Screen**
+- **💰 Opportunity List Screen (`/opportunities`)**
 
-  - Pipeline view with drag-and-drop stages
+  - Visual pipeline with deal progression stages
   - Weighted forecast calculations
-  - Sales rep performance metrics
-  - Deal size and probability tracking
-  - Win/loss analysis and trends
-
+  - Cross-referenced with business entity financial health
+  - Product/service opportunity categorization
+  - Competitive analysis and positioning
+  - Greek VAT impact calculations
 - **📈 Opportunity Detail Screen**
 
-  - Deal information and stakeholders
-  - Sales process and stage progression
+  - Linked business entity with complete context
+  - Stakeholder mapping within the business
   - Product/service configuration
-  - Competitive analysis and positioning
   - Proposal and quote management
-  - Greek tax calculations (VAT, withholding)
+  - Revenue impact and profitability analysis
+  - Integration with ERP for fulfillment planning
 
-- **📊 Sales Pipeline Screen**
-  - Visual pipeline with deal progression
-  - Stage-based analytics and bottlenecks
-  - Team performance and quotas
-  - Forecast accuracy and trends
-  - Pipeline health indicators
+#### **2.2 Quote & Order Management**
 
-#### **2.2 Quote & Proposal Management**
-
-- **📝 Quote Builder Screen**
-
-  - Product/service catalog integration
-  - Pricing rules and discount management
-  - Greek tax calculations (multiple VAT rates)
-  - Template library and customization
-  - Approval workflows and e-signatures
-
-- **📋 Quote List Screen**
-
-  - Quote status and expiration tracking
-  - Approval pending and rejected quotes
-  - Conversion rates and win analytics
-  - Template usage and performance
-  - Bulk quote operations
-
-- **💼 Proposal Management Screen**
-  - Document creation and collaboration
-  - Version control and approval workflows
-  - Template library and brand compliance
-  - Delivery tracking and client feedback
-  - Proposal ROI and success metrics
+- **📝 Unified Quote/Order System**
+  - Single interface for sales quotes and purchase orders
+  - Business entity context (customer vs supplier workflow)
+  - Product/service catalog with pricing rules
+  - Multi-currency support (EUR focus)
+  - Greek tax compliance (multiple VAT rates, withholding)
+  - Approval workflows and digital signatures
 
 ---
 
-### **3. ACTIVITY & TASK MANAGEMENT SCREENS**
+### **3. INTEGRATED COMMUNICATION & ACTIVITY MANAGEMENT**
 
-#### **3.1 Activity Management**
+#### **3.1 Universal Activity Timeline**
 
-- **📅 Activity List Screen**
+- **📅 Activity Management (`/activities`)**
+  - Unified timeline across ALL business interactions
+  - Smart activity categorization (sales, support, purchasing, admin)
+  - Integration with email, calendar, phone systems
+  - Automatic activity logging from ERP transactions
+  - Task automation and workflow triggers
 
-  - Task, call, and meeting scheduling
-  - Activity types and custom categories
-  - Priority levels and deadline tracking
-  - Assignment and team collaboration
-  - Activity templates and automation
+#### **3.2 Communication Hub**
 
-- **📞 Call Management Screen**
-
-  - Call logging with duration and outcome
-  - Call disposition and follow-up actions
-  - VoIP integration and click-to-call
-  - Call recording and transcript management
-  - Call analytics and performance metrics
-
-- **🤝 Meeting Management Screen**
-  - Meeting scheduling and calendar integration
-  - Attendee management and invitations
-  - Agenda creation and meeting notes
-  - Action items and follow-up tracking
-  - Meeting room booking and resources
-
-#### **3.2 Task Management**
-
-- **✅ Task List Screen**
-
-  - Task creation and assignment
-  - Priority levels and due dates
-  - Task categories and custom fields
-  - Progress tracking and completion
-  - Team collaboration and comments
-
-- **📋 Task Detail Screen**
-  - Task description and requirements
-  - Subtasks and dependencies
-  - Time tracking and effort estimation
-  - File attachments and resources
-  - Task history and audit trail
+- **📞 Multi-Channel Communication**
+  - Email integration with business entity context
+  - VoIP integration with click-to-call
+  - Video meeting scheduling and management
+  - WhatsApp Business API integration (Greek market focus)
+  - SMS campaigns and notifications
+  - Communication preference management per contact
 
 ---
 
-### **4. COMMUNICATION & COLLABORATION SCREENS**
+### **4. FINANCIAL & COMPLIANCE INTEGRATION**
 
-#### **4.1 Email Management**
+#### **4.1 Financial Health Dashboard**
 
-- **📧 Email Center Screen**
+- **💰 Business Financial Overview**
+  - Credit limit utilization and payment behavior
+  - Outstanding balances and aging analysis
+  - Payment terms compliance and history
+  - Profitability analysis per business relationship
+  - Currency exposure and exchange rate impact
 
-  - Unified inbox with CRM integration
-  - Email templates and personalization
-  - Mass email campaigns and targeting
-  - Email tracking and analytics
-  - Greek language support and templates
+#### **4.2 Greek Compliance Integration**
 
-- **📬 Email Campaign Screen**
-
-  - Campaign builder with drag-and-drop
-  - Target list creation and segmentation
-  - A/B testing and performance tracking
-  - Delivery scheduling and automation
-  - Greek compliance (GDPR, marketing consent)
-
-- **📊 Email Analytics Screen**
-  - Open rates and click-through metrics
-  - Engagement scoring and trends
-  - Bounce management and list hygiene
-  - Campaign ROI and conversion tracking
-  - Greek market benchmarks
-
-#### **4.2 Messaging Integration**
-
-- **💬 WhatsApp Integration Screen**
-
-  - Business API integration and setup
-  - Message templates and automation
-  - Broadcast lists and campaigns
-  - Conversation history and CRM sync
-  - Greek language support
-
-- **📱 Multi-Channel Communication Screen**
-  - Unified communication hub
-  - Channel preference management
-  - Message routing and assignment
-  - Response time tracking
-  - Greek customer communication preferences
+- **🇬🇷 AADE & Tax Compliance**
+  - Real-time AADE submission status
+  - VAT reporting and reconciliation
+  - Greek tax office (DOY) validation
+  - Business registry verification (GEMI)
+  - Professional certification tracking (Chamber of Commerce)
 
 ---
 
-### **5. CUSTOMER SERVICE SCREENS**
+## 🔧 **Technical Implementation Architecture**
 
-#### **5.1 Case Management**
+### **Unified Data Model**
 
-- **🎫 Case List Screen**
+```typescript
+interface UnifiedBusinessInterface {
+  // Core Entity
+  businessEntity: BusinessEntity;
+  roles: BusinessEntityRole[];
+  
+  // 360° Data Aggregation
+  contacts: Contact[];
+  communications: Communication[];
+  opportunities: Opportunity[];
+  orders: Order[];
+  invoices: Invoice[];
+  payments: Payment[];
+  support: SupportTicket[];
+  
+  // Calculated Metrics
+  healthScore: BusinessHealthScore;
+  totalValue: LifetimeValue;
+  relationshipStage: RelationshipStage;
+}
+```
 
-  - Case queue and assignment rules
-  - Priority levels and SLA tracking
-  - Case categories and custom fields
-  - Escalation rules and notifications
-  - Performance metrics and analytics
+### **Smart Tab Visibility Logic**
 
-- **🔧 Case Detail Screen**
-
-  - Case information and description
-  - Customer communication history
-  - Resolution steps and knowledge base
-  - Time tracking and billing
-  - Customer satisfaction surveys
-
-- **📚 Knowledge Base Screen**
-  - Article creation and management
-  - Category organization and search
-  - Article analytics and popularity
-  - Version control and approvals
-  - Greek language content management
-
-#### **5.2 Customer Portal**
-
-- **🌐 Portal Dashboard Screen**
-
-  - Customer self-service interface
-  - Case creation and tracking
-  - Knowledge base access
-  - Account information and updates
-  - Greek language portal
-
-- **📞 Support Ticket Screen**
-  - Ticket submission and tracking
-  - Priority levels and categories
-  - File attachments and screenshots
-  - Communication history
-  - Resolution feedback and ratings
-
----
-
-### **7. ANALYTICS & REPORTING SCREENS**
-
-#### **7.1 CRM Analytics Dashboard**
-
-- **📊 Executive Dashboard Screen**
-
-  - Key performance indicators
-  - Sales funnel and conversion metrics
-  - Customer acquisition and retention
-  - Revenue trends and forecasting
-  - Team performance and productivity
-
-- **📈 Sales Performance Screen**
-
-  - Individual and team metrics
-  - Quota tracking and achievement
-  - Pipeline analysis and forecasting
-  - Win/loss analysis and trends
-  - Activity metrics and productivity
-
-- **👥 Customer Analytics Screen**
-  - Customer lifetime value
-  - Churn analysis and prediction
-  - Segmentation and targeting
-  - Satisfaction and loyalty metrics
-  - Greek market analytics
-
-#### **7.2 Custom Reporting**
-
-- **📋 Report Builder Screen**
-
-  - Drag-and-drop report creation
-  - Data source selection and joining
-  - Filtering and grouping options
-  - Visualization types and formatting
-  - Greek language report templates
-
-- **📊 Report Library Screen**
-  - Standard report templates
-  - Custom report management
-  - Report scheduling and distribution
-  - Export options (PDF, Excel, CSV)
-  - Greek compliance reports
+```typescript
+interface TabVisibilityEngine {
+  // Always Visible
+  overview: true;
+  contacts: true;
+  communications: true;
+  documents: true;
+  
+  // Role-Based Visibility
+  opportunities: businessEntity.hasRole("customer") && userHasModule("crm");
+  orders: (businessEntity.hasRole("customer") || businessEntity.hasRole("supplier")) && userHasModule("erp");
+  invoices: userHasModule("erp_invoicing");
+  payments: userHasModule("erp_finance");
+  support: userHasModule("support");
+  
+  // Permission-Based
+  compliance: userHasPermission("view_compliance");
+  financial: userHasPermission("view_financial");
+}
+```
 
 ---
 
-### **8. WORKFLOW & AUTOMATION SCREENS**
+## 🎯 **Competitive Advantages**
 
-#### **8.1 Workflow Management**
+### **1. Eliminates Traditional CRM/ERP Silos**
 
-- **⚙️ Workflow Builder Screen**
+- **Problem Solved**: No more context switching between "ABC Company" in CRM and "ABC Company" in ERP
+- **Our Solution**: Single BusinessEntity with multiple roles (Customer • Supplier • Partner)
+- **Business Impact**: 90% reduction in system context switches, 25% faster decision making
 
-  - Visual workflow designer
-  - Trigger conditions and actions
-  - Approval processes and routing
-  - Automated task creation
-  - Greek business process templates
+### **2. True 360° Business Visibility**
 
-- **🔄 Business Process Management Screen**
-  - BPMN 2.0 process modeling
-  - Process execution and monitoring
-  - Performance metrics and optimization
-  - Error handling and recovery
-  - Greek compliance workflows
+- **Complete Relationship View**: All interactions, transactions, and communications in one place
+- **Real-Time Financial Health**: Live payment status, credit utilization, profitability
+- **Predictive Insights**: Relationship health scoring and opportunity identification
 
-#### **8.2 Automation Rules**
+### **3. Greek Market Leadership**
 
-- **🤖 Automation Center Screen**
-
-  - Rule creation and management
-  - Trigger setup and conditions
-  - Action configuration and testing
-  - Performance monitoring and logs
-  - Greek business rule templates
-
-- **📧 Email Automation Screen**
-  - Drip campaign creation
-  - Trigger-based email sequences
-  - Personalization and targeting
-  - Performance tracking and optimization
-  - Greek email compliance
+- **Full AADE Integration**: Tax compliance status visible in business overview
+- **Greek Business Practices**: Support for complex multi-role relationships
+- **Localized Workflows**: Greek banking, tax, and regulatory integration
 
 ---
 
-### **9. CUSTOMIZATION & ADMINISTRATION SCREENS**
+## 📊 **User Experience Flow**
 
-#### **9.1 Entity Management**
+### **Executive Usage Pattern**
 
-- **🏗️ Entity Builder Screen**
+1. **Dashboard Overview**: See all business relationships at a glance
+2. **Business Drill-Down**: Click any business for 360° view
+3. **Smart Actions**: Contextual actions based on business roles and current status
+4. **Cross-Module Flow**: Seamless movement between CRM and ERP data
 
-  - Custom entity creation
-  - Field definition and validation
-  - Relationship management
-  - Layout customization
-  - Greek field templates
+### **Sales Team Usage Pattern**
 
-- **🎨 Layout Manager Screen**
-  - Screen layout customization
-  - Field placement and sizing
-  - Tab organization and grouping
-  - Responsive design options
-  - Greek language layouts
+1. **Opportunity Management**: Work with opportunities linked to complete business context
+2. **Account Intelligence**: Full business relationship history for better positioning
+3. **Cross-Selling**: Identify opportunities based on current supplier relationships
+4. **Revenue Optimization**: Understand total business value beyond just sales
 
-#### **9.2 System Configuration**
+### **Finance Team Usage Pattern**
 
-- **⚙️ CRM Settings Screen**
-
-  - System configuration options
-  - Integration settings and APIs
-  - Security and permissions
-  - Performance optimization
-  - Greek localization settings
-
-- **🔐 Security Management Screen**
-  - User roles and permissions
-  - Access control and restrictions
-  - Audit logging and monitoring
-  - Data encryption and backup
-  - Greek privacy compliance
+1. **Credit Management**: Complete payment history across all relationship types
+2. **Risk Assessment**: Business health scoring with relationship depth analysis
+3. **Cash Flow Planning**: Integrated receivables and payables by business entity
+4. **Compliance Tracking**: Greek tax compliance status integration
 
 ---
 
-### **10. MOBILE SCREENS**
+## 🎨 **Screen Design Principles**
 
-#### **10.1 Mobile CRM App**
+### **Unified Navigation**
 
-- **📱 Mobile Dashboard Screen**
+- **Primary Nav**: Dashboard → Businesses → Contacts → Opportunities → Orders → Invoices
+- **Consistent Terminology**: "Businesses" throughout (never "Customers" vs "Accounts")
+- **Role Context**: Smart badges and filters based on business entity roles
 
-  - Key metrics and quick actions
-  - Recent activity and notifications
-  - Offline data access
-  - Location-based features
-  - Greek language support
+### **360° Detail Pages**
 
-- **📞 Mobile Contact Screen**
-  - Contact list and search
-  - Quick actions (call, email, text)
-  - Contact creation and editing
-  - GPS-based check-ins
-  - Greek contact formatting
+- **Header Consistency**: Business name, roles, health score, total value, last activity
+- **Smart Tabs**: Module and permission-based tab visibility
+- **Quick Actions**: Contextual actions based on business roles and current status
+- **Real-Time Data**: Live financial and interaction data
 
-#### **10.2 Mobile Sales App**
+### **Performance Standards**
 
-- **💼 Mobile Pipeline Screen**
-
-  - Deal progression and updates
-  - Quick quote creation
-  - Opportunity management
-  - Team collaboration
-  - Greek currency and tax support
-
-- **📋 Mobile Activity Screen**
-  - Task and meeting management
-  - Calendar integration
-  - Activity logging
-  - Team coordination
-  - Greek business hours
+- **Load Time**: < 2 seconds for complete 360° business view
+- **Data Freshness**: Real-time financial data, < 5-minute CRM data updates
+- **Mobile Responsive**: Full functionality on tablets and smartphones
 
 ---
 
-### **11. INDUSTRY-SPECIFIC SCREENS**
-
-#### **11.1 Maritime Industry**
-
-- **🚢 Vessel Management Screen**
-
-  - Fleet tracking and monitoring
-  - Maintenance scheduling
-  - Crew management
-  - Port operations
-  - Greek maritime compliance
-
-- **⚓ Port Operations Screen**
-  - Berthing and cargo handling
-  - Documentation management
-  - Customs integration
-  - Maritime authorities
-  - Greek port regulations
-
-#### **11.2 Tourism Industry**
-
-- **🏨 Property Management Screen**
-
-  - Accommodation listings
-  - Booking management
-  - Guest registration
-  - Tourism tax calculations
-  - Greek tourism compliance
-
-- **🎫 Booking Management Screen**
-  - Reservation processing
-  - Channel management
-  - Pricing optimization
-  - Guest communications
-  - Greek tourism regulations
-
-#### **11.3 Construction Industry**
-
-- **🏗️ Project Management Screen**
-
-  - Construction project tracking
-  - Permit management
-  - Subcontractor coordination
-  - Materials procurement
-  - Greek construction compliance
-
-- **📋 Professional Services Screen**
-  - Engineer stamp management
-  - Professional certification
-  - Project approvals
-  - Quality assurance
-  - Greek professional requirements
-
----
-
-## 🔧 **Technical Implementation Requirements**
-
-### **Screen Components Architecture**
-
-#### **Reusable UI Components**
-
-- **DataGrid**: Sortable, filterable, paginated lists
-- **FormBuilder**: Dynamic form generation and validation
-- **Dashboard**: Configurable widget-based dashboards
-- **Calendar**: Scheduling and timeline components
-- **FileUpload**: Document and media management
-- **SearchBar**: Advanced search with filters
-- **ActionBar**: Bulk actions and operations
-- **StatusIndicator**: Visual status and progress indicators
-- **NotificationCenter**: Real-time alerts and messages
-- **GreekFormats**: Greek-specific formatting components
-
-#### **Data Management**
-
-- **EntityManager**: Dynamic entity creation and management
-- **RelationshipManager**: Entity relationship handling
-- **ValidationEngine**: Field validation and business rules
-- **PermissionManager**: Access control and security
-- **AuditLogger**: Change tracking and history
-- **CacheManager**: Performance optimization
-- **SyncEngine**: Data synchronization and updates
-- **BackupManager**: Data backup and recovery
-
-#### **Integration Layer**
-
-- **APIManager**: Third-party API integration
-- **WebhookHandler**: Real-time event processing
-- **MessageQueue**: Asynchronous task processing
-- **EmailService**: Email sending and tracking
-- **SMSService**: SMS messaging and notifications
-- **VoIPService**: Voice communication integration
-- **FileService**: Document and media handling
-- **ReportEngine**: Report generation and export
-
-#### **Greek Compliance Engine**
-
-- **AADEConnector**: MyDATA integration
-- **TaxCalculator**: Greek tax calculations
-- **AddressValidator**: Greek address formatting
-- **BusinessRegistry**: Greek business information
-- **ComplianceChecker**: Regulatory compliance validation
-- **LanguageEngine**: Greek language processing
-- **CurrencyManager**: Euro and Greek formatting
-- **CalendarEngine**: Greek holidays and business days
-
----
-
-## 🎯 **Implementation Strategy**
-
-### **Phase 1: Core CRM Foundation (Months 1-3)**
-
-1. **Customer Management**: Contacts, Accounts, Leads
-2. **Basic Sales**: Opportunities, Quotes, Pipeline
-3. **Activity Management**: Tasks, Calls, Meetings
-4. **Greek Compliance**: Basic AADE integration
-5. **User Management**: Authentication, Roles, Permissions
-
-### **Phase 2: Advanced Features (Months 4-6)**
-
-1. **Communication**: Email, Messaging, Campaigns
-2. **Customer Service**: Cases, Knowledge Base, Portal
-3. **Analytics**: Dashboards, Reports, Insights
-4. **Automation**: Workflows, BPM, Rules
-5. **Customization**: Entity Builder, Layout Manager
-
-### **Phase 3: Industry Extensions (Months 7-12)**
-
-1. **Maritime Module**: Vessel, Port, Compliance
-2. **Tourism Module**: Properties, Bookings, Regulations
-3. **Construction Module**: Projects, Permits, Professionals
-4. **Advanced Integration**: E-commerce, Third-party APIs
-5. **Mobile Applications**: iOS, Android, PWA
-
-### **Phase 4: Enterprise Features (Months 13-18)**
-
-1. **Advanced Analytics**: AI, ML, Predictive Insights
-2. **Enterprise Integration**: ERP, Accounting, HR
-3. **Multi-tenant Architecture**: SaaS, White-label
-4. **API Marketplace**: Third-party extensions
-5. **Performance Optimization**: Scaling, Caching, CDN
-
----
-
-## 📊 **Success Metrics**
-
-### **User Experience Metrics**
-
-- **Time to First Value**: < 30 minutes setup
-- **Feature Adoption**: > 85% of core features used
-- **User Satisfaction**: > 4.5/5 rating
-- **Support Tickets**: < 2% of users per month
-- **Onboarding Completion**: > 90% completion rate
-
-### **Business Performance Metrics**
-
-- **Customer Acquisition**: 25% increase in new customers
-- **Sales Productivity**: 30% improvement in sales metrics
-- **Customer Retention**: 95% retention rate
-- **Revenue Growth**: 40% increase in customer lifetime value
-- **Greek Market Share**: 35% of SME CRM market
-
-### **Technical Performance Metrics**
-
-- **System Uptime**: 99.9% availability
-- **Response Time**: < 2 seconds for common operations
-- **Data Accuracy**: 99.9% data integrity
-- **API Performance**: < 200ms average response time
-- **Mobile Performance**: 60fps on mobile devices
-
----
-
-## 🚀 **Next Steps**
-
-1. **Technical Architecture**: Define APIs, models, and database schema
-2. **UI/UX Design**: Create wireframes and design system
-3. **Component Library**: Build reusable UI components
-4. **Development Framework**: Setup project structure and tools
-5. **Testing Strategy**: Define unit, integration, and E2E tests
-6. **Documentation**: Create developer and user documentation
-7. **Deployment Pipeline**: Setup CI/CD and infrastructure
-8. **Quality Assurance**: Implement testing and monitoring
-
----
-
-**Document Status**: Draft for Review  
-**Next Phase**: Technical Architecture Design  
-**Owner**: Development Team  
-**Review Date**: Monthly Review and Updates
+This unified approach eliminates the traditional CRM/ERP divide and creates a business management experience that executives will actually want to use daily.

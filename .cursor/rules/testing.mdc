@@ -1,7 +1,3 @@
----
-alwaysApply: true
----
-
 # Testing Rules - Greek ERP/CRM System
 
 ## Core Testing Standards
@@ -30,7 +26,7 @@ alwaysApply: true
 
 ## Integration Testing
 
-- **API Workflows**: Complete business processes (customer → invoice → AADE)
+- **API Workflows**: Complete business processes (business entity → invoice → AADE)
 - **Database**: Multi-schema operations and constraints
 - **Greek AADE**: Mock AADE integration with realistic responses
 - **Authentication**: Multi-tenant access control scenarios
@@ -46,9 +42,9 @@ alwaysApply: true
 
 ## End-to-End Testing
 
-- **User Workflows**: Complete customer management and invoicing flows
+- **User Workflows**: Complete business entity management and invoicing flows
 - **Multi-Language**: Test Greek and English interface switching
-- **Greek Business**: Realistic Greek company and customer scenarios
+- **Greek Business**: Realistic Greek company and business entity scenarios
 - **AADE Submission**: End-to-end invoice submission with QR codes
 - **Mobile**: Responsive design testing on various devices
 
@@ -88,5 +84,8 @@ alwaysApply: true
 - ❌ Don't skip performance tests for critical Greek workflows
 - ❌ Never commit tests with actual AFM/VAT numbers
 - ❌ Don't ignore multi-tenancy in test scenarios
+- ❌ Never skip rollback testing for database migrations
+- ❌ Don't test without realistic Greek character sets
+
 - ❌ Never skip rollback testing for database migrations
 - ❌ Don't test without realistic Greek character sets

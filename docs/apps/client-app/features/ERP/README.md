@@ -31,37 +31,154 @@ The ERP module provides a comprehensive, modular business management solution sp
 
 #### Features:
 
-- **Invoice Creation**: Professional invoices with Greek formatting
+- **16 Greek Document Types**: Complete support for all Greek business documents (parastatika)
 - **AADE MyDATA Integration**: Real-time tax authority submission
 - **QR Code Generation**: Mandatory QR codes on all invoices
-- **Basic Payment Tracking**: Payment status and overdue management
+- **Document Workflow**: Proper business document relationships and workflows
+- **Professional Services**: Enhanced support for service-only businesses
 - **Greek VAT Compliance**: Automatic VAT calculations based on business type
 - **Customer Integration**: Seamless use of CRM customer database
+
+#### Supported Document Types:
+
+**Legal Documents (Νόμιμα Παραστατικά)**:
+
+- **Sales Invoice** (Τιμολόγιο Πώλησης) - Standard B2B invoicing
+- **Receipt** (Απόδειξη Λιανικής Πώλησης) - Retail sales up to €500
+- **Credit Note** (Πιστωτικό Τιμολόγιο) - Invoice corrections/returns
+- **Debit Note** (Χρεωστικό Τιμολόγιο) - Additional charges
+- **Proforma Invoice** (Προτιμολόγιο) - Quotation document
+- **Delivery Note** (Δελτίο Αποστολής) - Goods delivery tracking
+- **Simplified Invoice** (Απλοποιημένο Τιμολόγιο) - Simplified B2B
+- **Self-billing** (Αυτο-τιμολόγηση) - Reverse charge scenarios
+- **E-Invoice** (Ηλεκτρονικό Τιμολόγιο) - UBL/XML format
+
+**Business Workflow Documents**:
+
+- **Sales Order** (Δελτίο Παραγγελίας) - Customer orders
+- **Order Confirmation** (Επιβεβαίωση Παραγγελίας) - Order acceptance
+- **Purchase Order** (Παραγγελία Προμηθευτή) - Supplier orders
+- **Request for Quotation** (Αίτημα Προσφοράς) - Quote requests
+- **Sales Quotation** (Προσφορά Πώλησης) - Customer quotes
+- **Return Note** (Δελτίο Επιστροφής) - Returns management
+- **Internal Transfer** (Εσωτερική Μεταφορά) - Inter-location transfers
 
 #### Use Cases:
 
 ```typescript
-// Doctor billing patients
+// Doctor billing patients - Enhanced service management
 const medicalInvoice = {
   customerId: "patient-123",
+  documentType: "sales_invoice", // or "receipt" for cash payments
   services: [
-    { name: "General Consultation", price: 50.0, vatExempt: true },
-    { name: "Medical Certificate", price: 25.0, vatExempt: true },
+    {
+      name: "General Consultation",
+      duration: 45, // minutes
+      price: 50.0,
+      vatExempt: true,
+      professionalType: "healthcare",
+      serviceLocation: "office",
+      appointmentDateTime: "2025-01-15T10:00:00Z",
+    },
+    {
+      name: "Medical Certificate",
+      duration: 15,
+      price: 25.0,
+      vatExempt: true,
+      requiresLicense: true,
+      preparationTime: 10, // minutes for certificate preparation
+    },
   ],
   greekCompliance: {
     aadeSubmission: true,
     vatExemption: "medical_services",
     professionalType: "healthcare",
+    medicalChamberRegistration: "ISA-12345",
+  },
+  recurring: {
+    isRecurring: false, // One-time appointment
+    followUpRequired: true,
+    followUpInterval: "monthly",
   },
 };
 
-// Lawyer billing client
+// Lawyer billing client - Professional services with time tracking
 const legalInvoice = {
   customerId: "client-456",
+  documentType: "sales_invoice",
   services: [
-    { name: "Legal Consultation", hours: 3, rate: 150.0, vatExempt: true },
-    { name: "Document Preparation", price: 200.0, vatExempt: true },
+    {
+      name: "Legal Consultation",
+      duration: 180, // 3 hours
+      pricing: "hourly",
+      hourlyRate: 150.0,
+      totalHours: 3,
+      vatExempt: true,
+      professionalType: "legal",
+      serviceLocation: "office",
+      requiresLicense: true,
+      certificationRequired: "DSA_BAR_LICENSE",
+    },
+    {
+      name: "Document Preparation",
+      duration: 120, // 2 hours
+      pricing: "project",
+      price: 200.0,
+      vatExempt: true,
+      serviceLocation: "remote", // Can be done remotely
+      allowsRemoteDelivery: true,
+    },
   ],
+  greekCompliance: {
+    aadeSubmission: true,
+    vatExemption: "legal_services",
+    professionalType: "legal",
+    barAssociationMembership: "DSA-67890",
+  },
+  // Case-based billing with proper documentation
+  caseReference: "CASE-2025-001",
+  clientMatter: "Contract Review and Legal Opinion",
+};
+
+// Engineering Consultant - Technical services with site visits
+const engineeringInvoice = {
+  customerId: "construction-company-789",
+  documentType: "sales_invoice",
+  services: [
+    {
+      name: "Structural Analysis",
+      duration: 480, // 8 hours
+      pricing: "project",
+      price: 800.0,
+      vatRate: 24.0, // Engineers pay VAT
+      professionalType: "engineering",
+      serviceLocation: "client_location",
+      requiresLicense: true,
+      certificationRequired: "TEE_STRUCTURAL_ENGINEER",
+    },
+    {
+      name: "Site Inspection",
+      duration: 240, // 4 hours
+      pricing: "hourly",
+      hourlyRate: 75.0,
+      totalHours: 4,
+      vatRate: 24.0,
+      serviceLocation: "client_location",
+      requiresPreparation: true,
+      preparationTime: 30, // minutes
+    },
+  ],
+  greekCompliance: {
+    aadeSubmission: true,
+    professionalType: "engineering",
+    teeRegistration: "TEE-54321",
+    projectPermitReference: "PERMIT-2025-BLD-001",
+  },
+  projectDetails: {
+    projectName: "Residential Building - Athens",
+    projectPhase: "design_review",
+    deliverables: ["structural_calculations", "inspection_report"],
+  },
 };
 ```
 
@@ -74,12 +191,15 @@ const legalInvoice = {
 
 #### Features:
 
-- **Product Management**: Create and manage all product types
-- **Basic Stock Tracking**: Current stock levels and low-stock alerts
-- **Product Variants**: Size, color, material variations
+- **Flexible Product Management**: Products, services, subscriptions, and bundles
+- **Service-Only Business Support**: Complete service management without inventory
+- **Professional Services**: Booking, scheduling, and license management
+- **Product Variants**: Unlimited dynamic attributes (color, size, material, etc.)
+- **Smart Inventory**: Only track inventory for physical products
 - **Barcode Support**: SKU generation and barcode scanning
-- **Basic Categories**: Product organization and filtering
-- **Price Management**: Multiple pricing tiers and currency support
+- **Advanced Categories**: Hierarchical organization with VAT defaults
+- **Flexible Pricing**: Multiple pricing tiers, hourly rates, project-based
+- **Service Scheduling**: Appointment booking and calendar integration
 
 #### Product Types Supported:
 
@@ -110,14 +230,42 @@ interface VariableProduct {
   ];
 }
 
-// Service Products
+// Service Products - Enhanced for Service-Only Businesses
 interface ServiceProduct {
   type: "service";
   name: string;
   pricing: "fixed" | "hourly" | "project";
-  duration?: number; // for appointment booking
+
+  // Booking & Scheduling
+  duration?: number; // Service duration in minutes
+  bufferTime?: number; // Buffer between appointments
+  isBookable: boolean; // Can be booked via calendar
+  advanceBookingDays?: number; // How far in advance
+  maxBookingsPerDay?: number; // Daily booking limit
+
+  // Professional Requirements
+  requiresLicense?: boolean; // Professional certification required
+  certificationRequired?: string; // Specific certification needed
+  professionalType?: string; // "doctor", "lawyer", "engineer", etc.
+
+  // Service Delivery
+  serviceLocation: "office" | "client_location" | "remote" | "any";
+  allowsRemoteDelivery: boolean; // Can be delivered remotely
+  requiresPreparation: boolean; // Needs preparation time
+  preparationTime?: number; // Preparation time in minutes
+
+  // Recurring Services
+  isRecurring: boolean; // Subscription/recurring service
+  recurringInterval?: "daily" | "weekly" | "monthly" | "yearly";
+  recurringDuration?: number; // How many intervals
+
+  // Pricing & VAT
   vatRate: number;
-  bookable: boolean;
+  vatExempt?: boolean; // Professional services exemption
+
+  // Inventory (services don't track inventory)
+  trackInventory: false;
+  requiresShipping: false;
 }
 
 // Bundle Products
@@ -329,9 +477,20 @@ const greekLaborCompliance = {
 
 **Save €10** (vs €50 CRM + €19 Invoicing = €69)
 
-- **Includes**: CRM + Basic Invoicing
-- **Perfect for**: Doctors, Lawyers, Consultants, Freelancers
-- **Focus**: Service-based businesses with billing needs
+- **Includes**: CRM + Enhanced Invoicing with 16 Document Types
+- **Perfect for**: Doctors, Lawyers, Engineers, Consultants, Freelancers
+- **Focus**: Service-only businesses with professional requirements
+
+**Enhanced Service Features**:
+
+- **Appointment Booking**: Calendar integration with buffer times
+- **Professional Licensing**: License and certification tracking
+- **Service Scheduling**: Duration, preparation time, booking limits
+- **Greek Professional Compliance**: Medical Chamber, Bar Association, TEE
+- **Multi-Location Services**: Office, client location, remote delivery
+- **Recurring Services**: Subscription and maintenance contracts
+- **Professional Invoicing**: VAT-exempt services, insurance billing
+- **No Inventory Hassle**: Services don't track physical inventory
 
 #### **🏪 Small Business Bundle** - €129/month
 
@@ -506,32 +665,148 @@ const confirmedOrder = {
 const cardiologistSetup = {
   businessType: "healthcare_specialist",
 
-  // CRM Configuration
+  // Enhanced Service Management
+  serviceConfiguration: {
+    // Professional Requirements
+    professionalType: "doctor",
+    requiresLicense: true,
+    certificationRequired: "ISA_CARDIOLOGY_SPECIALIST",
+    professionalChamber: "medical_association_athens",
+
+    // Service Types with Enhanced Details
+    appointmentTypes: [
+      {
+        name: "Initial Consultation",
+        duration: 45, // minutes
+        bufferTime: 15, // time between appointments
+        price: 80,
+        isBookable: true,
+        advanceBookingDays: 30,
+        requiresPreparation: true,
+        preparationTime: 10,
+        serviceLocation: "office",
+      },
+      {
+        name: "Follow-up Visit",
+        duration: 30,
+        bufferTime: 10,
+        price: 50,
+        isBookable: true,
+        advanceBookingDays: 60,
+        serviceLocation: "office",
+      },
+      {
+        name: "ECG Test",
+        duration: 20,
+        bufferTime: 5,
+        price: 35,
+        isBookable: true,
+        requiresPreparation: true,
+        preparationTime: 5,
+        serviceLocation: "office",
+      },
+      {
+        name: "Home Visit",
+        duration: 60,
+        bufferTime: 30, // travel time
+        price: 150,
+        isBookable: true,
+        advanceBookingDays: 7,
+        serviceLocation: "client_location",
+        allowsRemoteDelivery: false,
+      },
+    ],
+
+    // Scheduling Configuration
+    maxBookingsPerDay: 12,
+    workingHours: {
+      monday: { start: "09:00", end: "17:00" },
+      tuesday: { start: "09:00", end: "17:00" },
+      wednesday: { start: "09:00", end: "17:00" },
+      thursday: { start: "09:00", end: "17:00" },
+      friday: { start: "09:00", end: "15:00" },
+      saturday: { closed: true },
+      sunday: { closed: true },
+    },
+
+    // Recurring Services
+    recurringServices: [
+      {
+        name: "Monthly Checkup",
+        duration: 30,
+        price: 50,
+        isRecurring: true,
+        recurringInterval: "monthly",
+        recurringDuration: 12, // 12 months
+      },
+    ],
+  },
+
+  // CRM Configuration for Patient Management
   patientManagement: {
     customFields: [
       "medical_history",
       "insurance_provider",
       "emergency_contact",
-    ],
-    appointmentTypes: [
-      { name: "Initial Consultation", duration: 45, price: 80 },
-      { name: "Follow-up", duration: 30, price: 50 },
-      { name: "ECG Test", duration: 20, price: 35 },
+      "allergies",
+      "current_medications",
+      "preferred_appointment_time",
     ],
     greekHealthcareCompliance: true,
+    gdprCompliance: true,
+    medicalDataEncryption: true,
   },
 
-  // Basic Invoicing Configuration
+  // Enhanced Invoicing Configuration
   invoicing: {
-    vatExempt: true, // Medical services
+    // Greek Healthcare Billing
+    vatExempt: true, // Medical services exempt from VAT
     aadeIntegration: true,
+    documentTypes: [
+      "sales_invoice", // For private patients
+      "receipt", // For cash payments
+      "proforma", // For insurance pre-approval
+    ],
+
+    // Professional Compliance
     professionalChamber: "medical_association_athens",
-    insuranceBilling: true,
-    paymentMethods: ["cash", "card", "bank_transfer", "insurance_direct"],
+    medicalChamberRegistration: "ISA-12345",
+
+    // Payment Methods
+    paymentMethods: [
+      "cash",
+      "card",
+      "bank_transfer",
+      "insurance_direct", // Direct insurance billing
+      "installments", // For expensive procedures
+    ],
+
+    // Insurance Integration
+    insuranceBilling: {
+      supportedProviders: ["IKA", "EOPYY", "private_insurance"],
+      directBilling: true,
+      preAuthorizationRequired: true,
+    },
   },
 
-  // No complex inventory or employees needed
+  // Service-Only Business - No Inventory Needed
+  inventorySettings: {
+    trackInventory: false, // Services don't need inventory
+    requiresShipping: false,
+    physicalProducts: false,
+  },
+
+  // No employees needed for solo practice
   additionalModules: [],
+
+  // Service-Specific Reports
+  reportingNeeds: [
+    "patient_appointment_history",
+    "revenue_by_service_type",
+    "insurance_billing_summary",
+    "professional_chamber_reporting",
+    "tax_exempt_services_report",
+  ],
 };
 ```
 

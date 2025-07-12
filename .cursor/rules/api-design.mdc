@@ -1,13 +1,9 @@
----
-alwaysApply: true
----
-
 # API Design Rules - Greek ERP/CRM System
 
 ## Core API Standards
 
 - **REST Convention**: Standard HTTP methods (GET, POST, PUT, PATCH, DELETE)
-- **Base URL**: `/api/v{version}/` with proper versioning (e.g., `/api/v1/customers`)
+- **Base URL**: `/api/v{version}/` with proper versioning (e.g., `/api/v1/business-entities`)
 - **Status Codes**: Use standard HTTP status codes consistently
 - **Content Type**: `application/json` for all requests and responses
 - **Character Encoding**: UTF-8 to support Greek characters
@@ -94,5 +90,8 @@ alwaysApply: true
 - ❌ Don't ignore proper HTTP status codes
 - ❌ Never expose sensitive data (AFM, personal info) in logs
 - ❌ Don't skip API versioning for breaking changes
+- ❌ Never allow SQL injection through query parameters
+- ❌ Don't skip caching for frequently accessed reference data
+
 - ❌ Never allow SQL injection through query parameters
 - ❌ Don't skip caching for frequently accessed reference data

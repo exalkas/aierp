@@ -242,3 +242,5 @@ profiling/
 *.rej
 .git/
 .gitkeep 
+
+package-lock.json

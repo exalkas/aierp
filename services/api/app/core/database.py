@@ -209,6 +209,13 @@ SessionLocal = None
 async def create_tables():
     """Create database tables for all registered companies"""
     try:
+        # Import all models to register them with SQLAlchemy
+        from ..models import (
+            Company, User, BusinessEntity, Contact, Product, ProductCategory, 
+            ProductAttribute, ProductAttributeValue, ProductVariant, 
+            ProductInventory, Invoice, InvoiceItem
+        )
+        
         # Create master database tables first
         master_engine = db_manager.get_master_engine()
         Base.metadata.create_all(bind=master_engine)
@@ -237,4 +244,14 @@ def get_company_db(company_id: str) -> Session:
 
 def get_db_for_company(company_id: str):
     """Helper function to get database session for a specific company"""
-    return db_manager.get_company_session(company_id) 
+    return db_manager.get_company_session(company_id)
+
+
+def get_db():
+    """FastAPI dependency to get database session (uses master DB for now)"""
+    session_maker = db_manager.get_master_session_maker()
+    db = session_maker()
+    try:
+        yield db
+    finally:
+        db.close() 

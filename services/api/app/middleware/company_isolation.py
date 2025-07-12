@@ -4,8 +4,8 @@ Ensures strict data isolation between companies in multi-tenant architecture
 """
 
 import logging
-from typing import Optional
-from fastapi import Request, Response, HTTPException, status
+from typing import Optional, Tuple
+from fastapi import Request, Response, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
@@ -178,4 +178,79 @@ def ensure_company_isolation(company_id: str, resource_company_id: str):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: Resource belongs to different company"
+        )
+
+
+async def get_current_user_and_company(request: Request) -> Tuple[dict, str]:
+    """
+    FastAPI dependency to get current user and company from JWT token
+    
+    Returns:
+        Tuple[dict, str]: (user_data, company_id)
+    """
+    try:
+        # Get authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid authorization header"
+            )
+        
+        # Extract token
+        token = auth_header.replace("Bearer ", "")
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing token"
+            )
+        
+        # Decode JWT token
+        try:
+            payload = jwt.decode(
+                token,
+                settings.JWT_SECRET_KEY,
+                algorithms=[settings.JWT_ALGORITHM]
+            )
+            
+            # Extract user info
+            user_id = payload.get("user_id")
+            username = payload.get("username") or payload.get("sub")
+            email = payload.get("email")
+            company_id = payload.get("company_id")
+            
+            if not user_id or not company_id:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token: missing user_id or company_id"
+                )
+            
+            # Create user object (simplified for dependency injection)
+            user = {
+                "id": user_id,
+                "username": username,
+                "email": email,
+                "company_id": company_id
+            }
+            
+            return user, str(company_id)
+            
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token expired"
+            )
+        except jwt.InvalidTokenError as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid token: {str(e)}"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting user and company: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to authenticate user"
         ) 

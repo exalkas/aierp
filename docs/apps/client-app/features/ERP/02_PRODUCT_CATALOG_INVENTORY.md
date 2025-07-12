@@ -2,15 +2,40 @@
 
 ## Document Information
 
-- **Version**: 1.0
+- **Version**: 2.0
 - **Date**: January 2025
 - **Module**: Product Catalog & Inventory (€29/month)
 - **Dependencies**: Basic Invoicing Module
-- **Target Users**: Retail businesses, Restaurants, Small manufacturers, E-commerce stores
+- **Target Users**: Retail businesses, Restaurants, Small manufacturers, E-commerce stores, Service-only businesses
 
 ## Overview
 
-The Product Catalog & Inventory Module enables businesses to manage their product inventory, track stock levels, handle suppliers, and seamlessly integrate with invoicing. This module is essential for businesses that sell physical products and need to track inventory movement.
+The Product Catalog & Inventory Module enables businesses to manage their complete product and service catalog, including physical products with inventory tracking and service-only offerings for professional service providers. This module supports both product-based businesses that need inventory management and service-only businesses that don't require inventory tracking.
+
+### Key Capabilities
+
+**For Product-Based Businesses:**
+
+- Complete inventory management with stock tracking
+- Multi-location inventory across warehouses/stores
+- Supplier relationship management
+- Purchase order automation
+- Barcode scanning and SKU management
+
+**For Service-Only Businesses:**
+
+- Professional service catalog management
+- Appointment booking and scheduling
+- Service duration and pricing management
+- Professional licensing and certification tracking
+- No inventory complexity - services don't track stock
+
+**For Mixed Businesses:**
+
+- Unified catalog of both products and services
+- Smart inventory tracking (only for physical products)
+- Flexible pricing models (hourly, project-based, fixed)
+- Seamless integration with invoicing for both products and services
 
 ---
 
@@ -269,47 +294,99 @@ interface GetLowStockResponse {
 
 ## 🗃️ Data Models
 
-### Core Product Model
+### Enhanced Product Model - Supports Both Products and Services
 
 ```typescript
 interface Product {
   id: string;
   name: string;
-  sku: string;
+  productCode: string; // Unique product/service code
   description?: string;
+  shortDescription?: string;
+
+  // Product Type Classification
+  productType: ProductType; // "simple" | "variable" | "service" | "subscription" | "bundle" | "digital"
 
   // Categorization
   categoryId: string;
   category: ProductCategory;
   tags: string[];
 
-  // Pricing
-  unitPrice: number; // Selling price
-  costPrice: number; // Cost/purchase price
+  // Pricing (flexible for products and services)
+  baseSellingPrice: number; // Base selling price
+  baseCostPrice?: number; // Cost price (for products)
+  baseWholesalePrice?: number; // Wholesale price
   currency: string;
 
-  // Inventory
-  currentStock: number;
-  minStockLevel: number;
+  // Inventory Management (only for physical products)
+  trackInventory: boolean; // Services set to false
+  trackByVariant: boolean; // For variable products
+  currentStock?: number; // Only when trackInventory = true
+  minStockLevel?: number;
   maxStockLevel?: number;
-  reorderPoint: number;
+  reorderPoint?: number;
 
-  // Physical attributes
+  // Physical attributes (only for physical products)
   weight?: number;
   dimensions?: ProductDimensions;
   barcode?: string;
+  requiresShipping: boolean; // Services set to false
+
+  // Service-Specific Fields (for service-only businesses)
+  serviceDuration?: number; // Duration in minutes
+  serviceBufferTime?: number; // Buffer time between appointments
+  isBookable: boolean; // Can be booked via calendar
+  advanceBookingDays?: number; // How many days in advance can be booked
+  maxBookingsPerDay?: number; // Maximum bookings per day
+  requiresPreparation: boolean; // Requires preparation time
+  preparationTime?: number; // Preparation time in minutes
+
+  // Professional Service Requirements
+  requiresLicense: boolean; // Requires professional license
+  certificationRequired?: string; // Required certification
+  professionalType?: string; // "doctor", "lawyer", "engineer", etc.
+
+  // Service Delivery Settings
+  serviceLocation: "office" | "client_location" | "remote" | "any";
+  allowsRemoteDelivery: boolean; // Can be delivered remotely
+
+  // Recurring Service Settings
+  isRecurring: boolean; // Is this a recurring service
+  recurringInterval?: "daily" | "weekly" | "monthly" | "yearly";
+  recurringDuration?: number; // How many intervals
 
   // Greek tax information
   greekTaxInfo: ProductGreekTaxInfo;
+  vatCategory: VatCategory;
+  vatRate: number;
+  vatExemptReason?: string; // For professional services
 
-  // Supplier information
+  // Supplier information (only for products)
   primarySupplierId?: string;
   primarySupplier?: Supplier;
   alternativeSuppliers: ProductSupplier[];
 
-  // Status
+  // Product/Service variants (for variable products/services)
+  variants: ProductVariant[];
+  attributes: ProductAttribute[];
+
+  // Status and settings
   status: ProductStatus;
   isActive: boolean;
+  isFeatured: boolean;
+  isDigital: boolean;
+
+  // SEO and marketing
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords: string[];
+
+  // Media
+  primaryImageUrl?: string;
+  imageUrls: string[];
+
+  // Flexible custom fields
+  customFields: Record<string, any>;
 
   // Audit
   createdAt: Date;
@@ -317,21 +394,114 @@ interface Product {
   createdBy: string;
 
   // Calculated fields
-  stockValue: number; // currentStock * costPrice
-  stockStatus: StockStatus;
+  stockValue?: number; // currentStock * costPrice (only for products)
+  stockStatus?: StockStatus; // Only for products with inventory
   lastMovementDate?: Date;
+  hasVariants: boolean;
+  lowestPrice: number;
+  highestPrice: number;
+  totalStock: number;
+  availableStock: number;
+  isInStock: boolean;
 }
+
+type ProductType =
+  | "simple"
+  | "variable"
+  | "service"
+  | "subscription"
+  | "bundle"
+  | "digital";
+type ProductStatus = "active" | "inactive" | "discontinued" | "draft";
+type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
+type VatCategory = "standard" | "reduced_1" | "reduced_2" | "zero" | "exempt";
 
 interface ProductCategory {
   id: string;
   name: string;
   parentId?: string;
-  vatRate: number;
-  greekTaxCategory: GreekTaxCategory;
+
+  // Category-level defaults
+  defaultVatCategory: VatCategory;
+  defaultVatRate: number;
+  defaultUnitOfMeasure: string;
+
+  // Hierarchy
+  children: ProductCategory[];
+  products: Product[];
+
+  displayOrder: number;
+  isActive: boolean;
 }
 
-type ProductStatus = "active" | "discontinued" | "draft";
-type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
+// Product Variants for variable products/services
+interface ProductVariant {
+  id: string;
+  productId: string;
+  variantCode: string;
+  sku: string;
+  name: string;
+
+  // Variant-specific pricing
+  costPrice?: number;
+  sellingPrice?: number;
+  wholesalePrice?: number;
+
+  // Inventory (only for physical products)
+  stockQuantity?: number;
+  reservedQuantity?: number;
+  minimumStockLevel?: number;
+
+  // Variant attributes
+  attributeValues: Record<string, string>; // {"color": "red", "size": "large"}
+
+  // Media
+  primaryImageUrl?: string;
+  imageUrls: string[];
+
+  isActive: boolean;
+  isDefault: boolean;
+}
+
+// Dynamic attributes for products/services
+interface ProductAttribute {
+  id: string;
+  name: string;
+  displayName: string;
+  attributeType: AttributeType;
+  required: boolean;
+  values: ProductAttributeValue[];
+  displayOrder: number;
+  isActive: boolean;
+}
+
+type AttributeType =
+  | "text"
+  | "number"
+  | "decimal"
+  | "boolean"
+  | "date"
+  | "color"
+  | "size"
+  | "select"
+  | "multiselect"
+  | "range"
+  | "dimension"
+  | "weight"
+  | "temperature"
+  | "file"
+  | "url";
+
+interface ProductAttributeValue {
+  id: string;
+  value: string;
+  displayName: string;
+  colorCode?: string; // For color attributes
+  numericValue?: number; // For numeric attributes
+  fileUrl?: string; // For file attributes
+  displayOrder: number;
+  isActive: boolean;
+}
 ```
 
 ### Stock Movement Model

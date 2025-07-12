@@ -47,6 +47,16 @@ alwaysApply: true
 - **Formatting**: Greek date, currency, address formatting
 - **VAT Calculations**: Location-aware Greek VAT rates
 
+## Greek Reference Data Integration (MANDATORY)
+
+- **Region Selector**: Use GreekRegionSelector for address forms - supports VAT zone detection
+- **DOY Selector**: Use DOYSelector with autocomplete from master database
+- **Legal Form Selector**: Use LegalFormSelector for company setup (AE, EPE, OE, EE, IKE, AT)
+- **Bank Selector**: Use GreekBankSelector with SWIFT code validation
+- **VAT Rate Calculator**: Use VATRateCalculator for context-aware rates (takeaway vs dine-in)
+- **Business Activity**: Use KADSelector for business activity codes with hierarchy
+- **Postal Code**: Use PostalCodeInput with geographic validation
+
 ## Data Handling
 
 - **API Integration**: React Query for all server state
@@ -81,3 +91,4 @@ alwaysApply: true
 - ❌ Don't skip responsive design
 - ❌ Don't ignore Greek business validation
 - ❌ Don't skip loading/error states
+- ❌ Don't hardcode Greek reference data (regions, VAT rates, DOY codes) - use database

@@ -1,130 +1,98 @@
-# Backend Development Rules - Greek ERP/CRM System
+# Backend Rules - Greek ERP/CRM System
 
 ## Core Technology Stack
 
-- **Runtime**: Python 3.12+ with FastAPI 0.104+
-- **Database**: PostgreSQL 17+ (separate DB per company), Redis 7.2+ (caching/sessions)
-- **Message Queue**: Redis with Celery for background tasks
-- **ORM**: SQLAlchemy with Alembic for migrations
-- **Authentication**: JWT with refresh tokens, OAuth 2.0
-- **Security**: AES-256 encryption with PBKDF2 key derivation
-- **Performance**: <200ms average API response time
+- **Framework**: FastAPI 0.104+ with Python 3.11+ for async performance
+- **Database**: PostgreSQL 16+ with separate databases per company
+- **ORM**: SQLAlchemy 2.0+ with async support and declarative models
+- **Caching**: Redis 7.2+ for sessions, job queues, and performance
+- **Background Jobs**: Celery with Redis broker for AADE submissions
+- **Validation**: Pydantic v2 for request/response validation
+- **Authentication**: JWT with refresh tokens and 2FA support
 
-## Architecture Patterns
+## Architecture Standards
 
-- **Modular Monolith**: Core engines (Authorization, Data, Customization, Integration)
-- **Separate DB per Company**: Each company has dedicated database (erp*company*{id})
-- **Database Connection Routing**: Dynamic connection routing based on company context
-- **Deployment Flexibility**: Cloud SAAS and local desktop support
-- **Microservice Ready**: Can split to microservices when needed
+- **Multi-Tenancy**: Separate database per company with smart resource pooling
+- **Async First**: Use async/await for all I/O operations
+- **Dependency Injection**: FastAPI's dependency system for clean architecture
+- **Service Layer**: Business logic separated from API endpoints
+- **Repository Pattern**: Data access layer abstraction
+- **Event-Driven**: Use events for inter-service communication
 
-## Database Design (MANDATORY)
+## Database Standards
 
-- **Separate Databases**: Each company gets isolated database for zero write contention
-- **Multi-Schema per Company**: Use schemas within company DB (core, crm, erp, config, audit, custom)
-- **Audit Fields**: created_at, updated_at, created_by on ALL tables
-- **Soft Deletes**: Use is_deleted flag, never hard delete business data
-- **Custom Fields**: JSONB column for EspoCRM-style extensibility
-- **Partitioning**: Implement on high-volume tables with automatic partition management
+- **Models**: SQLAlchemy declarative models with proper relationships
+- **Migrations**: Alembic for database schema management
+- **Company Isolation**: Enforce company boundaries in all queries
+- **Greek Compliance**: Built-in AFM, DOY, VAT validation
+- **Audit Logging**: Track all business operations with user attribution
 
-## Database Connection Management
+## API Design Standards
 
-- **Dynamic Routing**: Route connections based on company_id in JWT token
-- **Connection Pooling**: Separate connection pools per company database
-- **Automatic Scaling**: Migrate companies between shared and dedicated instances
-- **Connection Factory**: Centralized database connection management
-- **Failover Support**: Automatic failover for database connectivity issues
+- **REST Convention**: Standard HTTP methods and status codes
+- **Versioning**: URL-based versioning (/api/v1/, /api/v2/)
+- **Documentation**: OpenAPI/Swagger auto-generated documentation
+- **Validation**: Request/response validation with clear error messages
+- **Role-Based Access**: Fine-grained permissions (business_entities:create, invoices:edit)
+- **Rate Limiting**: Protect against abuse with configurable limits
 
-## API Standards
+## Greek Business Integration
 
-- **RESTful Pattern**: Standard CRUD endpoints (/api/v1/{entity_type})
-- **Company Context**: Extract company_id from JWT token for database routing
-- **Response Format**: Consistent JSON structure with success/error fields
-- **Status Codes**: Proper HTTP status codes (200, 201, 400, 401, 403, 404, 500)
-- **Pagination**: Cursor-based pagination optimized for partitioned tables
-- **Versioning**: API versioning in URL path (/api/v1/, /api/v2/)
+- **AADE Integration**: MyDATA submission with proper error handling
+- **VAT Calculations**: Dynamic Greek VAT rates based on location
+- **AFM Validation**: Real-time Greek tax number validation
+- **DOY Lookup**: Greek tax office information and validation
+- **Greek Localization**: Proper Greek date, currency, address formatting
 
-## Authentication & Authorization
+## Error Handling & Logging
 
-- **JWT Tokens**: 15-minute access tokens, 7-day refresh tokens
-- **Company Context**: MANDATORY company_id in all tokens for database routing
-- **Role-Based Access**: Fine-grained permissions (customers:create, invoices:edit)
-- **2FA Required**: For admin and financial roles
-- **Session Management**: Redis-based session storage with company isolation
-
-## Greek Compliance (When Applicable)
-
-- **AFM Validation**: 9-digit format with checksum validation
-- **DOY Validation**: Valid Greek tax office codes
-- **AADE Integration**: Real-time MyDATA submission for invoices
-- **VAT Calculations**: Location-aware Greek VAT rates per company
-- **Context-Based**: Only apply to financial/tax operations, not general CRM
-- **Historical Reporting**: Multi-year compliance reports via partition unions
-
-## Data Handling
-
-- **Transactions**: Always use database transactions for multi-step operations
-- **Validation**: Pydantic models for request/response validation
-- **Encryption**: Sensitive data (AFM, personal info) encrypted at rest
-- **Caching**: Redis caching with company-specific cache keys
-- **Background Jobs**: Celery for heavy operations (AADE submissions, reports)
-- **Partition Awareness**: Queries optimized for partition pruning
-
-## Database Operations Automation
-
-- **Company Provisioning**: Automated database creation for new companies
-- **Migration Management**: Parallel migration execution across all company databases
-- **Resource Monitoring**: Track database performance per company
-- **Auto-scaling**: Automatic migration between shared and dedicated instances
-- **Backup Orchestration**: Automated company-specific backup scheduling
-
-## Error Handling
-
-- **Global Exception Handler**: Consistent error responses
-- **Business Errors**: Custom exception classes for business logic
-- **Database Connection Errors**: Specific handling for multi-database scenarios
-- **Greek Compliance Errors**: Specific errors for AFM/DOY/AADE failures
-- **Logging**: Structured logging with correlation IDs and company context
-- **Monitoring**: Health checks and performance metrics per company
-
-## Security Standards
-
-- **Input Validation**: Sanitize all inputs, especially Greek characters
-- **SQL Injection**: Use parameterized queries, never string concatenation
-- **Database Isolation**: Complete separation between company databases
-- **Rate Limiting**: Protect endpoints from abuse with company-specific limits
-- **CORS**: Proper CORS configuration for frontend domains
-- **Secrets Management**: Environment variables for all secrets
+- **Structured Logging**: JSON-formatted logs with correlation IDs
+- **Error Responses**: Consistent error format with Greek translations
+- **Exception Handling**: Proper exception hierarchy and handling
+- **Audit Trail**: Complete logging of business operations
+- **Monitoring**: Health checks and metrics collection
 
 ## Performance Requirements
 
-- **Response Time**: <200ms for simple operations, <2s for complex ones
-- **Database**: Proper indexing on foreign keys and partition keys
-- **Caching**: Cache frequently accessed reference data with company context
-- **Async Operations**: Use async/await for I/O operations
-- **Connection Pooling**: Company-specific database connection pooling
-- **Partition Optimization**: Ensure queries leverage partition pruning
+- **Response Times**: <200ms for simple operations, <2s for complex
+- **Caching Strategy**: Redis for frequently accessed data
+- **Database Optimization**: Proper indexing and query optimization
+- **Background Processing**: Async tasks for heavy operations
+- **Connection Pooling**: Efficient database connection management
 
-## File Organization
+## Security Implementation
 
-- **Structure**: models/, services/, api/, utils/, schemas/, database/
-- **Database Module**: Dedicated module for multi-database connection management
-- **Naming**: snake_case for files and functions, PascalCase for classes
-- **Imports**: Absolute imports, avoid circular dependencies
-- **Dependencies**: Use dependency injection for database sessions
+- **Authentication**: JWT tokens with company context
+- **Authorization**: Permission-based access control
+- **Data Encryption**: Sensitive data encrypted at rest
+- **Input Validation**: Prevent SQL injection and XSS attacks
+- **Company Isolation**: Strict multi-tenant data boundaries
+
+## Testing Requirements
+
+- **Unit Tests**: pytest with >85% coverage
+- **Integration Tests**: Real database scenarios
+- **Greek Compliance**: AFM, DOY, AADE validation testing
+- **Performance Tests**: Load testing for critical paths
+- **Security Tests**: Authentication and authorization testing
+
+## Development Workflow
+
+- **Code Quality**: Black, isort, pylint, mypy for code standards
+- **Git Flow**: Feature branches with PR reviews
+- **CI/CD**: Automated testing and deployment
+- **Documentation**: Comprehensive API and code documentation
+- **Environment Management**: Separate dev/staging/production configs
 
 ## What NOT to Do
 
-- ❌ Never create shared tables between companies
-- ❌ Don't hardcode database connections or company-specific logic
-- ❌ Never expose internal error details in production
+- ❌ Never skip company isolation in database queries
+- ❌ Don't hardcode Greek business rules in API logic
+- ❌ Never expose sensitive data in logs or error messages
 - ❌ Don't skip input validation for Greek characters
-- ❌ Never create cross-company data relationships
-- ❌ Don't ignore proper HTTP status codes
+- ❌ Never ignore proper HTTP status codes
+- ❌ Don't create blocking I/O operations in async endpoints
 - ❌ Never skip rate limiting on sensitive endpoints
-- ❌ Don't forget to include company context in all operations
-- ❌ Never skip partition-aware query optimization
-- ❌ Don't create APIs without proper database connection routing
-
-9. **Documentation**: Keep API documentation updated with Greek business context
-10. **Monitoring**: Implement proper logging and monitoring for production systems
+- ❌ Don't ignore proper exception handling
+- ❌ Never skip audit logging for financial transactions
+- ❌ Don't trust client-side validation alone

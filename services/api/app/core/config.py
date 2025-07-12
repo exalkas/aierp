@@ -4,107 +4,118 @@ Handles environment variables and Greek business requirements
 """
 
 import os
+import json
 from typing import List, Optional
-from pydantic_settings import BaseSettings
-from pydantic import Field, validator
+from pathlib import Path
+
+# Load .env file if it exists
+env_file = Path(__file__).parent.parent.parent / ".env"
+if env_file.exists():
+    with open(env_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                os.environ.setdefault(key, value)
 
 
-class Settings(BaseSettings):
+class Settings:
     """Application settings with Greek business configuration"""
     
-    # Application
-    ENVIRONMENT: str = Field(default="development", env="ENVIRONMENT")
-    DEBUG: bool = Field(default=True, env="DEBUG")
-    SECRET_KEY: str = Field(env="SECRET_KEY")
-    
-    # Database
-    DATABASE_URL: str = Field(env="DATABASE_URL")
-    DATABASE_POOL_SIZE: int = Field(default=20, env="DATABASE_POOL_SIZE")
-    DATABASE_MAX_OVERFLOW: int = Field(default=30, env="DATABASE_MAX_OVERFLOW")
-    
-    # Security
-    JWT_SECRET_KEY: str = Field(env="JWT_SECRET_KEY")
-    JWT_ALGORITHM: str = Field(default="HS256", env="JWT_ALGORITHM")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=15, env="ACCESS_TOKEN_EXPIRE_MINUTES")
-    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, env="REFRESH_TOKEN_EXPIRE_DAYS")
-    
-    # CORS and Security
-    CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
-        env="CORS_ORIGINS"
-    )
-    ALLOWED_HOSTS: List[str] = Field(
-        default=["localhost", "127.0.0.1"],
-        env="ALLOWED_HOSTS"
-    )
-    
-    # Greek Business Configuration
-    DEFAULT_VAT_RATE: float = Field(default=0.24, env="DEFAULT_VAT_RATE")  # 24% standard Greek VAT
-    REDUCED_VAT_RATE_1: float = Field(default=0.13, env="REDUCED_VAT_RATE_1")  # 13% reduced rate
-    REDUCED_VAT_RATE_2: float = Field(default=0.06, env="REDUCED_VAT_RATE_2")  # 6% super reduced rate
-    ZERO_VAT_RATE: float = Field(default=0.00, env="ZERO_VAT_RATE")  # 0% for exports/exemptions
-    
-    GREEK_CURRENCY: str = Field(default="EUR", env="GREEK_CURRENCY")
-    GREEK_LOCALE: str = Field(default="el_GR", env="GREEK_LOCALE")
-    DEFAULT_TIMEZONE: str = Field(default="Europe/Athens", env="DEFAULT_TIMEZONE")
-    
-    # AADE (Greek Tax Authority) Integration
-    AADE_BASE_URL: str = Field(default="https://mydata-dev.azure-api.net", env="AADE_BASE_URL")
-    AADE_SUBSCRIPTION_KEY: Optional[str] = Field(default=None, env="AADE_SUBSCRIPTION_KEY")
-    AADE_TIMEOUT_SECONDS: int = Field(default=30, env="AADE_TIMEOUT_SECONDS")
-    AADE_ENABLE_SANDBOX: bool = Field(default=True, env="AADE_ENABLE_SANDBOX")
-    
-    # File Storage
-    FILE_STORAGE_PATH: str = Field(default="./storage/files", env="FILE_STORAGE_PATH")
-    MAX_FILE_SIZE_MB: int = Field(default=50, env="MAX_FILE_SIZE_MB")
-    ALLOWED_FILE_EXTENSIONS: List[str] = Field(
-        default=[".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx", ".xls", ".xlsx"],
-        env="ALLOWED_FILE_EXTENSIONS"
-    )
-    
-    # Email Configuration
-    SMTP_HOST: Optional[str] = Field(default=None, env="SMTP_HOST")
-    SMTP_PORT: int = Field(default=587, env="SMTP_PORT")
-    SMTP_USERNAME: Optional[str] = Field(default=None, env="SMTP_USERNAME")
-    SMTP_PASSWORD: Optional[str] = Field(default=None, env="SMTP_PASSWORD")
-    SMTP_USE_TLS: bool = Field(default=True, env="SMTP_USE_TLS")
-    
-    # Logging
-    LOG_LEVEL: str = Field(default="INFO", env="LOG_LEVEL")
-    LOG_FORMAT: str = Field(
-        default="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        env="LOG_FORMAT"
-    )
-    
-    # Rate Limiting
-    RATE_LIMIT_REQUESTS: int = Field(default=100, env="RATE_LIMIT_REQUESTS")
-    RATE_LIMIT_WINDOW_SECONDS: int = Field(default=60, env="RATE_LIMIT_WINDOW_SECONDS")
-    
-    # Company Isolation
-    MAX_COMPANIES_PER_USER: int = Field(default=1, env="MAX_COMPANIES_PER_USER")
-    REQUIRE_COMPANY_IN_JWT: bool = Field(default=True, env="REQUIRE_COMPANY_IN_JWT")
-    
-    @validator("CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v):
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
-    
-    @validator("ALLOWED_HOSTS", pre=True)
-    def assemble_allowed_hosts(cls, v):
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
-    
-    @validator("ALLOWED_FILE_EXTENSIONS", pre=True)
-    def assemble_file_extensions(cls, v):
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    def __init__(self):
+        # Application
+        self.ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+        self.DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
+        self.SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
+        
+        # Database
+        self.DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/db")
+        self.DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "20"))
+        self.DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "30"))
+        
+        # Security
+        self.JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "your-jwt-secret-key")
+        self.JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+        self.ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
+        self.REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+        
+        # CORS and Security - Handle both JSON array and comma-separated formats
+        cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:3002")
+        if cors_origins.startswith('[') and cors_origins.endswith(']'):
+            # Handle JSON array format from .env file
+            self.CORS_ORIGINS: List[str] = json.loads(cors_origins)
+        else:
+            # Handle comma-separated format
+            self.CORS_ORIGINS: List[str] = [origin.strip() for origin in cors_origins.split(",")]
+        
+        allowed_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+        if allowed_hosts.startswith('[') and allowed_hosts.endswith(']'):
+            # Handle JSON array format from .env file
+            self.ALLOWED_HOSTS: List[str] = json.loads(allowed_hosts)
+        else:
+            # Handle comma-separated format
+            self.ALLOWED_HOSTS: List[str] = [host.strip() for host in allowed_hosts.split(",")]
+        
+        # Greek Business Configuration
+        self.DEFAULT_VAT_RATE: float = float(os.getenv("DEFAULT_VAT_RATE", "0.24"))
+        self.REDUCED_VAT_RATE_1: float = float(os.getenv("REDUCED_VAT_RATE_1", "0.13"))
+        self.REDUCED_VAT_RATE_2: float = float(os.getenv("REDUCED_VAT_RATE_2", "0.06"))
+        self.ZERO_VAT_RATE: float = float(os.getenv("ZERO_VAT_RATE", "0.00"))
+        
+        # Aegean Islands VAT rates (30% reduction)
+        self.AEGEAN_STANDARD_VAT_RATE: float = float(os.getenv("AEGEAN_STANDARD_VAT_RATE", "0.17"))
+        self.AEGEAN_REDUCED_VAT_RATE_1: float = float(os.getenv("AEGEAN_REDUCED_VAT_RATE_1", "0.09"))
+        self.AEGEAN_REDUCED_VAT_RATE_2: float = float(os.getenv("AEGEAN_REDUCED_VAT_RATE_2", "0.04"))
+        
+        # Context-based VAT rates
+        self.TAKEAWAY_COFFEE_VAT_RATE: float = float(os.getenv("TAKEAWAY_COFFEE_VAT_RATE", "0.13"))
+        self.DINEIN_COFFEE_VAT_RATE: float = float(os.getenv("DINEIN_COFFEE_VAT_RATE", "0.24"))
+        
+        # VAT calculation settings
+        self.VAT_CALCULATION_PRECISION: int = int(os.getenv("VAT_CALCULATION_PRECISION", "2"))
+        self.ENABLE_DYNAMIC_VAT_CALCULATION: bool = os.getenv("ENABLE_DYNAMIC_VAT_CALCULATION", "true").lower() == "true"
+        self.VAT_RULES_CACHE_TTL: int = int(os.getenv("VAT_RULES_CACHE_TTL", "3600"))
+        
+        self.GREEK_CURRENCY: str = os.getenv("GREEK_CURRENCY", "EUR")
+        self.GREEK_LOCALE: str = os.getenv("GREEK_LOCALE", "el_GR")
+        self.DEFAULT_TIMEZONE: str = os.getenv("DEFAULT_TIMEZONE", "Europe/Athens")
+        
+        # AADE (Greek Tax Authority) Integration
+        self.AADE_BASE_URL: str = os.getenv("AADE_BASE_URL", "https://mydata-dev.azure-api.net")
+        self.AADE_SUBSCRIPTION_KEY: Optional[str] = os.getenv("AADE_SUBSCRIPTION_KEY")
+        self.AADE_TIMEOUT_SECONDS: int = int(os.getenv("AADE_TIMEOUT_SECONDS", "30"))
+        self.AADE_ENABLE_SANDBOX: bool = os.getenv("AADE_ENABLE_SANDBOX", "true").lower() == "true"
+        
+        # File Storage
+        self.FILE_STORAGE_PATH: str = os.getenv("FILE_STORAGE_PATH", "./storage/files")
+        self.MAX_FILE_SIZE_MB: int = int(os.getenv("MAX_FILE_SIZE_MB", "50"))
+        
+        file_extensions = os.getenv("ALLOWED_FILE_EXTENSIONS", ".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx")
+        if file_extensions.startswith('[') and file_extensions.endswith(']'):
+            # Handle JSON array format from .env file
+            self.ALLOWED_FILE_EXTENSIONS: List[str] = json.loads(file_extensions)
+        else:
+            # Handle comma-separated format
+            self.ALLOWED_FILE_EXTENSIONS: List[str] = [ext.strip() for ext in file_extensions.split(",")]
+        
+        # Email Configuration
+        self.SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST")
+        self.SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+        self.SMTP_USERNAME: Optional[str] = os.getenv("SMTP_USERNAME")
+        self.SMTP_PASSWORD: Optional[str] = os.getenv("SMTP_PASSWORD")
+        self.SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
+        
+        # Logging
+        self.LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+        self.LOG_FORMAT: str = os.getenv("LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        
+        # Rate Limiting
+        self.RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
+        self.RATE_LIMIT_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+        
+        # Company Isolation
+        self.MAX_COMPANIES_PER_USER: int = int(os.getenv("MAX_COMPANIES_PER_USER", "1"))
+        self.REQUIRE_COMPANY_IN_JWT: bool = os.getenv("REQUIRE_COMPANY_IN_JWT", "true").lower() == "true"
 
 
 # Create global settings instance

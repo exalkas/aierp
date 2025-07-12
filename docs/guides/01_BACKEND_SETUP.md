@@ -63,13 +63,46 @@ cp services/.env.example packages/ai-services/ai-support-service/.env
 - `JWT_SECRET_KEY`: JWT signing key
 - `AADE_SUBSCRIPTION_KEY`: Greek tax authority API key
 
-### 3. Setup Database
+### 3. Setup Database with Alembic Migrations
+
+**📋 Complete Database Setup Guide Available:** [scripts/database-setup-guide.md](../../scripts/database-setup-guide.md)
+
+**Quick Setup:**
 
 1. **Install PostgreSQL** with Greek locale support
-2. **Run database setup:**
+2. **Create database:**
 
 ```bash
-psql -U postgres -f scripts/setup-database.sql
+# Windows
+.\scripts\setup-database-windows.ps1
+
+# Linux/macOS
+chmod +x scripts/setup-database-linux.sh
+./scripts/setup-database-linux.sh
+```
+
+3. **Run Alembic migrations:**
+
+```bash
+cd services/api
+source venv/bin/activate  # Linux/macOS
+# OR venv\Scripts\Activate.ps1  # Windows
+
+# Initialize database with migrations
+alembic upgrade 0001  # Core models
+alembic upgrade 0002  # Document state machine
+```
+
+4. **Seed Greek document workflows:**
+
+```bash
+python -m app.scripts.seed_greek_document_workflows
+```
+
+5. **Create initial company and admin user:**
+
+```bash
+python -m app.scripts.create_superuser
 ```
 
 ### 4. Start Services
@@ -115,6 +148,14 @@ cd packages/ai-services/ai-support-service && source venv/bin/activate && uvicor
 - **Greek Localization**: Dates, currency, phone numbers
 - **AADE Integration**: Ready for MyDATA submissions
 
+### Document State Machine
+
+- **16 Greek Document Types**: Complete support for all παραστατικά
+- **Workflow Management**: State transitions with business rules
+- **Greek Business Rules**: VAT, AADE, and legal compliance
+- **Audit Trail**: Complete document lifecycle tracking
+- **Automated Workflows**: Rule-based state transitions
+
 ### Company Isolation
 
 - **Separate Database per Company**: No data mixing between tenants
@@ -126,6 +167,7 @@ cd packages/ai-services/ai-support-service && source venv/bin/activate && uvicor
 - **Complete Audit Trail**: All API operations logged
 - **Greek Data Protection**: Sensitive data handling
 - **Security Middleware**: Rate limiting, input validation
+- **Document History**: Complete state change tracking
 
 ## 🛠️ Service Details
 
@@ -141,6 +183,17 @@ cd packages/ai-services/ai-support-service && source venv/bin/activate && uvicor
 - `GET /health` - Service health
 - `GET /api/v1/greek/vat-rates` - Greek VAT rates
 - `POST /api/v1/greek/validate/afm` - AFM validation
+
+**Document Workflow Endpoints:**
+
+- `POST /api/v1/workflow/initialize` - Initialize document workflow
+- `GET /api/v1/workflow/status/{document_id}` - Get workflow status
+- `POST /api/v1/workflow/execute/{document_id}` - Execute state transition
+- `GET /api/v1/workflow/actions/{document_id}` - Get available actions
+- `GET /api/v1/workflow/history/{document_id}` - Get state history
+- `GET /api/v1/workflow/templates` - Get workflow templates
+- `GET /api/v1/workflow/states` - Get all document states
+- `GET /api/v1/workflow/actions` - Get all document actions
 
 ### Auth Service (Port 8001)
 
@@ -187,6 +240,14 @@ cd packages/ai-services/ai-support-service && source venv/bin/activate && uvicor
 - Full ERP/CRM schema per company
 - Complete data isolation
 
+### Document State Machine Schema
+
+- **state_transition_rules**: Workflow transition rules with Greek business logic
+- **document_workflow_instances**: Active workflow instances for documents
+- **document_state_history**: Complete audit trail of state changes
+- **document_automation_rules**: Automated workflow rules
+- **greek_document_workflow_templates**: Pre-configured Greek document workflows
+
 ## 🔧 Development Tools
 
 ### API Documentation
@@ -204,6 +265,25 @@ When running in development mode:
 - Integrations: http://localhost:8003/health
 - Voice AI: http://localhost:8004/health
 - AI Support: http://localhost:8005/health
+
+### Document Workflow Testing
+
+```bash
+# Test workflow endpoints
+curl http://localhost:8000/api/v1/workflow/states
+curl http://localhost:8000/api/v1/workflow/actions
+curl http://localhost:8000/api/v1/workflow/templates
+
+# Test workflow initialization
+curl -X POST http://localhost:8000/api/v1/workflow/initialize \
+  -H "Content-Type: application/json" \
+  -d '{"document_type": "sales_invoice", "document_id": "uuid-here"}'
+
+# Test workflow execution
+curl -X POST http://localhost:8000/api/v1/workflow/execute/uuid-here \
+  -H "Content-Type: application/json" \
+  -d '{"action": "FINALIZE", "notes": "Ready for approval"}'
+```
 
 ### Logging
 

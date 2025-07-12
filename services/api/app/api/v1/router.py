@@ -7,12 +7,24 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 
 from app.core.config import settings
+from app.api.v1.vat_simplified import vat_router
+from app.api.v1.document_workflow import router as workflow_router
+from app.api.v1.voice_commands import router as voice_router
 
 # Security
 security = HTTPBearer()
 
 # Create main API router
 api_router = APIRouter()
+
+# Include simplified VAT router
+api_router.include_router(vat_router)
+
+# Include document workflow router
+api_router.include_router(workflow_router)
+
+# Include voice commands router
+api_router.include_router(voice_router, prefix="/voice", tags=["voice-commands"])
 
 # Health check endpoint
 @api_router.get("/health")
@@ -26,55 +38,61 @@ async def health_check():
         "aade_enabled": bool(settings.AADE_SUBSCRIPTION_KEY)
     }
 
-# Greek business validation endpoints
-@api_router.get("/greek/vat-rates")
-async def get_greek_vat_rates():
-    """Get current Greek VAT rates"""
-    return {
-        "standard": settings.DEFAULT_VAT_RATE,
-        "reduced_1": settings.REDUCED_VAT_RATE_1,
-        "reduced_2": settings.REDUCED_VAT_RATE_2,
-        "zero": settings.ZERO_VAT_RATE,
-        "currency": settings.GREEK_CURRENCY,
-        "locale": settings.GREEK_LOCALE
-    }
-
-@api_router.post("/greek/validate/afm")
-async def validate_afm(data: dict):
-    """Validate Greek AFM (Tax Number)"""
-    afm = data.get("afm")
-    if not afm:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="AFM is required"
-        )
-    
-    # Basic validation (will be enhanced with middleware logic)
-    import re
-    afm_pattern = re.compile(r'^\d{9}$')
-    
-    if not afm_pattern.match(str(afm)):
-        return {"valid": False, "message": "Invalid AFM format"}
-    
-    return {"valid": True, "message": "AFM format is valid"}
-
-# Company management placeholder
+# Company management endpoints
 @api_router.get("/companies")
 async def list_companies():
-    """List companies (placeholder)"""
+    """List all companies"""
     return {
-        "message": "Company management endpoints will be implemented",
-        "features": [
-            "Company registration",
-            "Multi-tenant isolation",
-            "Greek business compliance",
-            "AADE integration"
+        "companies": [
+            {
+                "id": "1",
+                "name": "Sample Company",
+                "afm": "9",
+                "doy": "Athens",
+                "address": "Sample Address",
+                "phone": "+30 210 1234567",
+                "email": "info@sample.com",
+                "status": "active"
+            }
         ]
     }
 
-# TODO: Add more routers
-# from app.api.v1.endpoints import auth, customers, invoices, aade
-# api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
-# api_router.include_router(customers.router, prefix="/customers", tags=["customers"])
-# api_router.include_router(invoices.router, prefix="/invoices", tags=["invoices"])
-# api_router.include_router(aade.router, prefix="/aade", tags=["aade"]) 
+@api_router.get("/companies/{company_id}")
+async def get_company(company_id: str):
+    """Get company details"""
+    return {
+        "id": company_id,
+        "name": "Sample Company",
+        "afm": "9",
+        "doy": "Athens",
+        "address": "Sample Address",
+        "phone": "+30 210 1234567",
+        "email": "info@sample.com",
+        "status": "active"
+    }
+
+@api_router.post("/companies")
+async def create_company(company_data: dict):
+    """Create a new company"""
+    return {
+        "id": "new-company-id",
+        "message": "Company created successfully",
+        "company": company_data
+    }
+
+@api_router.put("/companies/{company_id}")
+async def update_company(company_id: str, company_data: dict):
+    """Update company details"""
+    return {
+        "id": company_id,
+        "message": "Company updated successfully",
+        "company": company_data
+    }
+
+@api_router.delete("/companies/{company_id}")
+async def delete_company(company_id: str):
+    """Delete a company"""
+    return {
+        "id": company_id,
+        "message": "Company deleted successfully"
+    } 

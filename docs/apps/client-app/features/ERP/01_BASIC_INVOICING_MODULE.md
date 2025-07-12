@@ -1,16 +1,62 @@
-# 01. Basic Invoicing Module - Technical Specification
+# 01. Basic Invoicing Module - Unified CRM+ERP Integration
 
 ## Document Information
 
-- **Version**: 1.0
+- **Version**: 3.0 (Unified Architecture)
 - **Date**: January 2025
 - **Module**: Basic Invoicing (€19/month)
-- **Dependencies**: None (uses shared CRM customer data)
-- **Target Users**: Freelancers, Doctors, Lawyers, Consultants, Small Service Businesses
+- **Dependencies**: Unified Business Entity Management
+- **Target Users**: Freelancers, Doctors, Lawyers, Consultants, Small Service Businesses, Engineers, All Professional Services
+- **Integration**: Full CRM+ERP integration with 360° business view
 
 ## Overview
 
-The Basic Invoicing Module provides essential invoicing functionality with full Greek compliance, designed for service-based businesses that need simple yet professional billing capabilities. This module integrates seamlessly with CRM customer data while maintaining independence for businesses that only need invoicing.
+The Basic Invoicing Module provides comprehensive Greek business document management with full AADE compliance, supporting all 16 Greek document types (παραστατικά). Built on our unified BusinessEntity architecture, this module seamlessly integrates with CRM data to provide complete business relationship visibility and eliminate data silos between customer management and invoicing.
+
+### 🔗 **Unified CRM+ERP Integration**
+
+**Key Advantage**: When you invoice a business, you see their complete relationship history:
+
+- All communications and interactions (CRM data)
+- Previous invoices and payment history (ERP data)
+- Support tickets and satisfaction scores
+- Opportunity pipeline and deal context
+- Supplier relationships (if they're also a supplier)
+
+### Supported Document Types (16 Complete Greek Business Documents)
+
+**Legal Documents (Νόμιμα Παραστατικά)** - AADE Submission Required:
+
+- **Sales Invoice** (Τιμολόγιο Πώλησης) - Standard B2B invoicing
+- **Receipt** (Απόδειξη Λιανικής Πώλησης) - Retail sales up to €500
+- **Credit Note** (Πιστωτικό Τιμολόγιο) - Invoice corrections and returns
+- **Debit Note** (Χρεωστικό Τιμολόγιο) - Additional charges to existing invoices
+- **Proforma Invoice** (Προτιμολόγιο) - Quotation document (no VAT impact)
+- **Delivery Note** (Δελτίο Αποστολής) - Goods delivery tracking
+- **Simplified Invoice** (Απλοποιημένο Τιμολόγιο) - Simplified B2B transactions
+- **Self-billing** (Αυτο-τιμολόγηση) - Reverse charge scenarios
+- **E-Invoice** (Ηλεκτρονικό Τιμολόγιο) - UBL/XML structured format
+
+**Business Workflow Documents** - Internal Business Use:
+
+- **Sales Order** (Δελτίο Παραγγελίας) - Business order management
+- **Order Confirmation** (Επιβεβαίωση Παραγγελίας) - Order acceptance
+- **Purchase Order** (Παραγγελία Προμηθευτή) - Supplier ordering
+- **Request for Quotation** (Αίτημα Προσφοράς) - Quote requests
+- **Sales Quotation** (Προσφορά Πώλησης) - Business quotes
+- **Return Note** (Δελτίο Επιστροφής) - Returns and exchanges
+- **Internal Transfer** (Εσωτερική Μεταφορά) - Inter-location transfers
+
+### Key Features
+
+- **🔗 360° Business Context**: See complete business relationship while invoicing
+- **🏢 BusinessEntity Integration**: Single source of truth for all external businesses
+- **📋 Complete Document Workflow**: Proper business document relationships (Quote → Order → Invoice → Payment)
+- **🇬🇷 Greek VAT Compliance**: Automatic VAT calculations based on business type and location
+- **📡 AADE MyDATA Integration**: Real-time submission for legal documents
+- **🔧 Professional Services Support**: Enhanced support for service-only businesses
+- **📱 QR Code Generation**: Mandatory QR codes on all legal documents
+- **📄 Document Templates**: Professional Greek business document templates
 
 ---
 
@@ -18,7 +64,7 @@ The Basic Invoicing Module provides essential invoicing functionality with full 
 
 ### 1. Invoice Dashboard (`/erp/invoicing/dashboard`)
 
-**Purpose**: Overview of invoicing activity and key metrics
+**Purpose**: Overview of invoicing activity with unified business insights
 
 #### UI Components:
 
@@ -33,7 +79,7 @@ const InvoiceDashboard: React.FC<InvoiceDashboardProps> = () => {
     <DashboardLayout>
       <DashboardHeader title="Invoicing Overview" />
 
-      {/* Key Metrics Cards */}
+      {/* Key Metrics Cards with Business Context */}
       <MetricsGrid>
         <MetricCard
           title="Total Revenue This Month"
@@ -41,20 +87,25 @@ const InvoiceDashboard: React.FC<InvoiceDashboardProps> = () => {
           change="+15.3%"
           trend="up"
           icon={<EuroIcon />}
+          drilldown="/businesses?filter=revenue"
         />
         <MetricCard
           title="Outstanding Invoices"
           value="€3,200"
           count="8 invoices"
+          businessCount="5 businesses"
           status="warning"
           icon={<ClockIcon />}
+          drilldown="/businesses?filter=outstanding"
         />
         <MetricCard
           title="Overdue Payments"
           value="€850"
           count="2 invoices"
+          businessCount="2 businesses"
           status="danger"
           icon={<AlertIcon />}
+          drilldown="/businesses?filter=overdue"
         />
         <MetricCard
           title="AADE Submissions"
@@ -64,7 +115,7 @@ const InvoiceDashboard: React.FC<InvoiceDashboardProps> = () => {
         />
       </MetricsGrid>
 
-      {/* Quick Actions */}
+      {/* Quick Actions with Business Context */}
       <QuickActions>
         <QuickActionButton
           label="Create Invoice"
@@ -78,17 +129,33 @@ const InvoiceDashboard: React.FC<InvoiceDashboardProps> = () => {
           href="/erp/invoicing/list"
         />
         <QuickActionButton
-          label="Payment Tracking"
+          label="Business Health Check"
+          icon={<BusinessIcon />}
+          href="/businesses?filter=financial_health"
+        />
+        <QuickActionButton
+          label="Payment Follow-ups"
           icon={<PaymentIcon />}
-          href="/erp/invoicing/payments"
+          href="/businesses?filter=payment_required"
         />
       </QuickActions>
 
-      {/* Recent Invoices */}
-      <RecentInvoicesWidget limit={5} />
+      {/* Recent Invoices with Business Context */}
+      <RecentInvoicesWidget 
+        limit={5} 
+        showBusinessContext={true}
+        showOpportunityLinks={true}
+      />
 
-      {/* Payment Status Chart */}
-      <PaymentStatusChart />
+      {/* Payment Status Chart by Business Segment */}
+      <PaymentStatusChart groupBy="businessSegment" />
+
+      {/* Top Businesses by Revenue */}
+      <TopBusinessesWidget 
+        metric="revenue"
+        period="month"
+        limit={10}
+      />
 
       {/* AADE Submission Status */}
       <AADEStatusWidget />
@@ -99,7 +166,7 @@ const InvoiceDashboard: React.FC<InvoiceDashboardProps> = () => {
 
 ### 2. Invoice List (`/erp/invoicing/list`)
 
-**Purpose**: View and manage all invoices
+**Purpose**: View and manage all invoices with business relationship context
 
 #### UI Components:
 
@@ -117,10 +184,11 @@ const InvoiceList: React.FC<InvoiceListProps> = () => {
     <PageLayout>
       <PageHeader
         title="Invoices"
+        subtitle="Unified view with complete business context"
         actions={<CreateInvoiceButton href="/erp/invoicing/create" />}
       />
 
-      {/* Filters */}
+      {/* Enhanced Filters with Business Context */}
       <FilterBar>
         <StatusFilter
           value={filters.status}
@@ -137,9 +205,17 @@ const InvoiceList: React.FC<InvoiceListProps> = () => {
           value={filters.dateRange}
           onChange={(range) => updateFilter("dateRange", range)}
         />
-        <CustomerFilter
-          value={filters.customerId}
-          onChange={(id) => updateFilter("customerId", id)}
+        <BusinessEntityFilter
+          value={filters.businessEntityId}
+          onChange={(id) => updateFilter("businessEntityId", id)}
+          placeholder="Search businesses..."
+          showRoles={true}
+          showHealthScore={true}
+        />
+        <BusinessRoleFilter
+          value={filters.businessRoles}
+          onChange={(roles) => updateFilter("businessRoles", roles)}
+          options={["customer", "partner", "government"]}
         />
         <AADEStatusFilter
           value={filters.aadeStatus}
@@ -147,7 +223,7 @@ const InvoiceList: React.FC<InvoiceListProps> = () => {
         />
       </FilterBar>
 
-      {/* Invoice Data Grid */}
+      {/* Enhanced Invoice Data Grid with Business Context */}
       <InvoiceDataGrid
         invoices={invoices}
         loading={loading}
@@ -164,48 +240,103 @@ const InvoiceList: React.FC<InvoiceListProps> = () => {
             ),
           },
           {
-            key: "customer",
-            title: "Customer",
-            render: (invoice) => <CustomerCell customer={invoice.customer} />,
+            key: "businessEntity",
+            title: "Business",
+            sortable: true,
+            render: (invoice) => (
+              <BusinessEntityCell 
+                business={invoice.businessEntity}
+                showRoles={true}
+                showHealthScore={true}
+                showQuickActions={true}
+                href={`/businesses/${invoice.businessEntity.id}`}
+              />
+            ),
+          },
+          {
+            key: "amount",
+            title: "Amount",
+            sortable: true,
+            align: "right",
+            render: (invoice) => (
+              <AmountCell 
+                amount={invoice.totalAmount}
+                currency={invoice.currency}
+                paymentStatus={invoice.paymentStatus}
+              />
+            ),
           },
           {
             key: "issueDate",
             title: "Issue Date",
             sortable: true,
-            render: (invoice) => formatGreekDate(invoice.issueDate),
+            render: (invoice) => formatDate(invoice.issueDate),
           },
           {
-            key: "total",
-            title: "Total",
+            key: "dueDate",
+            title: "Due Date", 
             sortable: true,
-            render: (invoice) => formatEuro(invoice.total),
+            render: (invoice) => (
+              <DueDateCell 
+                dueDate={invoice.dueDate}
+                status={invoice.status}
+                showOverdueIndicator={true}
+              />
+            ),
           },
           {
             key: "status",
             title: "Status",
-            render: (invoice) => <StatusBadge status={invoice.status} />,
+            render: (invoice) => (
+              <StatusBadge 
+                status={invoice.status}
+                aadeStatus={invoice.aadeStatus}
+              />
+            ),
           },
           {
-            key: "aadeStatus",
-            title: "AADE",
+            key: "businessContext",
+            title: "Context",
             render: (invoice) => (
-              <AADEStatusBadge status={invoice.aadeStatus} />
+              <BusinessContextCell
+                businessEntity={invoice.businessEntity}
+                showOpportunities={true}
+                showRecentActivity={true}
+                showCommunications={true}
+              />
             ),
           },
           {
             key: "actions",
             title: "Actions",
-            render: (invoice) => <InvoiceActionMenu invoice={invoice} />,
+            render: (invoice) => (
+              <InvoiceActionsMenu 
+                invoice={invoice}
+                businessEntity={invoice.businessEntity}
+                actions={[
+                  "view", "edit", "duplicate", "send", 
+                  "viewBusiness", "addNote", "scheduleFollowup"
+                ]}
+              />
+            ),
           },
         ]}
-        onRowClick={(invoice) => navigate(`/erp/invoicing/${invoice.id}`)}
+        onRowClick={(invoice) => `/erp/invoicing/${invoice.id}`}
+        showBusinessContext={true}
+        enableBulkActions={true}
+        bulkActions={[
+          "send", "markPaid", "exportPDF", "submitAADE", 
+          "sendPaymentReminder", "updateBusinessNotes"
+        ]}
       />
 
-      <Pagination
-        current={pagination.page}
-        total={pagination.total}
-        pageSize={pagination.size}
-        onChange={(page) => updatePagination({ page })}
+      {/* Business Insights Panel */}
+      <BusinessInsightsPanel
+        visible={filters.businessEntityId}
+        businessId={filters.businessEntityId}
+        showFinancialHealth={true}
+        showRecentActivity={true}
+        showOpportunities={true}
       />
     </PageLayout>
   );
@@ -214,156 +345,196 @@ const InvoiceList: React.FC<InvoiceListProps> = () => {
 
 ### 3. Invoice Creation (`/erp/invoicing/create`)
 
-**Purpose**: Create new invoices with Greek compliance
+**Purpose**: Create new invoices with complete business relationship context
 
 #### UI Components:
 
 ```typescript
 interface InvoiceCreateProps {
-  customerId?: string; // Pre-selected from CRM
-  templateId?: string; // Invoice template
+  businessEntityId?: string;          // Pre-selected from business view
+  opportunityId?: string;             // Pre-selected from opportunity
+  quoteId?: string;                   // Converting from quote
 }
 
-const InvoiceCreate: React.FC<InvoiceCreateProps> = () => {
-  const { form, handleSubmit, errors } = useInvoiceForm();
-  const { customers } = useCustomers();
-  const { services } = useServices();
-  const { vatRates } = useGreekVATRates();
+const InvoiceCreate: React.FC<InvoiceCreateProps> = ({ 
+  businessEntityId, 
+  opportunityId, 
+  quoteId 
+}) => {
+  const { form, handleSubmit } = useInvoiceForm({
+    businessEntityId,
+    opportunityId,
+    quoteId,
+  });
 
   return (
-    <FormLayout>
-      <FormHeader
+    <PageLayout>
+      <PageHeader 
         title="Create Invoice"
-        subtitle="Create a new invoice with Greek compliance"
+        subtitle="Integrated with complete business context"
       />
 
-      <InvoiceForm onSubmit={handleSubmit}>
-        {/* Customer Selection */}
-        <FormSection title="Customer Information">
-          <CustomerSelector
-            value={form.customerId}
-            onChange={(customer) => form.setCustomer(customer)}
-            customers={customers}
-            required
-            allowCreate // Can create customer from CRM
+      <FormLayout>
+        {/* Business Entity Selection with 360° Context */}
+        <FormSection title="Business Information">
+          <BusinessEntitySelector
+            value={form.businessEntityId}
+            onChange={(businessId) => form.setBusinessEntityId(businessId)}
+            showBusinessCard={true}
+            showHealthScore={true}
+            showRecentActivity={true}
+            showPaymentHistory={true}
+            showCreditStatus={true}
+            onBusinessSelect={(business) => {
+              // Auto-populate invoice data from business
+              form.setPaymentTerms(business.paymentTerms);
+              form.setDiscountPercentage(business.discountPercentage);
+              form.setCurrency(business.preferredCurrency || "EUR");
+            }}
           />
-
-          {form.customer && (
-            <CustomerSummary customer={form.customer} showGreekTaxInfo />
+        
+          {form.businessEntityId && (
+            <BusinessContextCard
+              businessId={form.businessEntityId}
+              showMetrics={["totalSales", "outstandingAmount", "paymentHistory"]}
+              showAlerts={["creditLimit", "overduePayments", "aadeIssues"]}
+              showQuickLinks={[
+                { label: "View Business", href: `/businesses/${form.businessEntityId}` },
+                { label: "Recent Communications", href: `/businesses/${form.businessEntityId}/communications` },
+                { label: "Payment History", href: `/businesses/${form.businessEntityId}/payments` }
+              ]}
+            />
           )}
         </FormSection>
 
-        {/* Invoice Details */}
-        <FormSection title="Invoice Details">
-          <Row>
-            <Col md={6}>
-              <InvoiceNumberField
-                value={form.invoiceNumber}
-                onChange={form.setInvoiceNumber}
-                autoGenerate
-                pattern="INV-{YYYY}-{###}"
-              />
-            </Col>
-            <Col md={6}>
-              <InvoiceDateField
-                value={form.issueDate}
-                onChange={form.setIssueDate}
-                required
-              />
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
-              <DueDateField
-                value={form.dueDate}
-                onChange={form.setDueDate}
-                defaultDays={30}
-              />
-            </Col>
-            <Col md={6}>
-              <PaymentTermsSelector
-                value={form.paymentTerms}
-                onChange={form.setPaymentTerms}
-                options={["immediate", "15_days", "30_days", "60_days"]}
-              />
-            </Col>
-          </Row>
-        </FormSection>
-
-        {/* Services/Items */}
-        <FormSection title="Services & Items">
-          <InvoiceItemsEditor
-            items={form.items}
-            onChange={form.setItems}
-            services={services}
-            vatRates={vatRates}
-            allowCustomItems
+        {/* Document Type and Settings */}
+        <FormSection title="Document Information">
+          <DocumentTypeSelector
+            value={form.documentType}
+            onChange={(type) => form.setDocumentType(type)}
+            businessContext={form.businessEntity}
+            showLegalRequirements={true}
+            showAADERequirements={true}
           />
-
-          <AddItemButton
-            onClick={() => form.addItem()}
-            options={[
-              { type: "service", label: "Add Service" },
-              { type: "custom", label: "Add Custom Item" },
-              { type: "template", label: "From Template" },
-            ]}
+        
+          <InvoiceNumberGenerator
+            series={form.series}
+            sequence={form.sequenceNumber}
+            onChange={(number) => form.setInvoiceNumber(number)}
+            businessEntityType={form.businessEntity?.entityType}
+          />
+        
+          <DatePickers
+            issueDate={form.issueDate}
+            dueDate={form.dueDate}
+            serviceDate={form.serviceDate}
+            onChange={(dates) => form.setDates(dates)}
+            paymentTerms={form.businessEntity?.paymentTerms}
           />
         </FormSection>
 
-        {/* Greek Tax Calculation */}
-        <FormSection title="Tax Calculation">
+        {/* Line Items with Product/Service Integration */}
+        <FormSection title="Invoice Items">
+          <InvoiceLineItems
+            items={form.lineItems}
+            onChange={(items) => form.setLineItems(items)}
+            businessEntity={form.businessEntity}
+            showProductSuggestions={true}
+            showServiceTemplates={true}
+            showPricingHistory={true}
+            enableBulkActions={true}
+            greekVATCalculation={true}
+          />
+        
+          <ProductServiceSelector
+            businessEntityId={form.businessEntityId}
+            showRecentPurchases={true}
+            showPricingHistory={true}
+            showBundleOptions={true}
+            onProductSelect={(product) => form.addLineItem(product)}
+          />
+        </FormSection>
+
+        {/* Greek VAT and Compliance */}
+        <FormSection title="Greek Tax Compliance">
           <GreekVATCalculator
-            items={form.items}
-            customer={form.customer}
-            businessType={form.businessType}
-            onCalculation={form.setTaxCalculation}
+            lineItems={form.lineItems}
+            businessEntity={form.businessEntity}
+            documentType={form.documentType}
+            onChange={(vatData) => form.setVATData(vatData)}
+            showBreakdown={true}
+            validateCompliance={true}
           />
-
-          <TaxSummary
-            subtotal={form.subtotal}
-            vatAmount={form.vatAmount}
-            total={form.total}
-            vatBreakdown={form.vatBreakdown}
+        
+          <AADEComplianceChecker
+            documentType={form.documentType}
+            businessEntity={form.businessEntity}
+            showRequirements={true}
+            autoValidate={true}
           />
         </FormSection>
 
-        {/* Notes & Additional Info */}
+        {/* Totals and Payment Information */}
+        <FormSection title="Payment Terms">
+          <InvoiceTotals
+            lineItems={form.lineItems}
+            discountPercentage={form.discountPercentage}
+            vatData={form.vatData}
+            currency={form.currency}
+            showBreakdown={true}
+          />
+        
+          <PaymentTermsSelector
+            businessEntity={form.businessEntity}
+            value={form.paymentTerms}
+            onChange={(terms) => form.setPaymentTerms(terms)}
+            showCreditStatus={true}
+            showHistoricalBehavior={true}
+          />
+        </FormSection>
+
+        {/* Notes and Attachments */}
         <FormSection title="Additional Information">
           <NotesField
             value={form.notes}
-            onChange={form.setNotes}
-            placeholder="Internal notes (not visible on invoice)"
+            onChange={(notes) => form.setNotes(notes)}
+            showTemplates={true}
+            businessContext={form.businessEntity}
           />
-
-          <CustomerNotesField
-            value={form.customerNotes}
-            onChange={form.setCustomerNotes}
-            placeholder="Notes visible to customer"
+        
+          <AttachmentsField
+            files={form.attachments}
+            onChange={(files) => form.setAttachments(files)}
+            allowedTypes={["pdf", "doc", "docx", "jpg", "png"]}
+            maxSize="10MB"
           />
         </FormSection>
 
-        {/* Actions */}
+        {/* Form Actions */}
         <FormActions>
-          <SaveDraftButton
+          <SaveDraftButton 
             onClick={() => handleSubmit("draft")}
             disabled={!form.isValid}
           />
           <SendInvoiceButton
             onClick={() => handleSubmit("send")}
-            disabled={!form.isValid || !form.customer?.email}
+            disabled={!form.isComplete}
+            businessEntity={form.businessEntity}
           />
-          <PreviewButton onClick={() => openPreview(form.data)} />
+          <PreviewButton
+            onClick={() => form.preview()}
+            disabled={!form.hasItems}
+          />
         </FormActions>
-      </InvoiceForm>
-    </FormLayout>
+      </FormLayout>
+    </PageLayout>
   );
 };
 ```
 
-### 4. Invoice Detail (`/erp/invoicing/:id`)
+### 4. Invoice Detail View (`/erp/invoicing/:id`)
 
-**Purpose**: View and manage individual invoice
+**Purpose**: Complete invoice view with full business relationship context
 
 #### UI Components:
 
@@ -373,99 +544,83 @@ interface InvoiceDetailProps {
 }
 
 const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoiceId }) => {
-  const { invoice, loading, error } = useInvoice(invoiceId);
-  const { permissions } = useInvoicePermissions(invoice);
-
-  if (loading) return <InvoiceDetailSkeleton />;
-  if (error) return <ErrorState error={error} />;
+  const { invoice, business, loading } = useInvoiceWithBusiness(invoiceId);
 
   return (
-    <DetailLayout>
-      <DetailHeader>
-        <InvoiceTitle invoice={invoice} />
-        <InvoiceActionToolbar invoice={invoice} permissions={permissions} />
-      </DetailHeader>
-
-      <DetailContent>
-        {/* Invoice Preview */}
-        <InvoicePreviewCard invoice={invoice}>
-          <InvoicePDFViewer invoice={invoice} showGreekFormat />
-        </InvoicePreviewCard>
-
-        {/* Invoice Information */}
-        <InvoiceInfoCard>
-          <InfoSection title="Customer">
-            <CustomerDisplay customer={invoice.customer} />
-            <CustomerContactInfo customer={invoice.customer} />
-          </InfoSection>
-
-          <InfoSection title="Invoice Details">
-            <DetailRow label="Invoice Number" value={invoice.invoiceNumber} />
-            <DetailRow
-              label="Issue Date"
-              value={formatGreekDate(invoice.issueDate)}
-            />
-            <DetailRow
-              label="Due Date"
-              value={formatGreekDate(invoice.dueDate)}
-            />
-            <DetailRow label="Payment Terms" value={invoice.paymentTerms} />
-          </InfoSection>
-
-          <InfoSection title="Financial Summary">
-            <DetailRow label="Subtotal" value={formatEuro(invoice.subtotal)} />
-            <DetailRow
-              label="VAT Amount"
-              value={formatEuro(invoice.vatAmount)}
-            />
-            <DetailRow label="Total" value={formatEuro(invoice.total)} strong />
-          </InfoSection>
-        </InvoiceInfoCard>
-
-        {/* AADE Compliance */}
-        <AADEComplianceCard invoice={invoice}>
-          <AADESubmissionStatus
-            status={invoice.aadeStatus}
-            submissionDate={invoice.aadeSubmissionDate}
-            mark={invoice.aadeMark}
+    <PageLayout>
+      <PageHeader
+        title={`Invoice ${invoice.invoiceNumber}`}
+        subtitle={`${business.displayName} • ${invoice.documentType}`}
+        actions={
+          <InvoiceActions
+            invoice={invoice}
+            business={business}
+            actions={[
+              "edit", "duplicate", "send", "markPaid", "generatePDF",
+              "submitAADE", "viewBusiness", "addNote", "scheduleFollowup"
+            ]}
           />
+        }
+      />
 
-          {invoice.aadeStatus === "pending" && (
-            <SubmitToAADEButton
-              invoiceId={invoice.id}
-              onSubmit={handleAADESubmission}
-            />
-          )}
-
-          {invoice.qrCode && (
-            <QRCodeDisplay qrCode={invoice.qrCode} label="AADE QR Code" />
-          )}
-        </AADEComplianceCard>
-
-        {/* Payment Tracking */}
-        <PaymentTrackingCard invoice={invoice}>
-          <PaymentStatus
-            status={invoice.paymentStatus}
-            amountPaid={invoice.amountPaid}
-            amountDue={invoice.amountDue}
+      <DetailLayout>
+        {/* Invoice Document Panel */}
+        <MainPanel>
+          <InvoiceDocument
+            invoice={invoice}
+            business={business}
+            showQRCode={true}
+            showAADEStatus={true}
+            enableActions={true}
           />
+        
+          <InvoiceTimeline
+            invoice={invoice}
+            showBusinessContext={true}
+            showCommunications={true}
+            showPayments={true}
+            showAADEEvents={true}
+          />
+        </MainPanel>
 
-          <PaymentHistory payments={invoice.payments} />
-
-          {permissions.canRecordPayment && (
-            <RecordPaymentButton
-              invoiceId={invoice.id}
-              amountDue={invoice.amountDue}
-            />
-          )}
-        </PaymentTrackingCard>
-
-        {/* Activity Timeline */}
-        <ActivityTimelineCard>
-          <InvoiceTimeline activities={invoice.activities} showSystemEvents />
-        </ActivityTimelineCard>
-      </DetailContent>
-    </DetailLayout>
+        {/* Business Context Sidebar */}
+        <SidePanel>
+          <BusinessContextPanel
+            business={business}
+            currentInvoice={invoice}
+            sections={[
+              "overview",
+              "contacts", 
+              "recentActivity",
+              "paymentHistory",
+              "openInvoices",
+              "opportunities",
+              "communications"
+            ]}
+          />
+        
+          <QuickActionsPanel
+            business={business}
+            invoice={invoice}
+            actions={[
+              { label: "Send Payment Reminder", action: "sendReminder" },
+              { label: "Schedule Follow-up", action: "scheduleTask" },
+              { label: "Add Business Note", action: "addNote" },
+              { label: "View All Invoices", href: `/businesses/${business.id}/invoices` },
+              { label: "View Business Profile", href: `/businesses/${business.id}` }
+            ]}
+          />
+        
+          <RelatedInvoicesPanel
+            businessId={business.id}
+            currentInvoiceId={invoice.id}
+            showStatus={true}
+            showAmounts={true}
+            limit={10}
+          />
+        </SidePanel>
+      </DetailLayout>
+    </PageLayout>
   );
 };
 ```
@@ -676,55 +831,119 @@ interface GetAADEStatusResponse {
 
 ## 🗃️ Data Models
 
-### Core Invoice Model
+### Enhanced Invoice Model - Supporting 16 Greek Document Types
 
 ```typescript
 interface Invoice {
   id: string;
   invoiceNumber: string;
+  series: string;
+  sequenceNumber: number;
+  
+  // Company and customer
+  companyId: string;
   customerId: string;
   customer: Customer; // From CRM
 
-  // Invoice Details
+  // Document type and classification
+  invoiceType: InvoiceType; // 16 Greek document types
+  status: InvoiceStatus;
+  
+  // Greek business compliance
+  isLegalDocument: boolean; // Legal document (requires AADE) vs business workflow
+  affectsVat: boolean; // Does this document affect VAT calculations
+  affectsInventory: boolean; // Does this document affect inventory
+
+  // Document dates
   issueDate: Date;
   dueDate: Date;
-  paymentTerms: string;
+  serviceDate?: Date; // Date of service delivery
+  deliveryDate?: Date; // Actual delivery date
 
+  // Document workflow - related documents
+  parentDocumentId?: string; // Parent document (e.g., Order for Invoice)
+  originalDocumentId?: string; // Original document for corrections
+  
   // Items
   items: InvoiceItem[];
 
-  // Financial
+  // Financial calculations
   subtotal: number;
-  vatAmount: number;
-  total: number;
+  totalVatAmount: number;
+  totalDiscountAmount: number;
+  totalExtraCharges: number;
+  totalGross: number;
+  totalNet: number;
   currency: string;
 
-  // Status
-  status: InvoiceStatus;
+  // Payment information
   paymentStatus: PaymentStatus;
   amountPaid: number;
   amountDue: number;
+  paymentTerms: string;
+  paymentMethod?: PaymentMethod;
 
-  // Greek Compliance
+  // Greek AADE compliance
   aadeStatus: AADEStatus;
   aadeSubmissionDate?: Date;
-  aadeMark?: string;
-  qrCode?: string;
+  aadeMark?: string; // MyDATA submission mark
+  qrCode?: string; // QR code for legal documents
+  aadeClassification?: string; // AADE classification
   greekVATInfo: GreekVATInfo;
 
-  // Additional Info
+  // Document relationships and workflow
+  documentWorkflow: DocumentWorkflow;
+  
+  // Multi-language support
+  language: "greek" | "english";
+  
+  // Additional information
   notes?: string;
   customerNotes?: string;
+  internalNotes?: string;
+  
+  // Terms and conditions
+  termsAndConditions?: string;
+  
+  // Delivery information
+  deliveryAddress?: Address;
+  deliveryMethod?: string;
+  
+  // Greek business fields
+  greekBusinessFields: GreekBusinessFields;
 
-  // Audit
+  // Audit trail
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
+  lastModifiedBy: string;
 
   // Relations
   payments: Payment[];
   activities: InvoiceActivity[];
+  attachments: DocumentAttachment[];
 }
+
+// 16 Greek Document Types
+type InvoiceType = 
+  // Legal documents (νόμιμα παραστατικά)
+  | "sales_invoice"           // Τιμολόγιο Πώλησης
+  | "receipt"                 // Απόδειξη Λιανικής Πώλησης
+  | "credit_note"             // Πιστωτικό Τιμολόγιο
+  | "debit_note"              // Χρεωστικό Τιμολόγιο
+  | "proforma"                // Προτιμολόγιο
+  | "delivery_note"           // Δελτίο Αποστολής
+  | "simplified_invoice"      // Απλοποιημένο Τιμολόγιο
+  | "self_billing"            // Αυτο-τιμολόγηση
+  | "e_invoice"               // Ηλεκτρονικό Τιμολόγιο
+  // Business workflow documents
+  | "sales_order"             // Δελτίο Παραγγελίας
+  | "order_confirmation"      // Επιβεβαίωση Παραγγελίας
+  | "purchase_order"          // Παραγγελία Προμηθευτή
+  | "request_for_quotation"   // Αίτημα Προσφοράς
+  | "sales_quotation"         // Προσφορά Πώλησης
+  | "return_note"             // Δελτίο Επιστροφής
+  | "internal_transfer";      // Εσωτερική Μεταφορά
 
 interface InvoiceItem {
   id: string;
@@ -733,31 +952,122 @@ interface InvoiceItem {
   unitPrice: number;
   total: number;
 
-  // VAT
+  // Product/Service reference
+  productId?: string;
+  product?: Product;
+  
+  // VAT information
   vatRate: number;
   vatAmount: number;
   vatExempt: boolean;
   vatExemptionReason?: string;
+  vatCategory: VatCategory;
 
-  // Service-specific
+  // Service-specific fields
   serviceId?: string;
   duration?: number; // For hourly services
+  serviceDate?: Date;
+  professionalType?: string;
 
-  // Greek specifics
+  // Discount and charges
+  discountPercentage?: number;
+  discountAmount?: number;
+  extraCharges?: number;
+  
+  // Greek business compliance
   greekTaxCategory: GreekTaxCategory;
+  islandVatReduction: boolean;
+  
+  // Unit of measure
+  unitOfMeasure: string;
+  
+  // Custom fields
+  customFields: Record<string, any>;
+}
+
+interface DocumentWorkflow {
+  // Document relationships
+  isParentDocument: boolean;
+  hasChildDocuments: boolean;
+  childDocumentIds: string[];
+  
+  // Workflow stage
+  workflowStage: WorkflowStage;
+  nextAllowedActions: string[];
+  
+  // Approval workflow
+  requiresApproval: boolean;
+  approvalStatus?: "pending" | "approved" | "rejected";
+  approvedBy?: string;
+  approvedAt?: Date;
+  
+  // Version control
+  version: number;
+  isCurrentVersion: boolean;
+  previousVersionId?: string;
+}
+
+type WorkflowStage = 
+  | "draft"
+  | "pending_approval"
+  | "approved"
+  | "sent"
+  | "accepted"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+interface GreekBusinessFields {
+  // Professional service fields
+  professionalChamberRegistration?: string;
+  professionalType?: string;
+  
+  // AADE specific
+  aadeTransactionId?: string;
+  invoiceVariationType?: string;
+  
+  // Tax office information
+  issuerTaxOffice: string;
+  customerTaxOffice?: string;
+  
+  // Special business scenarios
+  isB2B: boolean;
+  isB2C: boolean;
+  isB2G: boolean; // Business to Government
+  
+  // Island VAT reduction
+  islandReduction: boolean;
+  islandReducionPercentage?: number;
+  
+  // Special tax scenarios
+  reverseChargeApplicable: boolean;
+  marginSchemeApplicable: boolean;
+  
+  // Export/import
+  isExport: boolean;
+  isImport: boolean;
+  countryOfOrigin?: string;
+  countryOfDestination?: string;
 }
 
 type InvoiceStatus =
   | "draft"
+  | "pending_approval"
+  | "approved"
   | "sent"
   | "viewed"
   | "accepted"
   | "rejected"
-  | "cancelled";
+  | "cancelled"
+  | "completed";
 
 type PaymentStatus = "unpaid" | "partially_paid" | "paid" | "overdue";
 
-type AADEStatus = "pending" | "submitted" | "accepted" | "rejected" | "error";
+type AADEStatus = "not_required" | "pending" | "submitted" | "accepted" | "rejected" | "error";
+
+type VatCategory = "standard" | "reduced_1" | "reduced_2" | "zero" | "exempt";
+
+type PaymentMethod = "cash" | "bank_transfer" | "credit_card" | "debit_card" | "cheque" | "installments";
 ```
 
 ### Payment Model

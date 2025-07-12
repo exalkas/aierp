@@ -12,7 +12,7 @@
 
 - **Separate Database per Company**: Each company gets dedicated database (erp*company*{id})
 - **Smart Resource Pooling**: Small companies share PostgreSQL instances, large companies get dedicated
-- **Partitioning Strategy**: Yearly partitions for customers, monthly for high-volume transactions
+- **Partitioning Strategy**: Yearly partitions for business entities, monthly for high-volume transactions
 - **Multi-Schema**: Use schemas within each company DB (core, crm, erp, config, audit, custom)
 - **No Shared Tables**: Zero write contention, complete performance isolation
 
@@ -26,7 +26,7 @@
 
 ## Partitioning Strategy (MANDATORY)
 
-- **Customer Tables**: Yearly partitions by created_at
+- **Business Entity Tables**: Yearly partitions by created_at
 - **Transaction Tables**: Monthly partitions by transaction_date
 - **Historical Access**: All data always available, no fiscal year switching
 - **Automatic Pruning**: PostgreSQL handles partition selection automatically
