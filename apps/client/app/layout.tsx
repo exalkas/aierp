@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { TranslationProvider, AuthProvider } from "@erp/shared-ui";
+import { AppName } from "@erp/shared-ui/constants";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Greek ERP/CRM System",
-  description: "Comprehensive Greek business management system",
+  description:
+    "Greek Business Management System with multi-tenant architecture and AADE compliance",
 };
 
 export default function RootLayout({
@@ -15,9 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="el">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">{children}</div>
+        <TranslationProvider>
+          <AuthProvider app={AppName.CLIENT}>{children}</AuthProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

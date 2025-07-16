@@ -13,7 +13,7 @@ import logging
 from uuid import uuid4
 
 from database import get_db
-from models import User, Company, UserRole, UserStatus
+from models import User, Company, UserStatus
 from jwt_utils import jwt_manager
 from schemas import (
     LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse,
@@ -56,45 +56,12 @@ class AuthenticationService:
                     detail="Invalid email or password"
                 )
             
-            # Check if account is locked
-            if user.locked_until and user.locked_until > datetime.utcnow():
-                logger.warning(f"Login attempt on locked account: {user.email}")
-                raise HTTPException(
-                    status_code=status.HTTP_423_LOCKED,
-                    detail="Account is temporarily locked due to too many failed login attempts"
-                )
-            
             # Verify password
             if not user.verify_password(login_data.password):
-                # Increment failed login attempts
-                user.failed_login_attempts += 1
-                
-                # Lock account if too many failed attempts
-                if user.failed_login_attempts >= settings.MAX_LOGIN_ATTEMPTS:
-                    user.locked_until = datetime.utcnow() + timedelta(hours=1)
-                    logger.warning(f"Account locked due to failed login attempts: {user.email}")
-                
-                await db.commit()
-                
                 logger.warning(f"Failed login attempt for user: {user.email}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid email or password"
-                )
-            
-            # Check user status
-            if user.status == UserStatus.SUSPENDED:
-                logger.warning(f"Login attempt on suspended account: {user.email}")
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Account is suspended"
-                )
-            
-            if user.status == UserStatus.INACTIVE:
-                logger.warning(f"Login attempt on inactive account: {user.email}")
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Account is inactive"
                 )
             
             # Get company information
@@ -109,11 +76,8 @@ class AuthenticationService:
                     detail="Company account is inactive"
                 )
             
-            # Reset failed login attempts on successful login
-            user.failed_login_attempts = 0
-            user.locked_until = None
+            # Update last login
             user.last_login = datetime.utcnow()
-            user.last_activity = datetime.utcnow()
             
             # Generate tokens
             access_token_expires = timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -127,8 +91,16 @@ class AuthenticationService:
             )
             refresh_token = self.jwt_manager.create_refresh_token(user=user)
             
-            # Update session token in database
-            user.session_token = secrets.token_urlsafe(32)
+            # Create user dict BEFORE commit to avoid session issues
+            user_dict = user.to_dict()
+            company_dict = {
+                "id": str(company.id),
+                "name": company.name,
+                "afm": company.afm,
+                "doy": company.doy,
+                "is_active": company.is_active,
+            }
+            
             await db.commit()
             
             logger.info(f"Successful login for user: {user.email}")
@@ -138,16 +110,8 @@ class AuthenticationService:
                 refresh_token=refresh_token,
                 token_type="bearer",
                 expires_in=int(access_token_expires.total_seconds()),
-                user=user.to_dict(),
-                company={
-                    "id": str(company.id),
-                    "name": company.name,
-                    "display_name": company.display_name,
-                    "afm": company.afm,
-                    "doy": company.doy,
-                    "is_active": company.is_active,
-                    "is_verified": company.is_verified
-                }
+                user=user_dict,
+                company=company_dict
             )
             
         except HTTPException:

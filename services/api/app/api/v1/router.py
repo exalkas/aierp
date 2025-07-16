@@ -10,6 +10,8 @@ from app.core.config import settings
 from app.api.v1.vat_simplified import vat_router
 from app.api.v1.document_workflow import router as workflow_router
 from app.api.v1.voice_commands import router as voice_router
+from app.api.v1.business_entities import router as business_entities_router
+from app.api.v1.contacts import router as contacts_router
 
 # Security
 security = HTTPBearer()
@@ -25,6 +27,26 @@ api_router.include_router(workflow_router)
 
 # Include voice commands router
 api_router.include_router(voice_router, prefix="/voice", tags=["voice-commands"])
+
+# Include business entity router
+api_router.include_router(business_entities_router, tags=["business-entities"])
+
+# Include contacts router
+api_router.include_router(contacts_router, tags=["contacts"])
+
+# Legacy/compatibility endpoints for frontend
+from fastapi import Request
+from fastapi.responses import RedirectResponse
+
+@api_router.get("/customers")
+async def redirect_customers():
+    """Redirect customers to business-entities with customer role filter"""
+    return RedirectResponse(url="/api/v1/business-entities?role_filter=customer", status_code=301)
+
+@api_router.get("/suppliers")
+async def redirect_suppliers():
+    """Redirect suppliers to business-entities with supplier role filter"""
+    return RedirectResponse(url="/api/v1/business-entities?role_filter=supplier", status_code=301)
 
 # Health check endpoint
 @api_router.get("/health")

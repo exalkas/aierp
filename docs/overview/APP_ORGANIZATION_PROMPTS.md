@@ -50,10 +50,35 @@ erp-monorepo/
 │       └── restaurant-kitchen/    # Restaurant modules
 │
 ├── apps/
-│   ├── saas/                      # Standard SaaS app
+│   ├── client/                    # Main business app (ERP/CRM)
 │   │   ├── src/
 │   │   ├── package.json
-│   │   └── vite.config.ts
+│   │   └── next.config.js
+│   │
+│   ├── admin/                     # Admin interface
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
+│   │
+│   ├── user-support/              # Customer-facing support portal
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
+│   │
+│   ├── staff-support/             # Internal support management
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
+│   │
+│   ├── setup/                     # Onboarding wizard
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
+│   │
+│   ├── marketing/                 # Public website & registration
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
 │   │
 │   └── customers/                 # Customer-specific apps
 │       ├── petshop/

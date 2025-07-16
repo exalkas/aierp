@@ -24,7 +24,8 @@ greek-erp-crm/
 │   ├── admin/      # Admin interface
 │   ├── user-support/     # Customer support portal
 │   ├── staff-support/    # Staff support management
-│   └── setup/      # Onboarding wizard
+│   ├── setup/      # Onboarding wizard
+│   └── marketing/  # Public website & registration
 ├── packages/
 │   ├── authorization/    # Subscription & permissions
 │   ├── data-engine/     # Database abstraction
@@ -206,7 +207,6 @@ class Subscription(Base):
 
 6. Alembic Migration Script:
    Create migration that sets up all tables with proper indexes.
-
 7. Greek Data Seeding:
 
 ```python
@@ -2942,25 +2942,25 @@ export class WorkflowBuilder {
 export class ${workflow.name.replace(/\s+/g, "")}Workflow {
   async execute(context: WorkflowContext): Promise<WorkflowResult> {
     const { entity, user, data } = context;
-    
+  
     try {
       // Check conditions
       const conditionsMet = await this.checkConditions(entity, data);
       if (!conditionsMet) {
         return { success: false, reason: 'Conditions not met' };
       }
-      
+    
       // Execute actions
       ${this.generateActionsCode(workflow.actions)}
-      
+    
       // Greek compliance checks
       ${this.generateGreekComplianceCode(workflow.greekBusinessRules)}
-      
+    
       // AADE integration if needed
       ${workflow.aadeIntegration ? this.generateAADECode(workflow) : ""}
-      
+    
       return { success: true, result: 'Workflow completed successfully' };
-      
+    
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -3150,11 +3150,11 @@ export const ${report.name.replace(/\s+/g, "")}Report = () => {
           greekFormatting={${report.greekFormatting}}
         />
       </div>
-      
+    
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         ${this.generateChartsCode(report.charts)}
       </div>
-      
+    
       <div className="space-y-4">
         ${this.generateTablesCode(report.tables)}
       </div>
@@ -3238,28 +3238,28 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
     try {
       // Authenticate
       const auth = await this.authenticate();
-      
+    
       // Fetch data
       const data = await this.fetchData(auth);
-      
+    
       // Transform data
       const transformedData = await this.transformData(data);
-      
+    
       // Greek compliance validation
       ${integration.greekDataHandling ? this.generateGreekValidationCode() : ""}
-      
+    
       // Save to database
       const saveResult = await this.saveData(transformedData);
-      
+    
       // AADE integration if needed
       ${integration.aadeIntegration ? this.generateAADEIntegrationCode() : ""}
-      
+    
       return {
         success: true,
         recordsProcessed: saveResult.count,
         executionTime: Date.now() - startTime
       };
-      
+    
     } catch (error) {
       return {
         success: false,
@@ -3281,7 +3281,7 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
           .join(",\n        ")}
       }
     });
-    
+  
     return await response.json();
   }
   
@@ -3294,12 +3294,12 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
   
   private async saveData(data: any[]): Promise<{ count: number }> {
     let count = 0;
-    
+  
     for (const item of data) {
       await this.dataEngine.create('${integration.targetEntity}', item);
       count++;
     }
-    
+  
     return { count };
   }
 }`;
@@ -4386,25 +4386,25 @@ export class ComplianceBuilder {
 export class ${compliance.name.replace(/\s+/g, "")}Compliance {
   async execute(context: ComplianceContext): Promise<ComplianceResult> {
     const { entity, user, data } = context;
-    
+  
     try {
       // Check conditions
       const conditionsMet = await this.checkConditions(entity, data);
       if (!conditionsMet) {
         return { success: false, reason: 'Conditions not met' };
       }
-      
+    
       // Execute actions
       ${this.generateActionsCode(compliance.rules)}
-      
+    
       // Greek compliance checks
       ${this.generateGreekComplianceCode(compliance.greekBusinessRules)}
-      
+    
       // AADE integration if needed
       ${compliance.aadeIntegration ? this.generateAADECode(compliance) : ""}
-      
+    
       return { success: true, result: 'Compliance completed successfully' };
-      
+    
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -4594,11 +4594,11 @@ export const ${report.name.replace(/\s+/g, "")}Report = () => {
           greekFormatting={${report.greekFormatting}}
         />
       </div>
-      
+    
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         ${this.generateChartsCode(report.charts)}
       </div>
-      
+    
       <div className="space-y-4">
         ${this.generateTablesCode(report.tables)}
       </div>
@@ -4682,28 +4682,28 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
     try {
       // Authenticate
       const auth = await this.authenticate();
-      
+    
       // Fetch data
       const data = await this.fetchData(auth);
-      
+    
       // Transform data
       const transformedData = await this.transformData(data);
-      
+    
       // Greek compliance validation
       ${integration.greekDataHandling ? this.generateGreekValidationCode() : ""}
-      
+    
       // Save to database
       const saveResult = await this.saveData(transformedData);
-      
+    
       // AADE integration if needed
       ${integration.aadeIntegration ? this.generateAADEIntegrationCode() : ""}
-      
+    
       return {
         success: true,
         recordsProcessed: saveResult.count,
         executionTime: Date.now() - startTime
       };
-      
+    
     } catch (error) {
       return {
         success: false,
@@ -4725,7 +4725,7 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
           .join(",\n        ")}
       }
     });
-    
+  
     return await response.json();
   }
   
@@ -4738,12 +4738,12 @@ export class ${integration.name.replace(/\s+/g, "")}Integration {
   
   private async saveData(data: any[]): Promise<{ count: number }> {
     let count = 0;
-    
+  
     for (const item of data) {
       await this.dataEngine.create('${integration.targetEntity}', item);
       count++;
     }
-    
+  
     return { count };
   }
 }`;

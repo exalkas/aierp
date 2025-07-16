@@ -84,6 +84,13 @@ class User(Base):
     failed_login_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime)
     
+    # Super user protection
+    is_super_user = Column(Boolean, default=False, nullable=False)
+    super_user_created_at = Column(DateTime)
+    super_user_created_by = Column(UUID(as_uuid=True))
+    can_be_deleted = Column(Boolean, default=True, nullable=False)
+    can_change_password = Column(Boolean, default=True, nullable=False)
+    
     # Session management
     last_login = Column(DateTime)
     last_activity = Column(DateTime)
@@ -240,46 +247,144 @@ class User(Base):
         self.failed_login_attempts = 0
     
     def unlock_account(self) -> None:
-        """Unlock account"""
-        self.status = UserStatus.ACTIVE
-        self.locked_until = None
+        """Unlock user account"""
         self.failed_login_attempts = 0
+        self.locked_until = None
+        
+    def is_protected_super_user(self) -> bool:
+        """Check if user is a protected super user"""
+        return self.is_super_user and self.role == UserRole.SUPER_ADMIN
+    
+    def can_be_deleted_by(self, requesting_user: 'User') -> bool:
+        """Check if user can be deleted by the requesting user"""
+        # Super users can only be deleted by themselves
+        if self.is_protected_super_user():
+            return requesting_user.id == self.id
+        
+        # Regular users can be deleted by super users or company admins
+        if requesting_user.is_protected_super_user():
+            return True
+            
+        # Company admins can delete users in their company (except super users)
+        if requesting_user.role == UserRole.COMPANY_ADMIN and requesting_user.company_id == self.company_id:
+            return not self.is_protected_super_user()
+        
+        return False
+    
+    def can_change_password_by(self, requesting_user: 'User') -> bool:
+        """Check if user password can be changed by the requesting user"""
+        # Super users can only change their own password
+        if self.is_protected_super_user():
+            return requesting_user.id == self.id
+        
+        # Regular users can change their own password
+        if requesting_user.id == self.id:
+            return True
+            
+        # Super users can change any user's password
+        if requesting_user.is_protected_super_user():
+            return True
+            
+        # Company admins can change passwords in their company (except super users)
+        if requesting_user.role == UserRole.COMPANY_ADMIN and requesting_user.company_id == self.company_id:
+            return not self.is_protected_super_user()
+        
+        return False
+    
+    def make_super_user(self, created_by_user: 'User') -> None:
+        """Make this user a protected super user"""
+        if not created_by_user.is_protected_super_user():
+            raise ValueError("Only super users can create other super users")
+        
+        self.is_super_user = True
+        self.role = UserRole.SUPER_ADMIN
+        self.super_user_created_at = func.now()
+        self.super_user_created_by = created_by_user.id
+        self.can_be_deleted = False
+        self.can_change_password = False
+    
+    def has_app_access(self, app_name: str) -> bool:
+        """Check if user has access to specific app"""
+        app_access_map = {
+            'admin': [UserRole.SUPER_ADMIN],
+            'client': [UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE, UserRole.VIEWER, UserRole.CLIENT],
+            'setup': [UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN],
+            'staff-support': [UserRole.SUPER_ADMIN],
+            'user-support': [UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN]
+        }
+        
+        allowed_roles = app_access_map.get(app_name, [])
+        return self.role in allowed_roles
+    
+    def get_app_permissions(self, app_name: str) -> List[str]:
+        """Get user permissions for specific app"""
+        if not self.has_app_access(app_name):
+            return []
+        
+        app_permissions = {
+            'admin': {
+                UserRole.SUPER_ADMIN: ['*']  # All permissions
+            },
+            'client': {
+                UserRole.SUPER_ADMIN: ['*'],
+                UserRole.COMPANY_ADMIN: ['company:*', 'users:*', 'settings:*', 'reports:*'],
+                UserRole.MANAGER: ['users:read', 'customers:*', 'products:*', 'invoices:*', 'reports:*'],
+                UserRole.EMPLOYEE: ['customers:read', 'customers:write', 'products:read', 'invoices:read', 'invoices:write'],
+                UserRole.VIEWER: ['customers:read', 'products:read', 'invoices:read', 'reports:read'],
+                UserRole.CLIENT: ['invoices:read', 'profile:read', 'profile:write']
+            },
+            'setup': {
+                UserRole.SUPER_ADMIN: ['*'],
+                UserRole.COMPANY_ADMIN: ['company:setup', 'modules:configure', 'integrations:setup']
+            },
+            'staff-support': {
+                UserRole.SUPER_ADMIN: ['*']
+            },
+            'user-support': {
+                UserRole.SUPER_ADMIN: ['*'],
+                UserRole.COMPANY_ADMIN: ['tickets:read', 'tickets:create', 'company:support']
+            }
+        }
+        
+        return app_permissions.get(app_name, {}).get(self.role, [])
     
     def to_dict(self, include_sensitive: bool = False) -> Dict[str, Any]:
-        """Convert user to dictionary for API responses"""
-        data = {
-            "id": str(self.id),
-            "company_id": str(self.company_id),
-            "username": self.username,
-            "email": self.email,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "full_name": self.full_name,
-            "display_name": self.display_name,
-            "phone": self.phone,
-            "mobile": self.mobile,
-            "role": self.role.value,
-            "department": self.department,
-            "position": self.position,
-            "status": self.status.value,
-            "is_active": self.is_active,
-            "is_verified": self.is_verified,
-            "language": self.language,
-            "timezone": self.timezone,
-            "two_factor_enabled": self.two_factor_enabled,
-            "last_login": self.last_login.isoformat() if self.last_login else None,
-            "last_activity": self.last_activity.isoformat() if self.last_activity else None,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        """Convert user to dictionary"""
+        user_dict = {
+            'id': str(self.id),
+            'company_id': str(self.company_id),
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'full_name': self.full_name,
+            'display_name': self.display_name,
+            'phone': self.phone,
+            'mobile': self.mobile,
+            'role': self.role.value,
+            'department': self.department,
+            'position': self.position,
+            'status': self.status.value,
+            'is_active': self.is_active,
+            'is_verified': self.is_verified,
+            'is_super_user': self.is_super_user,
+            'language': self.language,
+            'timezone': self.timezone,
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'permissions': self.get_role_permissions(),
+            'can_be_deleted': self.can_be_deleted,
+            'can_change_password': self.can_change_password
         }
         
         if include_sensitive:
-            data.update({
-                "permissions": self.permissions,
-                "notification_preferences": self.notification_preferences,
-                "ui_preferences": self.ui_preferences,
-                "failed_login_attempts": self.failed_login_attempts,
-                "password_changed_at": self.password_changed_at.isoformat() if self.password_changed_at else None
+            user_dict.update({
+                'password_hash': self.password_hash,
+                'session_token': self.session_token,
+                'two_factor_secret': self.two_factor_secret,
+                'failed_login_attempts': self.failed_login_attempts,
+                'locked_until': self.locked_until.isoformat() if self.locked_until else None
             })
         
-        return data 
+        return user_dict 

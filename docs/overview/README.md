@@ -9,7 +9,8 @@ docs/
 │   ├── admin-app/                  # System Administration
 │   ├── user-support-app/           # Customer-facing Support Portal
 │   ├── staff-support-app/          # Internal Support Management
-│   └── setup-app/                  # Onboarding Wizard
+│   ├── setup-app/                  # Onboarding Wizard
+│   └── marketing-app/              # Public Website & Registration
 ├── 🔗 shared/                      # Shared Components & Services
 ├── 🇬🇷 greek-compliance/          # Greek Business Compliance
 ├── 📊 implementation/              # Implementation Plans & Roadmaps

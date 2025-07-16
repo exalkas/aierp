@@ -51,35 +51,44 @@ class JWTManager:
             "username": user.username,
             "email": user.email,
             "full_name": user.full_name,
-            "role": user.role.value,
-            "status": user.status.value,
+            "role": user.role,
             "is_active": user.is_active,
-            "is_verified": user.is_verified,
+            "is_superuser": user.is_superuser,
             
             # Company context (essential for multi-tenant)
             "company_id": str(company.id),
             "company_name": company.name,
             "company_afm": company.afm,
             "company_active": company.is_active,
-            "company_verified": company.is_verified,
             
             # Permissions
             "permissions": user.get_role_permissions(),
-            "custom_permissions": user.permissions or [],
             
-            # Greek localization
-            "language": user.language,
-            "timezone": user.timezone,
+            # Default localization
+            "language": "el",
+            "timezone": "Europe/Athens",
             
             # Token type
             "token_type": "access"
         }
         
         try:
+            logger.info(f"🔍 AUTH DEBUG - Creating access token for user: {user.username}")
+            logger.info(f"🔍 AUTH DEBUG - Using JWT secret: {self.secret_key[:10]}...")
+            logger.info(f"🔍 AUTH DEBUG - Using JWT algorithm: {self.algorithm}")
+            logger.info(f"🔍 AUTH DEBUG - Token expires in: {self.access_token_expire_minutes} minutes")
+            logger.info(f"🔍 AUTH DEBUG - Payload keys: {list(payload.keys())}")
+            logger.info(f"🔍 AUTH DEBUG - Company ID in payload: {payload.get('company_id')}")
+            
             token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+            
+            logger.info(f"🔍 AUTH DEBUG - Token created successfully")
+            logger.info(f"🔍 AUTH DEBUG - Token length: {len(token)}")
+            logger.info(f"🔍 AUTH DEBUG - Token start: {token[:50]}...")
             logger.info(f"Access token created for user {user.username} ({user.email})")
             return token
         except Exception as e:
+            logger.error(f"🔍 AUTH DEBUG - Failed to create access token: {e}")
             logger.error(f"Failed to create access token: {e}")
             raise
     

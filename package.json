@@ -13,14 +13,16 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
-    "dev:all": "concurrently \"npm run dev:python\" \"npm run dev:js\"",
+    "dev:all": "concurrently \"npm run dev:python\" \"npm run dev:js\" \"npm run dev:auth\"",
     "dev:python": "npm run dev:api",
     "dev:js": "npm run dev:client",
     "dev:client": "cd apps/client && npm run dev",
+    "dev:client:turbo": "cd apps/client && npm run dev -- --turbo",
     "dev:admin": "cd apps/admin && npm run dev",
     "dev:user-support": "cd apps/user-support && npm run dev",
     "dev:staff-support": "cd apps/staff-support && npm run dev",
     "dev:setup": "cd apps/setup && npm run dev",
+    "dev:marketing": "cd apps/marketing && npm run dev",
     "dev:api": "cd services/api && poetry run python -m uvicorn main:app --reload --port 8000",
     "dev:auth": "cd services/auth && poetry run python -m uvicorn main:app --reload --port 8001",
     "dev:files": "cd services/files && poetry run python -m uvicorn main:app --reload --port 8002",
@@ -29,21 +31,32 @@
     "dev:voice": "cd packages/ai-services/voice-service && poetry run python -m uvicorn main:app --reload --port 8005",
     "install:python": "poetry install --no-root",
     "install:js": "npm install",
-    "install:both": "npm run install:js && npm run install:python",
-    "build": "npm run build:packages && npm run build:apps",
+    "install:both": "npm run install:js ; npm run install:python",
+    "build": "npm run build:packages ; npm run build:apps",
     "build:packages": "npm run build --workspaces --if-present",
     "build:apps": "npm run build --workspace=apps/*",
-    "test": "npm run test --workspaces && npm run test:python",
+    "build:shared-ui": "npm run build --workspace=packages/shared/ui",
+    "watch:shared-ui": "npm run dev --workspace=packages/shared/ui",
+    "dev:with-shared-ui": "concurrently \"npm run watch:shared-ui\" \"npm run dev:client\"",
+    "test": "npm run test --workspaces ; npm run test:python",
     "test:python": "poetry run pytest",
-    "lint": "npm run lint:js && npm run lint:python",
+    "lint": "npm run lint:js ; npm run lint:python",
     "lint:js": "npm run lint --workspaces --if-present",
-    "lint:python": "poetry run black --check . && poetry run isort --check-only . && poetry run flake8 . && poetry run mypy .",
-    "format": "npm run format:js && npm run format:python",
+    "lint:python": "poetry run black --check . ; poetry run isort --check-only . ; poetry run flake8 . ; poetry run mypy .",
+    "format": "npm run format:js ; npm run format:python",
     "format:js": "npm run format --workspaces --if-present",
-    "format:python": "poetry run black . && poetry run isort ."
+    "format:python": "poetry run black . ; poetry run isort ."
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.19",
     "concurrently": "^8.0.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
+    "react-hook-form": "^7.60.0",
+    "zod": "^4.0.5"
   }
 }

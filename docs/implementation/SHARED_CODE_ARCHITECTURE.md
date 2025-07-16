@@ -66,7 +66,12 @@ erp-monorepo/
 │   │   ├── package.json
 │   │   └── next.config.js
 │   │
-│   └── setup/                     # Onboarding wizard
+│   ├── setup/                     # Onboarding wizard
+│   │   ├── src/
+│   │   ├── package.json
+│   │   └── next.config.js
+│   │
+│   └── marketing/                 # Public website & registration
 │       ├── src/
 │       ├── package.json
 │       └── next.config.js

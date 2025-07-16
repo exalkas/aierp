@@ -1,141 +1,283 @@
-// Greek ERP/CRM - Shared UI Components
+"use client";
 
-// Component types
-export interface ButtonProps {
-  children: React.ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  size?: "sm" | "md" | "lg";
-  disabled?: boolean;
-  loading?: boolean;
-  onClick?: () => void;
-  className?: string;
-}
+// Shared UI Component Library with Greek Localization
+// Export all components, hooks, contexts, and utilities
 
-export interface InputProps {
-  type?: "text" | "email" | "password" | "number" | "tel";
-  placeholder?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  disabled?: boolean;
-  error?: string;
-  label?: string;
-  required?: boolean;
-  className?: string;
-}
+// Core Translation Infrastructure
+export {
+  TranslationProvider,
+  useTranslation,
+  useLanguage,
+} from "./contexts/TranslationContext";
+export { LanguageProvider } from "./contexts/LanguageContext";
 
-export interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-  children: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
-  showCloseButton?: boolean;
-  overlayClosable?: boolean;
-}
+// App constants and configurations (server-safe)
+export { AppName, APP_CONFIGS } from "./types";
+export { GreekLocaleProvider } from "./contexts/GreekLocaleContext";
 
-// Theme types
-export interface ThemeConfig {
-  colors: {
-    primary: string;
-    secondary: string;
-    success: string;
-    warning: string;
-    error: string;
-    background: string;
-    text: string;
-  };
-  typography: {
-    fontFamily: string;
-    fontSize: Record<string, string>;
-    fontWeight: Record<string, string>;
-  };
-  spacing: Record<string, string>;
-  breakpoints: Record<string, string>;
-}
+// Authentication Context
+export {
+  AuthProvider,
+  useAuth,
+  type AuthUser,
+  type AuthTokens,
+  type AuthState,
+  type LoginData,
+  type AuthContextValue,
+} from "./contexts/AuthenticationContext";
 
-// Utility functions
-export const cn = (
-  ...classes: (string | undefined | null | false)[]
-): string => {
-  return classes.filter(Boolean).join(" ");
-};
+// Translation Hooks
+export { useTranslationWithFallback } from "./hooks/useTranslationWithFallback";
+export { useLanguageDetection } from "./hooks/useLanguageDetection";
+export { useGreekLocalization } from "./hooks/useGreekLocalization";
 
-export const getDefaultTheme = (): ThemeConfig => ({
-  colors: {
-    primary: "#0066CC",
-    secondary: "#FFF700",
-    success: "#22C55E",
-    warning: "#F59E0B",
-    error: "#EF4444",
-    background: "#FFFFFF",
-    text: "#1F2937",
-  },
-  typography: {
-    fontFamily: "Inter, system-ui, sans-serif",
-    fontSize: {
-      xs: "0.75rem",
-      sm: "0.875rem",
-      base: "1rem",
-      lg: "1.125rem",
-      xl: "1.25rem",
-      "2xl": "1.5rem",
-      "3xl": "1.875rem",
-    },
-    fontWeight: {
-      light: "300",
-      normal: "400",
-      medium: "500",
-      semibold: "600",
-      bold: "700",
-    },
-  },
-  spacing: {
-    xs: "0.25rem",
-    sm: "0.5rem",
-    md: "1rem",
-    lg: "1.5rem",
-    xl: "2rem",
-    "2xl": "3rem",
-  },
-  breakpoints: {
-    sm: "640px",
-    md: "768px",
-    lg: "1024px",
-    xl: "1280px",
-  },
-});
+// Basic UI Components ✅ PHASE 2 COMPLETE
+export { Button, LoadingButton, IconButton } from "./components/ui/Button";
+export { Input, PasswordInput } from "./components/ui/Input";
+export { SimplePasswordInput } from "./components/ui/SimplePasswordInput";
+export {
+  Form,
+  FormField,
+  FormMessage,
+  FormSection,
+  FormActions,
+} from "./components/ui/Form";
+export {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "./components/ui/Card";
+export { Skeleton } from "./components/ui/Skeleton";
 
-// Form validation utilities
-export const validateEmail = (email: string): boolean => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
+// Advanced UI Components ✅ PHASE 7 COMPLETE
+export {
+  HorizontalButtonGroup,
+  VerticalButtonGroup,
+  AttachedButtonGroup,
+  FullWidthButtonGroup,
+} from "./components/ui/ButtonGroup";
+export { Select } from "./components/ui/Select";
+export { MultiSelect } from "./components/ui/MultiSelect";
+export { DatePicker } from "./components/ui/DatePicker";
+export { default as TimePicker } from "./components/ui/TimePicker";
+export { DateRangePicker } from "./components/ui/DateRangePicker";
+export { ImageUpload } from "./components/ui/ImageUpload";
+export { Checkbox, Radio, RadioGroup, Switch } from "./components/ui/Checkbox";
+export { Slider } from "./components/ui/Slider";
 
-export const validateAFM = (afm: string): boolean => {
-  // Basic Greek AFM (tax number) validation
-  return /^\d{9}$/.test(afm.replace(/\s/g, ""));
-};
+// Data Display Components ✅ PHASE 7 COMPLETE
+export { InfoCard, StatsCard, ActionCard } from "./components/ui/InfoCard";
 
-export const validateGreekPhone = (phone: string): boolean => {
-  // Greek phone number validation (mobile and landline)
-  const cleanPhone = phone.replace(/\s|-|\(|\)/g, "");
-  return /^(\+30|0030|30)?[26-9]\d{8}$/.test(cleanPhone);
-};
+// List & Table Components ✅ PHASE 7 COMPLETE
+export { List } from "./components/ui/List";
+export { DataTable } from "./components/ui/DataTable";
+export { SimpleTable } from "./components/ui/SimpleTable";
 
-// Format utilities
-export const formatCurrency = (amount: number, currency = "EUR"): string => {
-  return new Intl.NumberFormat("el-GR", {
-    style: "currency",
-    currency,
-  }).format(amount);
-};
+// Filtering & Search Components ✅ PHASE 7 COMPLETE
+export { SearchInput } from "./components/ui/SearchInput";
+export { QuickFilter } from "./components/ui/QuickFilter";
 
-export const formatDate = (date: Date | string): string => {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("el-GR").format(dateObj);
-};
+// Pagination Components ✅ PHASE 7 COMPLETE
+export { Pagination } from "./components/ui/Pagination";
+export { SimplePagination } from "./components/ui/SimplePagination";
 
-export const formatAFM = (afm: string): string => {
-  // Format Greek AFM with spaces: 9 -> 123 456 789
-  const cleaned = afm.replace(/\s/g, "");
-  return cleaned.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3");
-};
+// Modal & Dialog Components ✅ PHASE 7 COMPLETE
+export { Modal } from "./components/ui/Modal";
+export { ConfirmDialog } from "./components/ui/ConfirmDialog";
+export { AlertDialog } from "./components/ui/AlertDialog";
+export { FormModal } from "./components/ui/FormModal";
+export { FullscreenModal } from "./components/ui/FullscreenModal";
+export { DrawerModal } from "./components/ui/DrawerModal";
+
+// Notification Components ✅ PHASE 7 COMPLETE
+export { Toast } from "./components/ui/Toast";
+export { Alert } from "./components/ui/Alert";
+export { Banner } from "./components/ui/Banner";
+export { NotificationCenter } from "./components/ui/NotificationCenter";
+export { StatusIndicator } from "./components/ui/StatusIndicator";
+
+// Advanced Navigation Components ✅ PHASE 7 COMPLETE
+export { Tabs } from "./components/ui/Tabs";
+export { VerticalTabs } from "./components/ui/VerticalTabs";
+export { Stepper } from "./components/ui/Stepper";
+export { Sidebar } from "./components/ui/Sidebar";
+export { Header } from "./components/ui/Header";
+export { MultilingualNavigation } from "./components/ui/MultilingualNavigation";
+
+// Advanced Layout Components ✅ PHASE 7 COMPLETE
+export {
+  Flex,
+  FlexRow,
+  FlexCol,
+  FlexCenter,
+  FlexBetween,
+  FlexWrap,
+} from "./components/ui/Flex";
+export {
+  Divider,
+  HorizontalDivider,
+  VerticalDivider,
+  SectionDivider,
+  InlineDivider,
+} from "./components/ui/Divider";
+export {
+  Spacer,
+  HorizontalSpacer,
+  VerticalSpacer,
+  FlexSpacer,
+  FixedSpacer,
+  SpacerXS,
+  SpacerSM,
+  SpacerMD,
+  SpacerLG,
+  SpacerXL,
+  Spacer2XL,
+  Spacer3XL,
+} from "./components/ui/Spacer";
+
+// Data Visualization Components ✅ PHASE 7 COMPLETE
+export { DynamicChart } from "./components/ui/DynamicChart";
+export { LineChart } from "./components/ui/LineChart";
+export { BarChart } from "./components/ui/BarChart";
+export { PieChart } from "./components/ui/PieChart";
+export { KanbanBoard } from "./components/ui/KanbanBoard";
+export { Timeline } from "./components/ui/Timeline";
+export { CalendarView } from "./components/ui/CalendarView";
+
+// Utility Components ✅ PHASE 7 COMPLETE
+export { Tooltip } from "./components/ui/Tooltip";
+export { Popover } from "./components/ui/Popover";
+export { Dropdown } from "./components/ui/Dropdown";
+export { Avatar, AvatarGroup } from "./components/ui/Avatar";
+export { Badge } from "./components/ui/Badge";
+export { Tag, TagGroup } from "./components/ui/Tag";
+export {
+  EmptyState,
+  NoDataEmptyState,
+  SearchEmptyState,
+  ErrorEmptyState,
+  LoadingEmptyState,
+  NoUsersEmptyState,
+  NoFilesEmptyState,
+} from "./components/ui/EmptyState";
+export {
+  ErrorBoundary,
+  withErrorBoundary,
+} from "./components/ui/ErrorBoundary";
+
+// Greek-Specific Components ✅ PHASE 3 & 7 COMPLETE
+export { AFMInput } from "./components/greek/AFMInput";
+export { DOYSelector } from "./components/greek/DOYSelector";
+export { GreekPhoneInput } from "./components/greek/GreekPhoneInput";
+export { GreekRegionSelector } from "./components/greek/GreekRegionSelector";
+export { GreekAddressInput } from "./components/greek/GreekAddressInput";
+export {
+  GreekBusinessTermDisplay,
+  getGreekBusinessTerm,
+  searchGreekBusinessTerms,
+} from "./components/greek/GreekBusinessTermDisplay";
+export { GreekPostalCodeInput } from "./components/greek/GreekPostalCodeInput";
+
+// Multilingual Components ✅ PHASE 4 & 7 COMPLETE
+export { LanguageSelector } from "./components/multilingual/LanguageSelector";
+export {
+  LocalizedText,
+  LocalizedHeading,
+  LocalizedParagraph,
+  LocalizedLabel,
+  LocalizedButton,
+  useLocalizedText,
+} from "./components/multilingual/LocalizedText";
+export { MultilingualInput } from "./components/multilingual/MultilingualInput";
+export { MultilingualTextarea } from "./components/multilingual/MultilingualTextarea";
+export { TranslationEditor } from "./components/multilingual/TranslationEditor";
+
+// File Management Components ✅ PHASE 7 COMPLETE
+export { FileManager } from "./components/file/FileManager";
+export { FileUpload } from "./components/file/FileUpload";
+export { FileDropzone } from "./components/file/FileDropzone";
+export { FileCard } from "./components/file/FileCard";
+export { FileList } from "./components/file/FileList";
+export { FileGrid } from "./components/file/FileGrid";
+export { FolderTree } from "./components/file/FolderTree";
+export { FileProgress } from "./components/file/FileProgress";
+export { FileTable } from "./components/file/FileTable";
+export { FileVersions } from "./components/file/FileVersions";
+export { FileSharing } from "./components/file/FileSharing";
+export { FilePermissions } from "./components/file/FilePermissions";
+export { FileSearch } from "./components/file/FileSearch";
+export { FileFilter } from "./components/file/FileFilter";
+export { StorageQuota } from "./components/file/StorageQuota";
+export { FileAnalytics } from "./components/file/FileAnalytics";
+
+// Business-Specific Components ✅ PHASE 7 COMPLETE
+export { CustomerCard } from "./components/business/CustomerCard";
+export { ProductCard } from "./components/business/ProductCard";
+export { InvoiceCard } from "./components/business/InvoiceCard";
+export { ActivityCard } from "./components/business/ActivityCard";
+export { EntityCard } from "./components/business/EntityCard";
+
+// Authentication Components
+export { LoginForm } from "./components/auth/LoginForm";
+
+// Form Components ✅ PHASE 5 COMPLETE
+export { DynamicForm } from "./components/forms/DynamicForm";
+export { FormWizard } from "./components/forms/FormWizard";
+// Note: FormBuilder has TypeScript issues - will be fixed in future iteration
+// export { FormBuilder } from "./components/forms/FormBuilder";
+
+// Layout Components ✅ PHASE 6 COMPLETE
+export {
+  Container,
+  PageContainer,
+  CardContainer,
+  SectionContainer,
+} from "./components/layout/Container";
+export {
+  Grid,
+  GridItem,
+  DashboardGrid,
+  FormGrid,
+  CardGrid,
+} from "./components/layout/Grid";
+export {
+  Stack,
+  VStack,
+  HStack,
+  ButtonGroup,
+  FormStack,
+  NavStack,
+  ActionStack,
+  StackDivider,
+} from "./components/layout/Stack";
+export { Navigation, Breadcrumb } from "./components/layout/Navigation";
+
+// Validation Utilities
+export { greekValidationRules } from "./utils/greekValidation";
+export { formatters } from "./utils/formatters";
+export { constants } from "./utils/constants";
+
+// Types
+export type {
+  Language,
+  TranslationKey,
+  TranslationOptions,
+  LanguageDetectionOptions,
+  GreekValidationRule,
+  TranslationValue,
+  TranslationNamespace,
+  TranslationResources,
+  LanguageResources,
+  UserLanguagePreferences,
+  TranslationContextValue,
+  GreekLocaleSettings,
+} from "./types";
+export type { FormFieldType, FormSchema } from "./types/forms";
+export type { GreekReferenceData } from "./types/greek";
+
+// Custom Hooks
+export { useGreekValidation } from "./hooks/useGreekValidation";
+export { useForm } from "./hooks/useForm";
+export { useModal } from "./hooks/useModal";
+export { useDebounce } from "./hooks/useDebounce";

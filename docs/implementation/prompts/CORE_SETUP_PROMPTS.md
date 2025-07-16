@@ -16,12 +16,13 @@ These prompts implement the **SHARED_CODE_ARCHITECTURE.md** with monorepo struct
 # Create Greek ERP/CRM monorepo structure (Windows)
 # We're already in the project root, so create structure here
 
-# Create 4 main applications
+# Create 6 main applications
 New-Item -ItemType Directory -Path "apps\client" -Force
 New-Item -ItemType Directory -Path "apps\admin" -Force
 New-Item -ItemType Directory -Path "apps\user-support" -Force
 New-Item -ItemType Directory -Path "apps\staff-support" -Force
 New-Item -ItemType Directory -Path "apps\setup" -Force
+New-Item -ItemType Directory -Path "apps\marketing" -Force
 
 # Create core packages
 New-Item -ItemType Directory -Path "packages\authorization" -Force

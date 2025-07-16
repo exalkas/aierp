@@ -47,6 +47,8 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
         if not request.url.path.startswith("/api/"):
             return await call_next(request)
         
+        logger.info(f"🔍 MIDDLEWARE DEBUG - Processing API request: {request.method} {request.url.path}")
+        
         try:
             # Extract and validate company context
             company_id = await self._extract_company_context(request)
@@ -113,13 +115,22 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
         try:
             # Get authorization header
             auth_header = request.headers.get("Authorization")
+            logger.info(f"🔍 JWT DEBUG - Authorization header present: {bool(auth_header)}")
+            
             if not auth_header or not auth_header.startswith("Bearer "):
+                logger.warning(f"🔍 JWT DEBUG - Invalid auth header format: {auth_header[:50] if auth_header else 'None'}...")
                 return None
             
             # Extract token
             token = auth_header.replace("Bearer ", "")
             if not token:
+                logger.warning("🔍 JWT DEBUG - Empty token after Bearer removal")
                 return None
+            
+            logger.info(f"🔍 JWT DEBUG - Token length: {len(token)}")
+            logger.info(f"🔍 JWT DEBUG - Token start: {token[:50]}...")
+            logger.info(f"🔍 JWT DEBUG - Using JWT secret: {settings.JWT_SECRET_KEY[:10]}...")
+            logger.info(f"🔍 JWT DEBUG - Using JWT algorithm: {settings.JWT_ALGORITHM}")
             
             # Decode JWT token (without verification for company extraction)
             try:
@@ -129,26 +140,33 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
                     algorithms=[settings.JWT_ALGORITHM]
                 )
                 
+                logger.info(f"🔍 JWT DEBUG - Token decoded successfully")
+                logger.info(f"🔍 JWT DEBUG - Payload keys: {list(payload.keys())}")
+                
                 company_id = payload.get("company_id")
                 if company_id:
-                    logger.debug(f"Company ID from JWT: {company_id}")
+                    logger.info(f"🔍 JWT DEBUG - Company ID found: {company_id}")
                     return str(company_id)
+                else:
+                    logger.warning(f"🔍 JWT DEBUG - No company_id in payload: {payload}")
                 
             except jwt.ExpiredSignatureError:
-                logger.warning("JWT token expired")
+                logger.warning("🔍 JWT DEBUG - JWT token expired")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token expired"
                 )
             except jwt.InvalidTokenError as e:
-                logger.warning(f"Invalid JWT token: {e}")
+                logger.warning(f"🔍 JWT DEBUG - Invalid JWT token: {e}")
+                logger.warning(f"🔍 JWT DEBUG - Token that failed: {token[:100]}...")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token"
                 )
                 
         except Exception as e:
-            logger.error(f"Error extracting company from JWT: {e}")
+            logger.error(f"🔍 JWT DEBUG - Error extracting company from JWT: {e}")
+            logger.error(f"🔍 JWT DEBUG - Exception type: {type(e)}")
             return None
         
         return None

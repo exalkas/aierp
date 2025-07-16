@@ -19,42 +19,42 @@ from database import Base
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class UserRole(enum.Enum):
-    """User roles with hierarchical permissions"""
-    SUPER_ADMIN = "super_admin"      # System administrator
-    COMPANY_ADMIN = "company_admin"  # Company administrator
-    MANAGER = "manager"              # Department manager
-    EMPLOYEE = "employee"            # Regular employee
-    VIEWER = "viewer"                # Read-only access
-    CLIENT = "client"                # External client access
-
-
 class UserStatus(enum.Enum):
     """User account status"""
-    PENDING_VERIFICATION = "pending_verification"
     ACTIVE = "active"
     INACTIVE = "inactive"
+    PENDING_VERIFICATION = "pending_verification"
     SUSPENDED = "suspended"
-    LOCKED = "locked"
 
 
 class Company(Base):
     """
-    Company model - minimal fields needed for authentication
+    Company model for multi-tenant support
     """
     __tablename__ = "companies"
 
+    # Primary identification
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(255), nullable=False, index=True)
-    display_name = Column(String(255), nullable=False)
     
-    # Greek business compliance
-    afm = Column(String(9), nullable=False, unique=True, index=True)
-    doy = Column(String(10), nullable=False, index=True)
+    # Basic company information
+    name = Column(String(255), nullable=False)
+    afm = Column(String(9), unique=True, nullable=False)  # Greek Tax Number
+    doy = Column(String(10), nullable=False)  # Tax Office Code
+    
+    # Contact information
+    address = Column(Text)
+    city = Column(String(100))
+    postal_code = Column(String(10))
+    phone = Column(String(20))
+    email = Column(String(255))
+    website = Column(String(255))
+    
+    # Business details
+    vat_number = Column(String(20))
+    legal_form = Column(String(50))
     
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
-    is_verified = Column(Boolean, default=False, nullable=False)
     
     # Audit fields
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
@@ -62,6 +62,9 @@ class Company(Base):
     
     # Relationships
     users = relationship("User", back_populates="company")
+    
+    def __repr__(self):
+        return f"<Company(id={self.id}, name='{self.name}', afm='{self.afm}')>"
 
 
 class User(Base):
@@ -77,99 +80,55 @@ class User(Base):
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False, index=True)
     
     # Authentication fields
-    username = Column(String(100), nullable=False, index=True)
-    email = Column(String(255), nullable=False, index=True)
+    username = Column(String(50), nullable=False, unique=True, index=True)
+    email = Column(String(255), nullable=False, unique=True, index=True)
     password_hash = Column(String(255), nullable=False)
     
     # Personal information
-    first_name = Column(String(100), nullable=False)
-    last_name = Column(String(100), nullable=False)
-    display_name = Column(String(200))
+    first_name = Column(String(100))
+    last_name = Column(String(100))
     phone = Column(String(20))
-    mobile = Column(String(20))
     
     # Role and permissions
-    role = Column(Enum(UserRole), nullable=False, default=UserRole.EMPLOYEE)
-    permissions = Column(JSON, default=list)
-    department = Column(String(100))
-    position = Column(String(100))
+    role = Column(String(50), nullable=False, default='user')
     
     # Account status
-    status = Column(Enum(UserStatus), nullable=False, default=UserStatus.PENDING_VERIFICATION)
     is_active = Column(Boolean, default=True, nullable=False)
-    is_verified = Column(Boolean, default=False, nullable=False)
-    
-    # Language and localization
-    language = Column(String(2), default="el")
-    timezone = Column(String(50), default="Europe/Athens")
-    
-    # Security settings
-    two_factor_enabled = Column(Boolean, default=False)
-    two_factor_secret = Column(String(255))
-    failed_login_attempts = Column(Integer, default=0)
-    locked_until = Column(DateTime)
+    is_superuser = Column(Boolean, default=False, nullable=False)
     
     # Session management
     last_login = Column(DateTime)
-    last_activity = Column(DateTime)
-    session_token = Column(String(255), unique=True, index=True)
-    
-    # Password management
-    password_changed_at = Column(DateTime)
-    password_reset_token = Column(String(255), unique=True, index=True)
-    password_reset_expires = Column(DateTime)
-    
-    # Email verification
-    email_verification_token = Column(String(255), unique=True, index=True)
-    email_verification_expires = Column(DateTime)
-    email_verified_at = Column(DateTime)
-    
-    # User preferences
-    notification_preferences = Column(JSON, default=dict)
-    ui_preferences = Column(JSON, default=dict)
     
     # Audit fields
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
-    created_by = Column(UUID(as_uuid=True))
-    updated_by = Column(UUID(as_uuid=True))
     
     # Relationships
     company = relationship("Company", back_populates="users")
     
-    # Indexes
-    __table_args__ = (
-        Index('idx_user_company', 'company_id'),
-        Index('idx_user_username_company', 'username', 'company_id', unique=True),
-        Index('idx_user_email_company', 'email', 'company_id', unique=True),
-        Index('idx_user_role', 'role'),
-        Index('idx_user_status', 'status'),
-        Index('idx_user_active', 'is_active'),
-        Index('idx_user_session', 'session_token'),
-    )
-    
     def __repr__(self):
-        return f"<User(id={self.id}, username='{self.username}', email='{self.email}', role='{self.role.value}')>"
+        return f"<User(id={self.id}, username='{self.username}', email='{self.email}', role='{self.role}')>"
     
     @property
     def full_name(self) -> str:
         """Get user's full name"""
-        return f"{self.first_name} {self.last_name}"
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.username
+
+    @property
+    def display_name(self) -> str:
+        """Get display name (fallback to username if no full name)"""
+        return self.full_name
     
     @property
     def is_admin(self) -> bool:
         """Check if user has admin role"""
-        return self.role in [UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN]
-    
-    @property
-    def is_manager(self) -> bool:
-        """Check if user has manager role or higher"""
-        return self.role in [UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN, UserRole.MANAGER]
+        return self.role in ['admin', 'super_admin']
     
     def set_password(self, password: str) -> None:
         """Hash and set user password"""
         self.password_hash = pwd_context.hash(password)
-        self.password_changed_at = func.now()
     
     def verify_password(self, password: str) -> bool:
         """Verify user password"""
@@ -177,46 +136,24 @@ class User(Base):
     
     def has_permission(self, permission: str) -> bool:
         """Check if user has specific permission"""
-        # Super admin has all permissions
-        if self.role == UserRole.SUPER_ADMIN:
+        # Admin users have all permissions
+        if self.is_admin:
             return True
         
-        # Check role-based permissions
+        # For now, basic role-based permissions
         role_permissions = self.get_role_permissions()
-        if permission in role_permissions:
-            return True
-        
-        # Check specific permissions
-        if self.permissions and permission in self.permissions:
-            return True
-        
-        return False
+        return permission in role_permissions
     
     def get_role_permissions(self) -> List[str]:
-        """Get permissions based on user role"""
-        role_permissions = {
-            UserRole.SUPER_ADMIN: ["*"],  # All permissions
-            UserRole.COMPANY_ADMIN: [
-                "company:manage", "users:manage", "settings:manage",
-                "businesses:manage", "products:manage", "invoices:manage",
-                "reports:view", "analytics:view", "audit:view"
-            ],
-            UserRole.MANAGER: [
-                "businesses:manage", "products:manage", "invoices:manage",
-                "reports:view", "analytics:view", "users:view"
-            ],
-            UserRole.EMPLOYEE: [
-                "businesses:read", "businesses:write", "products:read", "products:write",
-                "invoices:read", "invoices:write", "reports:view"
-            ],
-            UserRole.VIEWER: [
-                "businesses:read", "products:read", "invoices:read", "reports:view"
-            ],
-            UserRole.CLIENT: [
-                "invoices:read", "profile:read", "profile:write"
-            ]
+        """Get permissions based on role"""
+        role_perms = {
+            'admin': ['*'],  # All permissions
+            'manager': ['customers:*', 'products:*', 'invoices:*', 'reports:view'],
+            'user': ['customers:view', 'products:view', 'invoices:view'],
+            'accountant': ['invoices:*', 'customers:view', 'products:view', 'reports:view'],
+            'sales': ['customers:*', 'invoices:create', 'invoices:update', 'products:view']
         }
-        return role_permissions.get(self.role, [])
+        return role_perms.get(self.role, ['customers:view'])
     
     def to_dict(self, include_sensitive: bool = False) -> Dict[str, Any]:
         """Convert user to dictionary for API responses"""
@@ -230,29 +167,15 @@ class User(Base):
             "full_name": self.full_name,
             "display_name": self.display_name,
             "phone": self.phone,
-            "mobile": self.mobile,
-            "role": self.role.value,
-            "department": self.department,
-            "position": self.position,
-            "status": self.status.value,
+            "role": self.role,
             "is_active": self.is_active,
-            "is_verified": self.is_verified,
-            "language": self.language,
-            "timezone": self.timezone,
-            "two_factor_enabled": self.two_factor_enabled,
+            "is_superuser": self.is_superuser,
             "last_login": self.last_login.isoformat() if self.last_login else None,
-            "last_activity": self.last_activity.isoformat() if self.last_activity else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "permissions": self.get_role_permissions(),
+            "can_be_deleted": not self.is_superuser,
+            "can_change_password": True
         }
-        
-        if include_sensitive:
-            data.update({
-                "permissions": self.permissions,
-                "notification_preferences": self.notification_preferences,
-                "ui_preferences": self.ui_preferences,
-                "failed_login_attempts": self.failed_login_attempts,
-                "password_changed_at": self.password_changed_at.isoformat() if self.password_changed_at else None
-            })
         
         return data 

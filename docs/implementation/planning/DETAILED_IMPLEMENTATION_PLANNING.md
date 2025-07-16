@@ -35,12 +35,14 @@ This document provides a **comprehensive screen-by-screen breakdown** of the ent
 
 ### 1.1 Multiple Applications Structure
 
-We need to build **4 applications**:
+We need to build **6 applications**:
 
 1. **Client Application** - Main business operations (responsive web app)
 2. **Admin Application** - System administration
-3. **Support Application** - Customer support
-4. **Setup Application** - Onboarding and migration
+3. **User Support Application** - Customer support portal
+4. **Staff Support Application** - Internal support management
+5. **Setup Application** - Onboarding and migration
+6. **Marketing Application** - Public website & registration
 
 ### 1.2 Deployment Models
 
