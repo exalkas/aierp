@@ -9,6 +9,7 @@ import {
   Input,
   Badge,
   Checkbox,
+  useTranslation,
 } from "@erp/shared-ui";
 import {
   Filter,
@@ -66,6 +67,7 @@ export default function BusinessEntityAdvancedFilters({
   onClearAll,
   className = "",
 }: BusinessEntityAdvancedFiltersProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -114,496 +116,202 @@ export default function BusinessEntityAdvancedFilters({
     return count;
   };
 
-  const entityTypeOptions = [
-    { value: "business", label: "Business" },
-    { value: "individual", label: "Individual" },
-    { value: "government", label: "Government" },
-    { value: "non_profit", label: "Non-Profit" },
-  ];
-
-  const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "suspended", label: "Suspended" },
-    { value: "prospect", label: "Prospect" },
-    { value: "blocked", label: "Blocked" },
-  ];
-
-  const roleOptions = [
-    { value: "customer", label: "Customer" },
-    { value: "supplier", label: "Supplier" },
-    { value: "partner", label: "Partner" },
-    { value: "competitor", label: "Competitor" },
-    { value: "lead", label: "Lead" },
-  ];
-
-  const legalFormOptions = [
-    { value: "AE", label: "ΑΕ (Ανώνυμη Εταιρεία)" },
-    { value: "EPE", label: "ΕΠΕ (Εταιρεία Περιορισμένης Ευθύνης)" },
-    { value: "OE", label: "ΟΕ (Ομόρρυθμη Εταιρεία)" },
-    { value: "EE", label: "ΕΕ (Ετερόρρυθμη Εταιρεία)" },
-    { value: "IKE", label: "ΙΚΕ (Ιδιωτική Κεφαλαιουχική Εταιρεία)" },
-    { value: "AT", label: "ΑΤ (Ατομική Επιχείρηση)" },
-  ];
-
-  const greekRegions = [
-    "Αττική",
-    "Κεντρική Μακεδονία",
-    "Θεσσαλία",
-    "Κρήτη",
-    "Δυτική Ελλάδα",
-    "Πελοπόννησος",
-    "Ήπειρος",
-    "Ανατολική Μακεδονία και Θράκη",
-    "Δυτική Μακεδονία",
-    "Στερεά Ελλάδα",
-    "Βόρειο Αιγαίο",
-    "Νότιο Αιγαίο",
-    "Ιόνια Νησιά",
-  ];
-
-  const FilterSection = ({
-    title,
-    icon: Icon,
-    sectionKey,
-    children,
-  }: {
-    title: string;
-    icon: any;
-    sectionKey: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="border border-gray-200 rounded-lg">
-      <button
-        className="w-full p-3 flex items-center justify-between text-left hover:bg-gray-50"
-        onClick={() =>
-          setActiveSection(activeSection === sectionKey ? null : sectionKey)
-        }
-      >
-        <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-gray-600" />
-          <span className="font-medium text-gray-700">{title}</span>
-        </div>
-        {activeSection === sectionKey ? (
-          <ChevronUp className="w-4 h-4 text-gray-500" />
-        ) : (
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        )}
-      </button>
-      {activeSection === sectionKey && (
-        <div className="p-3 border-t border-gray-200 bg-gray-50">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-
-  const CheckboxGroup = ({
-    options,
-    selectedValues,
-    onChange,
-  }: {
-    options: { value: string; label: string }[];
-    selectedValues?: string[];
-    onChange: (value: string) => void;
-  }) => (
-    <div className="space-y-2">
-      {options.map((option) => (
-        <label
-          key={option.value}
-          className="flex items-center space-x-2 cursor-pointer"
-        >
-          <Checkbox
-            checked={selectedValues?.includes(option.value) || false}
-            onChange={() => onChange(option.value)}
-          />
-          <span className="text-sm text-gray-700">{option.label}</span>
-        </label>
-      ))}
-    </div>
-  );
+  const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Filter Toggle and Active Count */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2"
-        >
-          <Filter className="w-4 h-4" />
-          Advanced Filters
-          {getActiveFiltersCount() > 0 && (
-            <Badge variant="info">{getActiveFiltersCount()}</Badge>
-          )}
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4" />
-          ) : (
-            <ChevronDown className="w-4 h-4" />
-          )}
-        </Button>
-
-        {getActiveFiltersCount() > 0 && (
+    <Card
+      className={`${className} bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700`}
+    >
+      <CardHeader className="bg-white dark:bg-gray-800 dark:text-white">
+        <div className="flex items-center justify-between">
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClearAll}
-            className="flex items-center gap-1"
+            variant="outline"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-2 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
-            <RotateCcw className="w-3 h-3" />
-            Clear All
+            <Filter size={16} />
+            {t("advanced_filters", { ns: "business_entities" })}
+            {activeFiltersCount > 0 && (
+              <Badge variant="secondary" size="sm" className="ml-1">
+                {activeFiltersCount}
+              </Badge>
+            )}
+            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </Button>
-        )}
-      </div>
 
-      {/* Active Filters Summary */}
-      {getActiveFiltersCount() > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {filters.search && (
-            <Badge variant="outline" className="flex items-center gap-1">
-              Search: {filters.search}
-              <X
-                className="w-3 h-3 cursor-pointer"
-                onClick={() => updateFilter("search", undefined)}
-              />
-            </Badge>
-          )}
-          {filters.entityTypes?.map((type) => (
-            <Badge
-              key={type}
-              variant="outline"
-              className="flex items-center gap-1"
+          {activeFiltersCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearAll}
+              className="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              Type: {type}
-              <X
-                className="w-3 h-3 cursor-pointer"
-                onClick={() => toggleArrayFilter("entityTypes", type)}
-              />
-            </Badge>
-          ))}
-          {filters.statuses?.map((status) => (
-            <Badge
-              key={status}
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              Status: {status}
-              <X
-                className="w-3 h-3 cursor-pointer"
-                onClick={() => toggleArrayFilter("statuses", status)}
-              />
-            </Badge>
-          ))}
-          {filters.roles?.map((role) => (
-            <Badge
-              key={role}
-              variant="outline"
-              className="flex items-center gap-1"
-            >
-              Role: {role}
-              <X
-                className="w-3 h-3 cursor-pointer"
-                onClick={() => toggleArrayFilter("roles", role)}
-              />
-            </Badge>
-          ))}
-          {filters.hasValidAFM !== undefined && (
-            <Badge variant="outline" className="flex items-center gap-1">
-              Valid AFM: {filters.hasValidAFM ? "Yes" : "No"}
-              <X
-                className="w-3 h-3 cursor-pointer"
-                onClick={() => updateFilter("hasValidAFM", undefined)}
-              />
-            </Badge>
+              <RotateCcw size={14} />
+              {t("clear_all", { ns: "common" })}
+            </Button>
           )}
         </div>
-      )}
+      </CardHeader>
 
-      {/* Expanded Filters */}
       {isExpanded && (
-        <Card>
-          <CardContent className="space-y-4">
-            {/* Basic Search */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Search
-              </label>
-              <Input
-                type="text"
-                placeholder="Search by name, email, AFM, or entity code..."
-                value={filters.search || ""}
-                onChange={(e) =>
-                  updateFilter("search", e.target.value || undefined)
-                }
-              />
-            </div>
-
-            {/* Filter Sections */}
-            <div className="space-y-3">
-              {/* Entity Types */}
-              <FilterSection
-                title="Entity Types"
-                icon={Building2}
-                sectionKey="entityTypes"
-              >
-                <CheckboxGroup
-                  options={entityTypeOptions}
-                  selectedValues={filters.entityTypes}
-                  onChange={(value) => toggleArrayFilter("entityTypes", value)}
-                />
-              </FilterSection>
-
-              {/* Status */}
-              <FilterSection
-                title="Status"
-                icon={Building2}
-                sectionKey="status"
-              >
-                <CheckboxGroup
-                  options={statusOptions}
-                  selectedValues={filters.statuses}
-                  onChange={(value) => toggleArrayFilter("statuses", value)}
-                />
-              </FilterSection>
-
-              {/* Roles */}
-              <FilterSection
-                title="Business Roles"
-                icon={Building2}
-                sectionKey="roles"
-              >
-                <CheckboxGroup
-                  options={roleOptions}
-                  selectedValues={filters.roles}
-                  onChange={(value) => toggleArrayFilter("roles", value)}
-                />
-              </FilterSection>
-
-              {/* Greek Tax Information */}
-              <FilterSection
-                title="Greek Tax Information"
-                icon={FileText}
-                sectionKey="greek"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <Checkbox
-                        checked={filters.hasValidAFM === true}
-                        onChange={() =>
-                          updateFilter(
-                            "hasValidAFM",
-                            filters.hasValidAFM === true ? undefined : true
-                          )
-                        }
-                      />
-                      <span className="text-sm text-gray-700">
-                        Has Valid AFM
-                      </span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <Checkbox
-                        checked={filters.vatExempt === true}
-                        onChange={() =>
-                          updateFilter(
-                            "vatExempt",
-                            filters.vatExempt === true ? undefined : true
-                          )
-                        }
-                      />
-                      <span className="text-sm text-gray-700">VAT Exempt</span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Legal Forms
-                    </label>
-                    <CheckboxGroup
-                      options={legalFormOptions}
-                      selectedValues={filters.legalForms}
-                      onChange={(value) =>
-                        toggleArrayFilter("legalForms", value)
-                      }
+        <CardContent className="space-y-6 bg-white dark:bg-gray-800">
+          {/* Entity Types */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <Building2 size={16} />
+              {t("entity_types", { ns: "business_entities" })}
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {["business", "individual", "government", "non_profit"].map(
+                (type) => (
+                  <label
+                    key={type}
+                    className="flex items-center space-x-2 text-sm cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={filters.entityTypes?.includes(type) || false}
+                      onChange={() => toggleArrayFilter("entityTypes", type)}
+                      className="dark:border-gray-600"
                     />
-                  </div>
-                </div>
-              </FilterSection>
-
-              {/* Location */}
-              <FilterSection
-                title="Location"
-                icon={MapPin}
-                sectionKey="location"
-              >
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Greek Regions
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {t(`entity_type_${type}`, { ns: "business_entities" })}
+                    </span>
                   </label>
-                  <CheckboxGroup
-                    options={greekRegions.map((region) => ({
-                      value: region,
-                      label: region,
-                    }))}
-                    selectedValues={filters.regions}
-                    onChange={(value) => toggleArrayFilter("regions", value)}
-                  />
-                </div>
-              </FilterSection>
-
-              {/* Financial Filters */}
-              <FilterSection
-                title="Financial Information"
-                icon={CreditCard}
-                sectionKey="financial"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Credit Limit (€)
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Min"
-                        value={filters.creditLimitMin || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "creditLimitMin",
-                            e.target.value
-                              ? parseFloat(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                      <Input
-                        type="number"
-                        placeholder="Max"
-                        value={filters.creditLimitMax || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "creditLimitMax",
-                            e.target.value
-                              ? parseFloat(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Total Sales (€)
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Min"
-                        value={filters.totalSalesMin || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "totalSalesMin",
-                            e.target.value
-                              ? parseFloat(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                      <Input
-                        type="number"
-                        placeholder="Max"
-                        value={filters.totalSalesMax || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "totalSalesMax",
-                            e.target.value
-                              ? parseFloat(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </FilterSection>
-
-              {/* Date Filters */}
-              <FilterSection
-                title="Date Filters"
-                icon={Calendar}
-                sectionKey="dates"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Created Date
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        type="date"
-                        placeholder="From"
-                        value={filters.createdAfter || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "createdAfter",
-                            e.target.value || undefined
-                          )
-                        }
-                      />
-                      <Input
-                        type="date"
-                        placeholder="To"
-                        value={filters.createdBefore || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "createdBefore",
-                            e.target.value || undefined
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Contact Date
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        type="date"
-                        placeholder="From"
-                        value={filters.lastContactAfter || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "lastContactAfter",
-                            e.target.value || undefined
-                          )
-                        }
-                      />
-                      <Input
-                        type="date"
-                        placeholder="To"
-                        value={filters.lastContactBefore || ""}
-                        onChange={(e) =>
-                          updateFilter(
-                            "lastContactBefore",
-                            e.target.value || undefined
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </FilterSection>
+                )
+              )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Status */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <FileText size={16} />
+              {t("status", { ns: "business_entities" })}
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {["active", "inactive", "suspended", "prospect", "blocked"].map(
+                (status) => (
+                  <label
+                    key={status}
+                    className="flex items-center space-x-2 text-sm cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={filters.statuses?.includes(status) || false}
+                      onChange={() => toggleArrayFilter("statuses", status)}
+                      className="dark:border-gray-600"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {t(`status_${status}`, { ns: "business_entities" })}
+                    </span>
+                  </label>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Roles */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <CreditCard size={16} />
+              {t("roles", { ns: "business_entities" })}
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {["customer", "supplier", "partner"].map((role) => (
+                <label
+                  key={role}
+                  className="flex items-center space-x-2 text-sm cursor-pointer"
+                >
+                  <Checkbox
+                    checked={filters.roles?.includes(role) || false}
+                    onChange={() => toggleArrayFilter("roles", role)}
+                    className="dark:border-gray-600"
+                  />
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {t(`role_${role}`, { ns: "business_entities" })}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Greek-specific Filters */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <MapPin size={16} />
+              {t("greek_filters", { ns: "business_entities" })}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="flex items-center space-x-2 text-sm cursor-pointer">
+                <Checkbox
+                  checked={filters.hasValidAFM === true}
+                  onChange={() =>
+                    updateFilter(
+                      "hasValidAFM",
+                      filters.hasValidAFM === true ? undefined : true
+                    )
+                  }
+                  className="dark:border-gray-600"
+                />
+                <span className="text-gray-700 dark:text-gray-300">
+                  {t("has_valid_afm", { ns: "business_entities" })}
+                </span>
+              </label>
+
+              <label className="flex items-center space-x-2 text-sm cursor-pointer">
+                <Checkbox
+                  checked={filters.vatExempt === true}
+                  onChange={() =>
+                    updateFilter(
+                      "vatExempt",
+                      filters.vatExempt === true ? undefined : true
+                    )
+                  }
+                  className="dark:border-gray-600"
+                />
+                <span className="text-gray-700 dark:text-gray-300">
+                  {t("vat_exempt", { ns: "business_entities" })}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Date Filters */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <Calendar size={16} />
+              {t("date_filters", { ns: "business_entities" })}
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  {t("created_after", { ns: "business_entities" })}
+                </label>
+                <Input
+                  type="date"
+                  value={filters.createdAfter || ""}
+                  onChange={(e) =>
+                    updateFilter("createdAfter", e.target.value || undefined)
+                  }
+                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  {t("created_before", { ns: "business_entities" })}
+                </label>
+                <Input
+                  type="date"
+                  value={filters.createdBefore || ""}
+                  onChange={(e) =>
+                    updateFilter("createdBefore", e.target.value || undefined)
+                  }
+                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }

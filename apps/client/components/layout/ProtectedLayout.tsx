@@ -233,19 +233,24 @@ function Navigation({ children }: { children: React.ReactNode }) {
   const sidebarHeader = (
     <div className="space-y-3">
       {/* Main header with app info */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="flex-shrink-0">
-            <Logo size="sm" />
-          </div>
-          <div
-            className={`min-w-0 transition-all duration-300 ease-in-out ${
-              sidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
-            }`}
-          >
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+      <div className="flex items-start justify-between">
+        <div
+          className={`min-w-0 transition-all duration-300 ease-in-out ${
+            sidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+          }`}
+        >
+          {/* Logo and App Name Row */}
+          <div className="flex items-center space-x-3 mb-1">
+            <div className="flex-shrink-0">
+              <Logo size="sm" />
+            </div>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">
               {t("app_name", { ns: "navigation" })}
             </h1>
+          </div>
+
+          {/* User/Company Name Row - Left Aligned */}
+          <div className="ml-0">
             <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
               {companyInfo.name}
               {companyInfo.afm && ` • ΑΦΜ: ${companyInfo.afm}`}
@@ -253,15 +258,13 @@ function Navigation({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Close button when sidebar is open */}
-        {!sidebarCollapsed && (
-          <button
-            onClick={() => setSidebarCollapsed(true)}
-            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
-        )}
+        {/* Close button always visible and aligned to the right */}
+        <button
+          onClick={() => setSidebarCollapsed(true)}
+          className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors flex-shrink-0"
+        >
+          <ChevronLeft size={20} />
+        </button>
       </div>
 
       {/* Theme and Language controls when sidebar is open */}

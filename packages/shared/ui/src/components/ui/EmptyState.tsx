@@ -160,11 +160,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
         {/* Text Content */}
         <div className="text-center space-y-2">
-          <h3 className={`font-semibold text-gray-900 ${sizeClasses.title}`}>
+          <h3
+            className={`font-semibold text-gray-900 dark:text-white ${sizeClasses.title}`}
+          >
             {displayTitle}
           </h3>
           {displayDescription && (
-            <p className={`text-gray-500 max-w-md ${sizeClasses.description}`}>
+            <p
+              className={`text-gray-500 dark:text-gray-400 max-w-md ${sizeClasses.description}`}
+            >
               {displayDescription}
             </p>
           )}

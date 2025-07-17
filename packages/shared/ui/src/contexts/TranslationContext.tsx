@@ -45,6 +45,8 @@ const DEFAULT_RESOURCES: LanguageResources = {
       no_results: "Δεν βρέθηκαν αποτελέσματα",
       clear_all: "Καθαρισμός όλων",
       retry: "Δοκιμή ξανά",
+      page_of: "Σελίδα {{current}} από {{total}}",
+      showing_results: "Εμφάνιση {{start}}-{{end}} από {{total}}",
     },
     forms: {
       field_required: "Το πεδίο είναι υποχρεωτικό",
@@ -171,6 +173,114 @@ const DEFAULT_RESOURCES: LanguageResources = {
       select_language: "Επιλογή γλώσσας",
       select_theme: "Επιλογή θέματος",
     },
+    customers: {
+      customers_title: "Πελάτες",
+      customers_description:
+        "Διαχειριστείτε τις σχέσεις με τους πελάτες σας και παρακολουθήστε την απόδοση των πωλήσεων",
+      add_new_customer: "Προσθήκη Νέου Πελάτη",
+      total_customers: "Συνολικοί Πελάτες",
+      active_customers: "Ενεργοί Πελάτες",
+      total_sales: "Συνολικές Πωλήσεις",
+      average_order_value: "Μέσος Όρος Παραγγελίας",
+      customer_directory: "Κατάλογος Πελατών",
+      error_loading_stats: "Σφάλμα φόρτωσης στατιστικών πελατών",
+      back_to_customers: "Επιστροφή στους Πελάτες",
+      create_new_customer: "Δημιουργία Νέου Πελάτη",
+      create_customer_description:
+        "Συμπληρώστε τα στοιχεία για να δημιουργήσετε έναν νέο πελάτη",
+    },
+    suppliers: {
+      suppliers_title: "Προμηθευτές",
+      suppliers_description:
+        "Διαχειριστείτε τις σχέσεις με τους προμηθευτές σας και τις διαδικασίες προμηθειών",
+      add_new_supplier: "Προσθήκη Νέου Προμηθευτή",
+      total_suppliers: "Συνολικοί Προμηθευτές",
+      active_suppliers: "Ενεργοί Προμηθευτές",
+      total_purchases: "Συνολικές Αγορές",
+      average_rating: "Μέσος Όρος Αξιολόγησης",
+      supplier_directory: "Κατάλογος Προμηθευτών",
+      error_loading_stats: "Σφάλμα φόρτωσης στατιστικών προμηθευτών",
+      back_to_suppliers: "Επιστροφή στους Προμηθευτές",
+      create_new_supplier: "Δημιουργία Νέου Προμηθευτή",
+      create_supplier_description:
+        "Συμπληρώστε τα στοιχεία για να δημιουργήσετε έναν νέο προμηθευτή",
+    },
+    business_entities: {
+      error_loading_entities: "Σφάλμα φόρτωσης επιχειρήσεων",
+      quick_search_placeholder:
+        "Γρήγορη αναζήτηση με όνομα, email, ΑΦΜ ή κωδικό...",
+      // Customer context
+      customer_found: "Βρέθηκε {{count}} πελάτης",
+      customers_found: "Βρέθηκαν {{count}} πελάτες",
+      // Supplier context
+      supplier_found: "Βρέθηκε {{count}} προμηθευτής",
+      suppliers_found: "Βρέθηκαν {{count}} προμηθευτές",
+      // General entity context
+      entity_found: "Βρέθηκε {{count}} επιχείρηση",
+      entities_found: "Βρέθηκαν {{count}} επιχειρήσεις",
+      filter_label: "Φίλτρο",
+      loading_entities: "Φόρτωση επιχειρήσεων...",
+      // General empty states
+      no_entities_found: "Δεν βρέθηκαν επιχειρήσεις",
+      try_adjusting_filters:
+        "Δοκιμάστε να αλλάξετε τα κριτήρια αναζήτησης ή τα φίλτρα",
+      create_first_entity:
+        "Δημιουργήστε την πρώτη σας επιχείρηση για να ξεκινήσετε",
+      // Customer specific empty states
+      no_customers_found: "Δεν βρέθηκαν πελάτες",
+      create_first_customer:
+        "Δημιουργήστε τον πρώτο σας πελάτη για να ξεκινήσετε",
+      // Supplier specific empty states
+      no_suppliers_found: "Δεν βρέθηκαν προμηθευτές",
+      create_first_supplier:
+        "Δημιουργήστε τον πρώτο σας προμηθευτή για να ξεκινήσετε",
+      valid_afm: "Έγκυρος ΑΦΜ",
+      contact_info: "Στοιχεία Επικοινωνίας",
+      business_details: "Επιχειρηματικά Στοιχεία",
+      roles: "Ρόλοι",
+      address: "Διεύθυνση",
+      // Status translations
+      status_active: "Ενεργό",
+      status_inactive: "Ανενεργό",
+      status_suspended: "Σε αναστολή",
+      status_prospect: "Προοπτική",
+      status_blocked: "Αποκλεισμένο",
+      // Role translations
+      role_customer: "Πελάτης",
+      role_supplier: "Προμηθευτής",
+      role_partner: "Συνεργάτης",
+      // Directory and relationship management
+      customer_directory: "Κατάλογος Πελατών",
+      supplier_directory: "Κατάλογος Προμηθευτών",
+      all_directory: "Κατάλογος Επιχειρήσεων",
+      manage_customer_relationships:
+        "Διαχειριστείτε τις σχέσεις με τους πελάτες σας",
+      manage_supplier_relationships:
+        "Διαχειριστείτε τις σχέσεις με τους προμηθευτές σας",
+      manage_all_relationships:
+        "Διαχειριστείτε όλες τις επιχειρηματικές σας σχέσεις",
+      add_new_customer: "Προσθήκη Νέου Πελάτη",
+      add_new_supplier: "Προσθήκη Νέου Προμηθευτή",
+      add_new_all: "Προσθήκη Νέας Επιχείρησης",
+      create_customer: "Δημιουργία Πελάτη",
+      create_supplier: "Δημιουργία Προμηθευτή",
+      create_all: "Δημιουργία Επιχείρησης",
+      // Advanced filters
+      advanced_filters: "Προηγμένα Φίλτρα",
+      entity_types: "Τύποι Επιχείρησης",
+      status: "Κατάσταση",
+      greek_filters: "Ελληνικά Φίλτρα",
+      date_filters: "Φίλτρα Ημερομηνίας",
+      created_after: "Δημιουργήθηκε μετά",
+      created_before: "Δημιουργήθηκε πριν",
+      has_valid_afm: "Έχει Έγκυρο ΑΦΜ",
+      vat_exempt: "Απαλλαγή ΦΠΑ",
+      // Entity type translations
+      entity_type_business: "Επιχείρηση",
+      entity_type_individual: "Φυσικό Πρόσωπο",
+      entity_type_government: "Κυβερνητικός Οργανισμός",
+      entity_type_non_profit: "Μη Κερδοσκοπικός",
+    },
   },
   en: {
     common: {
@@ -196,6 +306,8 @@ const DEFAULT_RESOURCES: LanguageResources = {
       no_results: "No results found",
       clear_all: "Clear all",
       retry: "Try again",
+      page_of: "Page {{current}} of {{total}}",
+      showing_results: "Showing {{start}}-{{end}} of {{total}}",
     },
     forms: {
       field_required: "Field is required",
@@ -321,6 +433,110 @@ const DEFAULT_RESOURCES: LanguageResources = {
       all_rights_reserved: "All rights reserved.",
       select_language: "Select language",
       select_theme: "Select theme",
+    },
+    customers: {
+      customers_title: "Customers",
+      customers_description:
+        "Manage your customer relationships and track sales performance",
+      add_new_customer: "Add New Customer",
+      total_customers: "Total Customers",
+      active_customers: "Active Customers",
+      total_sales: "Total Sales",
+      average_order_value: "Avg. Order Value",
+      customer_directory: "Customer Directory",
+      error_loading_stats: "Error loading customer statistics",
+      back_to_customers: "Back to Customers",
+      create_new_customer: "Create New Customer",
+      create_customer_description:
+        "Fill in the details to create a new customer",
+    },
+    suppliers: {
+      suppliers_title: "Suppliers",
+      suppliers_description:
+        "Manage your supplier relationships and procurement processes",
+      add_new_supplier: "Add New Supplier",
+      total_suppliers: "Total Suppliers",
+      active_suppliers: "Active Suppliers",
+      total_purchases: "Total Purchases",
+      average_rating: "Average Rating",
+      supplier_directory: "Supplier Directory",
+      error_loading_stats: "Error loading supplier statistics",
+      back_to_suppliers: "Back to Suppliers",
+      create_new_supplier: "Create New Supplier",
+      create_supplier_description:
+        "Fill in the details to create a new supplier",
+    },
+    business_entities: {
+      error_loading_entities: "Error loading business entities",
+      quick_search_placeholder:
+        "Quick search by name, email, AFM, or entity code...",
+      // Customer context
+      customer_found: "{{count}} Customer found",
+      customers_found: "{{count}} Customers found",
+      // Supplier context
+      supplier_found: "{{count}} Supplier found",
+      suppliers_found: "{{count}} Suppliers found",
+      // General entity context
+      entity_found: "{{count}} Entity found",
+      entities_found: "{{count}} Entities found",
+      filter_label: "Filter",
+      loading_entities: "Loading entities...",
+      // General empty states
+      no_entities_found: "No Business Entities Found",
+      try_adjusting_filters: "Try adjusting your search criteria or filters",
+      create_first_entity: "Create your first business entity to get started",
+      // Customer specific empty states
+      no_customers_found: "No Customers Found",
+      create_first_customer: "Create your first customer to get started",
+      // Supplier specific empty states
+      no_suppliers_found: "No Suppliers Found",
+      create_first_supplier: "Create your first supplier to get started",
+      valid_afm: "Valid AFM",
+      contact_info: "Contact Info",
+      business_details: "Business Details",
+      roles: "Roles",
+      address: "Address",
+      // Status translations
+      status_active: "Active",
+      status_inactive: "Inactive",
+      status_suspended: "Suspended",
+      status_prospect: "Prospect",
+      status_blocked: "Blocked",
+      // Role translations
+      role_customer: "Customer",
+      role_supplier: "Supplier",
+      role_partner: "Partner",
+      // Directory and relationship management
+      customer_directory: "Customer Directory",
+      supplier_directory: "Supplier Directory",
+      all_directory: "Business Directory",
+      manage_customer_relationships:
+        "Manage your customer relationships and track sales performance",
+      manage_supplier_relationships:
+        "Manage your supplier relationships and procurement processes",
+      manage_all_relationships:
+        "Manage your business relationships and contacts",
+      add_new_customer: "Add New Customer",
+      add_new_supplier: "Add New Supplier",
+      add_new_all: "Add New Entity",
+      create_customer: "Create Customer",
+      create_supplier: "Create Supplier",
+      create_all: "Create Entity",
+      // Advanced filters
+      advanced_filters: "Advanced Filters",
+      entity_types: "Entity Types",
+      status: "Status",
+      greek_filters: "Greek Filters",
+      date_filters: "Date Filters",
+      created_after: "Created After",
+      created_before: "Created Before",
+      has_valid_afm: "Has Valid AFM",
+      vat_exempt: "VAT Exempt",
+      // Entity type translations
+      entity_type_business: "Business",
+      entity_type_individual: "Individual",
+      entity_type_government: "Government",
+      entity_type_non_profit: "Non-Profit",
     },
   },
 };
