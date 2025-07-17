@@ -36,6 +36,9 @@ export interface RequestConfig {
   companyId?: string;
 }
 
+// Dashboard API
+export * from "./dashboardApi";
+
 // API utilities
 export const createApiClient = (
   baseURL: string,

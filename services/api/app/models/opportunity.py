@@ -5,7 +5,7 @@ Sales pipeline, deals, and opportunity management
 
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON, Index, ForeignKey, Enum, Numeric, Integer
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, foreign
 from sqlalchemy.sql import func
 import uuid
 import enum
@@ -205,8 +205,8 @@ class Opportunity(Base):
     lead = relationship("Lead", foreign_keys=[lead_id])
     campaign = relationship("Campaign", foreign_keys=[campaign_id])
     activities = relationship("Activity", back_populates="opportunity")
-    quotes = relationship("Invoice", primaryjoin="and_(Invoice.original_document_id==Opportunity.id, Invoice.invoice_type=='sales_quotation')")
-    orders = relationship("Invoice", primaryjoin="and_(Invoice.original_document_id==Opportunity.id, Invoice.invoice_type=='sales_order')")
+    quotes = relationship("Invoice", primaryjoin="and_(foreign(Invoice.original_document_id)==Opportunity.id, Invoice.invoice_type=='sales_quotation')", viewonly=True)
+    orders = relationship("Invoice", primaryjoin="and_(foreign(Invoice.original_document_id)==Opportunity.id, Invoice.invoice_type=='sales_order')", viewonly=True)
     
     # Indexes for efficient queries
     __table_args__ = (

@@ -132,7 +132,7 @@ class Location(Base):
     
     # Relationships
     parent_location = relationship("Location", remote_side=[id], foreign_keys=[parent_location_id])
-    child_locations = relationship("Location", foreign_keys=[parent_location_id])
+    child_locations = relationship("Location", foreign_keys=[parent_location_id], overlaps="parent_location")
     location_manager = relationship("User", foreign_keys=[location_manager_id])
     inventory_items = relationship("InventoryItem", back_populates="location")
     

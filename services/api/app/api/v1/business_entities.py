@@ -265,21 +265,20 @@ async def create_business_entity(
     
     return BusinessEntityResponse.from_orm(entity)
 
-@router.get("/", response_model=BusinessEntityListResponse)
-async def list_business_entities(
-    skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
-    search: Optional[str] = Query(None, description="Search term for name, email, AFM, or entity code"),
-    entity_type: Optional[BusinessEntityType] = Query(None, description="Filter by entity type"),
-    status: Optional[BusinessEntityStatus] = Query(None, description="Filter by status"),
-    role_filter: Optional[BusinessEntityRole] = Query(None, description="Filter by role"),
-    sort_by: str = Query("display_name", description="Field to sort by"),
-    sort_order: str = Query("asc", pattern="^(asc|desc)$", description="Sort order"),
-    service: BusinessEntityService = Depends(get_business_entity_service),
-    current_user: User = Depends(get_current_user)
+# Helper function to avoid code duplication
+async def _list_business_entities_impl(
+    skip: int,
+    limit: int,
+    search: Optional[str],
+    entity_type: Optional[BusinessEntityType],
+    status: Optional[BusinessEntityStatus],
+    role_filter: Optional[BusinessEntityRole],
+    sort_by: str,
+    sort_order: str,
+    service: BusinessEntityService,
+    current_user: User
 ):
-    """List business entities with filtering and pagination"""
-    
+    """Implementation for listing business entities"""
     entities, total_count = await service.list_business_entities(
         requesting_user=current_user,
         skip=skip,
@@ -301,6 +300,44 @@ async def list_business_entities(
         page=page,
         page_size=limit,
         total_pages=total_pages
+    )
+
+@router.get("/", response_model=BusinessEntityListResponse)
+async def list_business_entities_with_slash(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
+    search: Optional[str] = Query(None, description="Search term for name, email, AFM, or entity code"),
+    entity_type: Optional[BusinessEntityType] = Query(None, description="Filter by entity type"),
+    status: Optional[BusinessEntityStatus] = Query(None, description="Filter by status"),
+    role_filter: Optional[BusinessEntityRole] = Query(None, description="Filter by role"),
+    sort_by: str = Query("display_name", description="Field to sort by"),
+    sort_order: str = Query("asc", pattern="^(asc|desc)$", description="Sort order"),
+    service: BusinessEntityService = Depends(get_business_entity_service),
+    current_user: User = Depends(get_current_user)
+):
+    """List business entities with filtering and pagination (with trailing slash)"""
+    return await _list_business_entities_impl(
+        skip, limit, search, entity_type, status, role_filter, 
+        sort_by, sort_order, service, current_user
+    )
+
+@router.get("", response_model=BusinessEntityListResponse)
+async def list_business_entities_without_slash(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
+    search: Optional[str] = Query(None, description="Search term for name, email, AFM, or entity code"),
+    entity_type: Optional[BusinessEntityType] = Query(None, description="Filter by entity type"),
+    status: Optional[BusinessEntityStatus] = Query(None, description="Filter by status"),
+    role_filter: Optional[BusinessEntityRole] = Query(None, description="Filter by role"),
+    sort_by: str = Query("display_name", description="Field to sort by"),
+    sort_order: str = Query("asc", pattern="^(asc|desc)$", description="Sort order"),
+    service: BusinessEntityService = Depends(get_business_entity_service),
+    current_user: User = Depends(get_current_user)
+):
+    """List business entities with filtering and pagination (without trailing slash)"""
+    return await _list_business_entities_impl(
+        skip, limit, search, entity_type, status, role_filter, 
+        sort_by, sort_order, service, current_user
     )
 
 @router.get("/{entity_id}", response_model=BusinessEntityResponse)

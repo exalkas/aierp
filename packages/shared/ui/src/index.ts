@@ -11,6 +11,14 @@ export {
 } from "./contexts/TranslationContext";
 export { LanguageProvider } from "./contexts/LanguageContext";
 
+// Theme Infrastructure
+export {
+  ThemeProvider,
+  useTheme,
+  type Theme,
+  type ThemeContextValue,
+} from "./contexts/ThemeContext";
+
 // App constants and configurations (server-safe)
 export { AppName, APP_CONFIGS } from "./types";
 export { GreekLocaleProvider } from "./contexts/GreekLocaleContext";
@@ -35,6 +43,7 @@ export { useGreekLocalization } from "./hooks/useGreekLocalization";
 export { Button, LoadingButton, IconButton } from "./components/ui/Button";
 export { Input, PasswordInput } from "./components/ui/Input";
 export { SimplePasswordInput } from "./components/ui/SimplePasswordInput";
+export { Logo } from "./components/ui/Logo";
 export {
   Form,
   FormField,
@@ -181,6 +190,7 @@ export { GreekPostalCodeInput } from "./components/greek/GreekPostalCodeInput";
 
 // Multilingual Components ✅ PHASE 4 & 7 COMPLETE
 export { LanguageSelector } from "./components/multilingual/LanguageSelector";
+export { ThemeSelector } from "./components/multilingual/ThemeSelector";
 export {
   LocalizedText,
   LocalizedHeading,

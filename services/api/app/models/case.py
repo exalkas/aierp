@@ -226,7 +226,7 @@ class Case(Base):
     escalated_to_user = relationship("User", foreign_keys=[escalated_to_user_id])
     previous_assignee = relationship("User", foreign_keys=[previous_assignee_id])
     parent_case = relationship("Case", remote_side=[id], foreign_keys=[parent_case_id])
-    child_cases = relationship("Case", foreign_keys=[parent_case_id])
+    child_cases = relationship("Case", foreign_keys=[parent_case_id], overlaps="parent_case")
     activities = relationship("Activity", back_populates="case")
     
     # Indexes for efficient queries

@@ -22,7 +22,7 @@ export default function BusinessEntitiesPage() {
       setError(null);
 
       // Test business entities endpoint
-      const response = await fetch("/api/v1/business-entities", {
+      const response = await fetch("/api/v1/business-entities/", {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
           "Content-Type": "application/json",
@@ -101,7 +101,8 @@ export default function BusinessEntitiesPage() {
               ✅ API Integration Successful!
             </h3>
             <p className="text-green-700 mb-2">
-              Business Entities Endpoint: <code>/api/v1/business-entities</code>
+              Business Entities Endpoint:{" "}
+              <code>/api/v1/business-entities/</code>
             </p>
             <p className="text-green-700 mb-4">
               Found {entities.length} business entities

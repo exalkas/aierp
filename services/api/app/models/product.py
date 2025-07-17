@@ -381,8 +381,8 @@ class ProductCategory(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
     
     # Relationships
-    parent = relationship("ProductCategory", remote_side=[id])
-    children = relationship("ProductCategory")
+    parent = relationship("ProductCategory", remote_side=[id], foreign_keys=[parent_id])
+    children = relationship("ProductCategory", foreign_keys=[parent_id], overlaps="parent")
     products = relationship("Product", back_populates="category")
     
     __table_args__ = (

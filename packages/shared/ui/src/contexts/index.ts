@@ -56,9 +56,8 @@ export {
 export {
   ThemeProvider,
   useTheme,
-  type MaritimeTheme,
-  type ColorPalette,
-  type ThemeSettings,
+  type Theme,
+  type ThemeContextValue,
 } from "./ThemeContext";
 
 export {

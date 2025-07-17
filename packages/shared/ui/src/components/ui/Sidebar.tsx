@@ -86,9 +86,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const getItemClasses = (item: SidebarItem, depth: number = 0) => {
     const baseClasses = `
-      group flex items-center w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-      ${collapsed ? "justify-center" : "justify-between"}
-      ${depth > 0 ? "ml-4" : ""}
+      group flex items-center w-full text-sm font-medium rounded-lg transition-colors duration-200
+      ${collapsed ? "justify-center px-2 py-3" : "justify-between px-3 py-2"}
+      ${depth > 0 && !collapsed ? "ml-4" : ""}
       ${itemClassName}
     `;
 
@@ -97,10 +97,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
 
     if (item.disabled) {
-      return `${baseClasses} text-gray-400 cursor-not-allowed`;
+      return `${baseClasses} text-gray-400 dark:text-gray-600 cursor-not-allowed`;
     }
 
-    return `${baseClasses} text-gray-700 hover:bg-gray-100 hover:text-gray-900`;
+    return `${baseClasses} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white`;
   };
 
   const renderItem = (item: SidebarItem, depth: number = 0) => {
@@ -115,7 +115,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={getItemClasses(item, depth)}
           title={collapsed ? item.label : undefined}
         >
-          <div className="flex items-center min-w-0">
+          <div
+            className={`flex items-center ${
+              collapsed ? "justify-center" : "min-w-0"
+            }`}
+          >
             {item.icon && (
               <span
                 className={`flex-shrink-0 ${
@@ -134,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!collapsed && (
             <div className="flex items-center space-x-2">
               {item.badge && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                   {item.badge}
                 </span>
               )}
@@ -175,18 +179,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             ? "transform -translate-x-full lg:translate-x-0"
             : ""
         }
-        h-full bg-white border-r border-gray-200 flex flex-col transition-all duration-300
+        h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300
         ${className}
       `}
     >
       {/* Header */}
-      <div className={`p-4 border-b border-gray-200 ${headerClassName}`}>
-        {/* Toggle Button - Always visible at top */}
+      <div
+        className={`p-4 border-b border-gray-200 dark:border-gray-700 ${headerClassName}`}
+      >
+        {/* Toggle Button - Visible when collapsed */}
         {showToggleButton && collapsible && (
-          <div className="flex justify-end mb-3">
+          <div
+            className={`mb-3 ${
+              collapsed ? "flex justify-center" : "flex justify-end"
+            }`}
+          >
             <button
               onClick={onToggleCollapse}
-              className="p-2 rounded-md hover:bg-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-700 text-white shadow-sm"
+              className="p-2 rounded-md hover:bg-gray-600 dark:hover:bg-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-700 dark:bg-gray-600 text-white shadow-sm"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
@@ -202,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {overlayOnMobile && (
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0066CC] focus:ring-offset-2 absolute top-4 right-4"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0066CC] focus:ring-offset-2 absolute top-4 right-4"
             aria-label="Close sidebar"
           >
             <X size={20} />
@@ -217,7 +227,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer */}
       {footer && !collapsed && (
-        <div className="p-4 border-t border-gray-200">{footer}</div>
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          {footer}
+        </div>
       )}
     </div>
   );
@@ -236,7 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Mobile toggle button */}
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0066CC] focus:ring-offset-2"
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0066CC] focus:ring-offset-2"
           aria-label="Open sidebar"
         >
           <Menu size={20} />

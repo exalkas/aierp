@@ -20,7 +20,11 @@ class JWTManager:
     """JWT token management class"""
     
     def __init__(self):
-        self.secret_key = settings.JWT_SECRET_KEY or secrets.token_urlsafe(32)
+        # Require JWT_SECRET_KEY from environment - no fallbacks
+        if not settings.JWT_SECRET_KEY:
+            raise ValueError("JWT_SECRET_KEY must be set in environment variables")
+        
+        self.secret_key = settings.JWT_SECRET_KEY
         self.algorithm = settings.JWT_ALGORITHM
         self.access_token_expire_minutes = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
         self.refresh_token_expire_days = settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
@@ -73,22 +77,10 @@ class JWTManager:
         }
         
         try:
-            logger.info(f"🔍 AUTH DEBUG - Creating access token for user: {user.username}")
-            logger.info(f"🔍 AUTH DEBUG - Using JWT secret: {self.secret_key[:10]}...")
-            logger.info(f"🔍 AUTH DEBUG - Using JWT algorithm: {self.algorithm}")
-            logger.info(f"🔍 AUTH DEBUG - Token expires in: {self.access_token_expire_minutes} minutes")
-            logger.info(f"🔍 AUTH DEBUG - Payload keys: {list(payload.keys())}")
-            logger.info(f"🔍 AUTH DEBUG - Company ID in payload: {payload.get('company_id')}")
-            
             token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
-            
-            logger.info(f"🔍 AUTH DEBUG - Token created successfully")
-            logger.info(f"🔍 AUTH DEBUG - Token length: {len(token)}")
-            logger.info(f"🔍 AUTH DEBUG - Token start: {token[:50]}...")
             logger.info(f"Access token created for user {user.username} ({user.email})")
             return token
         except Exception as e:
-            logger.error(f"🔍 AUTH DEBUG - Failed to create access token: {e}")
             logger.error(f"Failed to create access token: {e}")
             raise
     

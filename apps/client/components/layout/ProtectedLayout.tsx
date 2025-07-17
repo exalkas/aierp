@@ -7,8 +7,13 @@ import {
   useAuth,
   TranslationProvider,
   useTranslation,
+  ThemeProvider,
+  useTheme,
   AppName,
   Sidebar,
+  LanguageSelector,
+  ThemeSelector,
+  Logo,
 } from "@erp/shared-ui";
 import {
   Home,
@@ -18,12 +23,13 @@ import {
   FileText,
   BarChart3,
   Settings,
-  Ship,
   AlertTriangle,
   Loader2,
   LogOut,
   TestTube,
   Store,
+  ChevronLeft,
+  Menu,
 } from "lucide-react";
 
 // Simple mock for company context until we can fix the imports
@@ -38,14 +44,17 @@ function LoadingSpinner() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
       <div className="text-center">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white mb-4 mx-auto">
-          <Ship size={20} />
+        <div className="mb-4 mx-auto flex justify-center">
+          <Logo size="md" />
         </div>
-        <Loader2 size={32} className="animate-spin text-blue-600 mb-4" />
-        <p className="text-gray-600">
-          {t("loading", { ns: "common", defaultValue: "Loading..." })}
+        <Loader2
+          size={32}
+          className="animate-spin text-blue-600 mb-4 mx-auto"
+        />
+        <p className="text-gray-600 dark:text-gray-400">
+          {t("loading", { ns: "common" })}
         </p>
       </div>
     </div>
@@ -63,21 +72,18 @@ function ErrorDisplay({
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
       <div className="text-center max-w-md mx-auto p-6">
         <AlertTriangle size={48} className="text-red-500 mb-4 mx-auto" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          {t("error_occurred", {
-            ns: "common",
-            defaultValue: "An error occurred",
-          })}
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          {t("error", { ns: "common" })}
         </h2>
-        <p className="text-gray-600 mb-6">{error}</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
         <button
           onClick={onRetry}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
         >
-          {t("try_again", { ns: "common", defaultValue: "Try Again" })}
+          {t("back", { ns: "common" })}
         </button>
       </div>
     </div>
@@ -89,6 +95,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
   const { user, logout, isLoading } = useAuth();
   const { state: companyState } = useCompany();
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -118,7 +125,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
   const navigationItems = [
     {
       id: "dashboard",
-      label: t("dashboard", { ns: "navigation", defaultValue: "Dashboard" }),
+      label: t("dashboard", { ns: "navigation" }),
       href: "/dashboard",
       icon: <Home size={20} />,
       onClick: () => {
@@ -128,7 +135,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "customers",
-      label: t("customers", { ns: "navigation", defaultValue: "Customers" }),
+      label: t("customers", { ns: "navigation" }),
       href: "/dashboard/customers",
       icon: <Users size={20} />,
       onClick: () => {
@@ -138,7 +145,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "suppliers",
-      label: t("suppliers", { ns: "navigation", defaultValue: "Suppliers" }),
+      label: t("suppliers", { ns: "navigation" }),
       href: "/dashboard/suppliers",
       icon: <Building2 size={20} />,
       onClick: () => {
@@ -148,7 +155,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "products",
-      label: t("products", { ns: "navigation", defaultValue: "Products" }),
+      label: t("products", { ns: "navigation" }),
       href: "/dashboard/products",
       icon: <Package size={20} />,
       disabled: true,
@@ -159,7 +166,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "invoices",
-      label: t("invoices", { ns: "navigation", defaultValue: "Invoices" }),
+      label: t("invoices", { ns: "navigation" }),
       href: "/dashboard/invoices",
       icon: <FileText size={20} />,
       disabled: true,
@@ -170,7 +177,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "reports",
-      label: t("reports", { ns: "navigation", defaultValue: "Reports" }),
+      label: t("reports", { ns: "navigation" }),
       href: "/dashboard/reports",
       icon: <BarChart3 size={20} />,
       disabled: true,
@@ -181,10 +188,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "test-flow",
-      label: t("test_flow", {
-        ns: "navigation",
-        defaultValue: "Test Workflow",
-      }),
+      label: t("test_flow", { ns: "navigation" }),
       href: "/dashboard/test-business-flow",
       icon: <TestTube size={20} />,
       onClick: () => {
@@ -194,7 +198,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
     },
     {
       id: "settings",
-      label: t("settings", { ns: "navigation", defaultValue: "Settings" }),
+      label: t("settings", { ns: "navigation" }),
       href: "/dashboard/settings",
       icon: <Settings size={20} />,
       disabled: true,
@@ -227,53 +231,78 @@ function Navigation({ children }: { children: React.ReactNode }) {
   const companyInfo = getCompanyDisplayInfo();
 
   const sidebarHeader = (
-    <div className="flex items-center space-x-3">
-      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white flex-shrink-0">
-        <Ship size={20} />
+    <div className="space-y-3">
+      {/* Main header with app info */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="flex-shrink-0">
+            <Logo size="sm" />
+          </div>
+          <div
+            className={`min-w-0 transition-all duration-300 ease-in-out ${
+              sidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+            }`}
+          >
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              {t("app_name", { ns: "navigation" })}
+            </h1>
+            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+              {companyInfo.name}
+              {companyInfo.afm && ` • ΑΦΜ: ${companyInfo.afm}`}
+            </p>
+          </div>
+        </div>
+
+        {/* Close button when sidebar is open */}
+        {!sidebarCollapsed && (
+          <button
+            onClick={() => setSidebarCollapsed(true)}
+            className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
       </div>
-      <div
-        className={`min-w-0 transition-all duration-300 ease-in-out ${
-          sidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
-        }`}
-      >
-        <h1 className="text-lg font-semibold text-gray-900 truncate">
-          {t("app_name", { ns: "common", defaultValue: "Greek ERP/CRM" })}
-        </h1>
-        <p className="text-xs text-gray-600 truncate">
-          {companyInfo.name}
-          {companyInfo.afm && ` • ΑΦΜ: ${companyInfo.afm}`}
-        </p>
-      </div>
+
+      {/* Theme and Language controls when sidebar is open */}
+      {!sidebarCollapsed && (
+        <div className="flex items-center justify-start pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center space-x-2">
+            <ThemeSelector variant="toggle" size="sm" />
+            <LanguageSelector
+              variant="dropdown"
+              size="sm"
+              showFlag={true}
+              showNativeName={false}
+              className="min-w-0"
+              theme={theme}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 
   const sidebarFooter = (
     <div
-      className={`space-y-3 transition-all duration-300 ease-in-out ${
+      className={`transition-all duration-300 ease-in-out ${
         sidebarCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
       }`}
     >
-      <div className="text-xs text-gray-600">
-        {t("welcome_user", {
-          ns: "common",
-          defaultValue: "Welcome, {{name}}",
-          variables: { name: user?.name || user?.email },
-        })}
-      </div>
       <button
         onClick={handleLogout}
         disabled={isLoading}
-        className="w-full bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-red-600 dark:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 dark:hover:bg-red-600 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
       >
         {isLoading ? (
           <>
             <Loader2 size={16} className="animate-spin" />
-            {t("logging_out", { ns: "common", defaultValue: "Logging out..." })}
+            {t("logging_out", { ns: "navigation" })}
           </>
         ) : (
           <>
             <LogOut size={16} />
-            {t("logout", { ns: "common", defaultValue: "Logout" })}
+            {t("logout", { ns: "navigation" })}
           </>
         )}
       </button>
@@ -281,7 +310,7 @@ function Navigation({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar
@@ -290,8 +319,8 @@ function Navigation({ children }: { children: React.ReactNode }) {
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           header={sidebarHeader}
           footer={sidebarFooter}
-          className="h-full border-r border-gray-200 shadow-sm"
-          showToggleButton={true}
+          className="h-full border-r border-gray-200 dark:border-gray-700 shadow-sm dark:bg-gray-800"
+          showToggleButton={sidebarCollapsed}
           collapsible={true}
           width={sidebarCollapsed ? "w-16" : "w-64"}
         />
@@ -317,41 +346,97 @@ function Navigation({ children }: { children: React.ReactNode }) {
           sidebarCollapsed ? "lg:ml-0" : "lg:ml-0"
         }`}
       >
+        {/* Desktop Header - Only show when sidebar is collapsed */}
+        {sidebarCollapsed && (
+          <div className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Logo size="sm" />
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t("app_name", { ns: "navigation" })}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 flex items-center justify-center">
+                  <ThemeSelector
+                    variant="toggle"
+                    size="sm"
+                    className="h-8 w-8 min-w-8"
+                  />
+                </div>
+                <div className="h-8 flex items-center">
+                  <LanguageSelector
+                    variant="dropdown"
+                    size="sm"
+                    showFlag={true}
+                    showNativeName={false}
+                    className="min-w-0"
+                    theme={theme}
+                  />
+                </div>
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                  className="h-8 w-8 flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Mobile Header */}
-        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               >
-                <Store size={20} />
+                <Menu size={20} />
               </button>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {t("app_name", {
-                    ns: "common",
-                    defaultValue: "Greek ERP/CRM",
-                  })}
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t("app_name", { ns: "navigation" })}
                 </h1>
-                <p className="text-xs text-gray-600 truncate">
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                   {companyInfo.name}
                   {companyInfo.afm && ` • ΑΦΜ: ${companyInfo.afm}`}
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              disabled={isLoading}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <LogOut size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 flex items-center justify-center">
+                <ThemeSelector
+                  variant="toggle"
+                  size="md"
+                  className="h-8 w-8 min-w-8"
+                />
+              </div>
+              <div className="h-8 flex items-center">
+                <LanguageSelector
+                  variant="dropdown"
+                  size="sm"
+                  showFlag={true}
+                  showNativeName={false}
+                  className="min-w-0"
+                  theme={theme}
+                />
+              </div>
+              <button
+                onClick={handleLogout}
+                disabled={isLoading}
+                className="h-8 w-8 flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-gray-50">
+        <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             {children}
           </div>
@@ -417,17 +502,14 @@ function ProtectedLayoutContent({ children }: { children: React.ReactNode }) {
   ) {
     return (
       <ErrorDisplay
-        error={t("access_denied", {
-          ns: "common",
-          defaultValue: "Access denied. Please contact your administrator.",
-        })}
+        error={t("access_denied", { ns: "navigation" })}
         onRetry={() => router.push("/login")}
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation children={children} />
     </div>
   );
@@ -441,9 +523,11 @@ export default function ProtectedLayout({
 }) {
   return (
     <TranslationProvider>
-      <AuthProvider app={AppName.CLIENT}>
-        <ProtectedLayoutContent>{children}</ProtectedLayoutContent>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider app={AppName.CLIENT}>
+          <ProtectedLayoutContent>{children}</ProtectedLayoutContent>
+        </AuthProvider>
+      </ThemeProvider>
     </TranslationProvider>
   );
 }

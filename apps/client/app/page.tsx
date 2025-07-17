@@ -3,7 +3,7 @@ export default function HomePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-maritime-blue mb-6">
-          Greek ERP/CRM System
+          Axiologic
         </h1>
         <p className="text-xl text-gray-600 mb-8">
           Comprehensive business management for Greek companies

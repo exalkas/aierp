@@ -152,7 +152,7 @@ class ChartOfAccounts(Base):
     
     # Relationships
     parent_account = relationship("ChartOfAccounts", remote_side=[id], foreign_keys=[parent_account_id])
-    child_accounts = relationship("ChartOfAccounts", foreign_keys=[parent_account_id])
+    child_accounts = relationship("ChartOfAccounts", foreign_keys=[parent_account_id], overlaps="parent_account")
     journal_entries = relationship("JournalEntryLine", back_populates="account")
     
     # Constraints and indexes

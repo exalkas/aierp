@@ -135,9 +135,11 @@ class AppAuthMiddleware {
   private jwtSecret: Uint8Array;
 
   constructor() {
-    const secret =
-      process.env.JWT_SECRET_KEY ||
-      "your-super-secret-jwt-key-change-in-production";
+    // Require JWT_SECRET_KEY from environment - no fallbacks
+    const secret = process.env.JWT_SECRET_KEY;
+    if (!secret) {
+      throw new Error("JWT_SECRET_KEY must be set in environment variables");
+    }
     this.jwtSecret = new TextEncoder().encode(secret);
   }
 

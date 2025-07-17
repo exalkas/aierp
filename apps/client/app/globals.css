@@ -1,22 +1,43 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
     --foreground-rgb: 0, 0, 0;
     --background-start-rgb: 214, 219, 220;
     --background-end-rgb: 255, 255, 255;
+
+    /* Maritime theme colors */
+    --maritime-blue: #0066CC;
+    --maritime-blue-dark: #0052A3;
+    --maritime-blue-light: #3B82F6;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
-    }
+/* Dark theme support */
+.dark {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
 }
 
 body {
     color: rgb(var(--foreground-rgb));
-    background: linear-gradient(to bottom,
-            transparent,
-            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Maritime blue utility classes */
+.text-maritime-blue {
+    color: var(--maritime-blue);
+}
+
+.bg-maritime-blue {
+    background-color: var(--maritime-blue);
+}
+
+.border-maritime-blue {
+    border-color: var(--maritime-blue);
+}
+
+.hover\:bg-maritime-blue:hover {
+    background-color: var(--maritime-blue-dark);
 }

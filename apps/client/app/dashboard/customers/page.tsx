@@ -23,78 +23,6 @@ export default function CustomersPage() {
     averageOrderValue: 0,
   });
 
-  // Debug authentication state
-  useEffect(() => {
-    console.log("CustomerPage - Auth Debug:", {
-      isAuthenticated,
-      hasTokens: !!tokens,
-      hasAccessToken: !!tokens?.accessToken,
-      user: user ? { id: user.id, email: user.email, role: user.role } : null,
-      tokenExpiry: tokens?.expiresAt,
-    });
-  }, [isAuthenticated, tokens, user]);
-
-  // Test API call to debug authentication
-  const testApiCall = async () => {
-    try {
-      console.log("Testing API call with current tokens...");
-
-      if (!tokens?.accessToken) {
-        console.error("No access token available");
-        return;
-      }
-
-      const response = await fetch("/api/v1/business-entities?limit=1", {
-        headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("Test API Response:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Test API Success:", data);
-        alert("API call successful! Check console for details.");
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.log("Test API Error:", errorData);
-        alert(
-          `API call failed: ${response.status} - ${
-            errorData.detail || response.statusText
-          }`
-        );
-      }
-    } catch (error) {
-      console.error("Test API Error:", error);
-      alert(`API call error: ${error}`);
-    }
-  };
-
-  // Clear all stored tokens and force re-login
-  const clearTokensAndRelogin = () => {
-    // Clear localStorage
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("authToken");
-
-      // Clear cookies
-      document.cookie =
-        "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie =
-        "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    }
-
-    alert("Tokens cleared! Redirecting to login...");
-    router.push("/login");
-  };
-
   const handleCreateCustomer = () => {
     router.push("/dashboard/customers/create");
   };
@@ -105,46 +33,6 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Debug Info - Remove in production */}
-      {process.env.NODE_ENV === "development" && (
-        <Card className="bg-yellow-50 border-yellow-200">
-          <CardHeader>
-            <h3 className="text-sm font-medium text-yellow-800">Debug Info</h3>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-yellow-700 space-y-1 mb-3">
-              <div>Authenticated: {isAuthenticated ? "✅ Yes" : "❌ No"}</div>
-              <div>Has Tokens: {tokens ? "✅ Yes" : "❌ No"}</div>
-              <div>
-                Access Token:{" "}
-                {tokens?.accessToken ? "✅ Present" : "❌ Missing"}
-              </div>
-              <div>User Role: {user?.role || "None"}</div>
-              <div>Company ID: {user?.companyId || "None"}</div>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={testApiCall}
-                size="sm"
-                variant="outline"
-                className="text-xs"
-              >
-                Test API Call
-              </Button>
-
-              <Button
-                onClick={clearTokensAndRelogin}
-                size="sm"
-                variant="destructive"
-                className="text-xs"
-              >
-                Clear Tokens & Re-login
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

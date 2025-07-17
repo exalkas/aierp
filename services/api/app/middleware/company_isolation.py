@@ -47,7 +47,7 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
         if not request.url.path.startswith("/api/"):
             return await call_next(request)
         
-        logger.info(f"🔍 MIDDLEWARE DEBUG - Processing API request: {request.method} {request.url.path}")
+        logger.debug(f"Processing API request: {request.method} {request.url.path}")
         
         try:
             # Extract and validate company context
@@ -115,22 +115,14 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
         try:
             # Get authorization header
             auth_header = request.headers.get("Authorization")
-            logger.info(f"🔍 JWT DEBUG - Authorization header present: {bool(auth_header)}")
             
             if not auth_header or not auth_header.startswith("Bearer "):
-                logger.warning(f"🔍 JWT DEBUG - Invalid auth header format: {auth_header[:50] if auth_header else 'None'}...")
                 return None
             
             # Extract token
             token = auth_header.replace("Bearer ", "")
             if not token:
-                logger.warning("🔍 JWT DEBUG - Empty token after Bearer removal")
                 return None
-            
-            logger.info(f"🔍 JWT DEBUG - Token length: {len(token)}")
-            logger.info(f"🔍 JWT DEBUG - Token start: {token[:50]}...")
-            logger.info(f"🔍 JWT DEBUG - Using JWT secret: {settings.JWT_SECRET_KEY[:10]}...")
-            logger.info(f"🔍 JWT DEBUG - Using JWT algorithm: {settings.JWT_ALGORITHM}")
             
             # Decode JWT token (without verification for company extraction)
             try:
@@ -140,33 +132,23 @@ class CompanyIsolationMiddleware(BaseHTTPMiddleware):
                     algorithms=[settings.JWT_ALGORITHM]
                 )
                 
-                logger.info(f"🔍 JWT DEBUG - Token decoded successfully")
-                logger.info(f"🔍 JWT DEBUG - Payload keys: {list(payload.keys())}")
-                
                 company_id = payload.get("company_id")
                 if company_id:
-                    logger.info(f"🔍 JWT DEBUG - Company ID found: {company_id}")
                     return str(company_id)
-                else:
-                    logger.warning(f"🔍 JWT DEBUG - No company_id in payload: {payload}")
                 
             except jwt.ExpiredSignatureError:
-                logger.warning("🔍 JWT DEBUG - JWT token expired")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token expired"
                 )
             except jwt.InvalidTokenError as e:
-                logger.warning(f"🔍 JWT DEBUG - Invalid JWT token: {e}")
-                logger.warning(f"🔍 JWT DEBUG - Token that failed: {token[:100]}...")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid token"
                 )
                 
         except Exception as e:
-            logger.error(f"🔍 JWT DEBUG - Error extracting company from JWT: {e}")
-            logger.error(f"🔍 JWT DEBUG - Exception type: {type(e)}")
+            logger.error(f"Error extracting company from JWT: {e}")
             return None
         
         return None
@@ -236,6 +218,11 @@ async def get_current_user_and_company(request: Request) -> Tuple[dict, str]:
             username = payload.get("username") or payload.get("sub")
             email = payload.get("email")
             company_id = payload.get("company_id")
+            full_name = payload.get("full_name")
+            role = payload.get("role")
+            is_active = payload.get("is_active", True)
+            is_superuser = payload.get("is_superuser", False)
+            permissions = payload.get("permissions", [])
             
             if not user_id or not company_id:
                 raise HTTPException(
@@ -243,13 +230,30 @@ async def get_current_user_and_company(request: Request) -> Tuple[dict, str]:
                     detail="Invalid token: missing user_id or company_id"
                 )
             
-            # Create user object (simplified for dependency injection)
-            user = {
+            # Create user-like object with all necessary attributes for services
+            class UserFromToken:
+                def __init__(self, data):
+                    self.id = data["id"]
+                    self.username = data["username"]
+                    self.email = data["email"]
+                    self.company_id = data["company_id"]
+                    self.full_name = data.get("full_name")
+                    self.role = data.get("role")
+                    self.is_active = data.get("is_active", True)
+                    self.is_super_user = data.get("is_superuser", False)  # Note: service expects is_super_user
+                    self.permissions = data.get("permissions", [])
+            
+            user = UserFromToken({
                 "id": user_id,
                 "username": username,
                 "email": email,
-                "company_id": company_id
-            }
+                "company_id": company_id,
+                "full_name": full_name,
+                "role": role,
+                "is_active": is_active,
+                "is_superuser": is_superuser,
+                "permissions": permissions
+            })
             
             return user, str(company_id)
             

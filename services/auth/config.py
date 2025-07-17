@@ -5,6 +5,17 @@ Connects to same database as API service for user authentication
 
 import os
 from typing import List
+from pathlib import Path
+
+# Load .env file if it exists
+env_file = Path(__file__).parent / ".env"
+if env_file.exists():
+    with open(env_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                os.environ.setdefault(key, value)
 
 
 class Settings:
@@ -22,8 +33,11 @@ class Settings:
             "postgresql://erp_admin_315:replace_with_local_database_password@localhost:5432/erp_maritime_hellenic_4007"
         )
         
-        # JWT Configuration
-        self.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-super-secret-jwt-key-change-in-production")
+        # JWT Configuration - no fallbacks, must be set in environment
+        self.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+        if not self.JWT_SECRET_KEY:
+            raise ValueError("JWT_SECRET_KEY must be set in environment variables")
+        
         self.JWT_ALGORITHM = "HS256"
         self.JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
         self.JWT_REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))

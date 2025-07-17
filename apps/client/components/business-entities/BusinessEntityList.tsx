@@ -189,13 +189,13 @@ export default function BusinessEntityList({
       const params = buildAPIParams(filters, page);
 
       console.log("BusinessEntityList - Making API call:", {
-        url: `/api/v1/business-entities?${params}`,
+        url: `/api/v1/business-entities/?${params}`,
         hasToken: !!tokens.accessToken,
         tokenLength: tokens.accessToken?.length,
         tokenExpiry: tokens.expiresAt,
       });
 
-      const response = await fetch(`/api/v1/business-entities?${params}`, {
+      const response = await fetch(`/api/v1/business-entities/?${params}`, {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
           "Content-Type": "application/json",

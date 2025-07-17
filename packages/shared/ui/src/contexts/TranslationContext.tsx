@@ -44,6 +44,7 @@ const DEFAULT_RESOURCES: LanguageResources = {
       select_option: "Επιλέξτε μια επιλογή",
       no_results: "Δεν βρέθηκαν αποτελέσματα",
       clear_all: "Καθαρισμός όλων",
+      retry: "Δοκιμή ξανά",
     },
     forms: {
       field_required: "Το πεδίο είναι υποχρεωτικό",
@@ -77,6 +78,99 @@ const DEFAULT_RESOURCES: LanguageResources = {
       iban_label: "IBAN",
       vat_rate_label: "Συντελεστής Φ.Π.Α.",
     },
+    navigation: {
+      dashboard: "Κεντρικός Πίνακας",
+      customers: "Πελάτες",
+      suppliers: "Προμηθευτές",
+      products: "Προϊόντα",
+      invoices: "Τιμολόγια",
+      reports: "Αναφορές",
+      test_flow: "Δοκιμαστική Ροή",
+      settings: "Ρυθμίσεις",
+      app_name: "Axiologic",
+      welcome_user: "Καλώς ήρθατε, {{name}}",
+      logout: "Αποσύνδεση",
+      logging_out: "Αποσύνδεση...",
+      access_denied: "Δεν έχετε πρόσβαση. Επικοινωνήστε με τον διαχειριστή.",
+    },
+    dashboard: {
+      welcome_user: "Καλώς ήρθατε, {{name}}!",
+      company_overview:
+        "Επισκόπηση της επιχείρησής σας • Εταιρεία: {{company}}",
+      company_not_set: "Δεν έχει οριστεί",
+      development_progress: "Πρόοδος Ανάπτυξης",
+      milestone_1_progress: "Milestone 1: CRM + Τιμολόγηση (Ολοκληρώθηκε 75%)",
+      erp_core_next: "ERP Core: Αποθέματα + Οικονομικά (Επόμενο)",
+      total_customers: "Συνολικοί Πελάτες",
+      monthly_invoices: "Μηνιαία Τιμολόγια",
+      monthly_revenue: "Μηνιαίος Τζίρος",
+      active_opportunities: "Ενεργές Ευκαιρίες",
+      recent_activities: "Πρόσφατες Δραστηριότητες",
+      quick_actions: "Γρήγορες Ενέργειες",
+      new_invoice: "Νέο Τιμολόγιο",
+      new_invoice_desc: "Δημιουργία και αποστολή στο AADE",
+      new_customer: "Νέος Πελάτης",
+      new_customer_desc: "Καταχώρηση επιχείρησης/προμηθευτή",
+      new_opportunity: "Νέα Ευκαιρία",
+      new_opportunity_desc: "Καταχώρηση ευκαιρίας πώλησης",
+      // Error messages
+      error_loading_stats: "Σφάλμα φόρτωσης στατιστικών",
+      data_temporarily_unavailable: "Δεδομένα προσωρινά μη διαθέσιμα",
+      retry_in_moment: "Δοκιμάστε ξανά σε λίγο",
+      contact_support: "Επικοινωνήστε με την υποστήριξη",
+      loading_stats: "Φόρτωση στατιστικών...",
+      stats_unavailable: "Στατιστικά μη διαθέσιμα",
+      schedule: "Προγραμματισμός",
+      schedule_desc: "Νέο ραντεβού ή δραστηριότητα",
+      system_modules: "Μονάδες Συστήματος - Roadmap Ανάπτυξης",
+      milestone_1_title: "Milestone 1: CRM + Τιμολόγηση",
+      milestone_1_desc: "Βασικές επιχειρηματικές λειτουργίες",
+      erp_core_title: "ERP Core: Αποθέματα + Οικονομικά",
+      erp_core_desc: "Ολοκληρωμένη επιχειρησιακή διαχείριση",
+      erp_expansion_title: "ERP Expansion: Προηγμένες Λειτουργίες",
+      erp_expansion_desc: "Προηγμένες αναλύσεις & αυτοματισμοί",
+      module_active: "Ενεργό",
+      module_developing: "Ανάπτυξη",
+      module_planned: "Προγραμματισμένο",
+      open_module: "Άνοιγμα μονάδας",
+      in_development: "Σε ανάπτυξη",
+      next_phase: "Επόμενη φάση",
+      view_all_activities: "Δείτε όλες τις δραστηριότητες →",
+      no_recent_activities: "Δεν υπάρχουν πρόσφατες δραστηριότητες",
+      no_recent_activities_desc:
+        "Όταν δημιουργήσετε τιμολόγια, πελάτες ή άλλες δραστηριότητες, θα εμφανιστούν εδώ",
+      error_loading_activities: "Σφάλμα φόρτωσης δραστηριοτήτων",
+      business_management: "Διαχείριση Επιχειρήσεων",
+      business_management_desc: "Πελάτες, προμηθευτές, επαφές & σχέσεις",
+      greek_invoicing: "Ελληνική Τιμολόγηση",
+      greek_invoicing_desc: "16 είδη παραστατικών & AADE ενσωμάτωση",
+      sales_pipeline: "Πωλήσεις & Pipeline",
+      sales_pipeline_desc: "Ευκαιρίες, προσφορές & πρόβλεψη πωλήσεων",
+      product_catalog: "Κατάλογος Προϊόντων",
+      product_catalog_desc: "Προϊόντα, υπηρεσίες & τιμολόγηση",
+      inventory_management: "Διαχείριση Αποθέματος",
+      inventory_management_desc: "Αποθήκες, κίνηση & αυτοματισμοί",
+      financial_management: "Οικονομική Διαχείριση",
+      financial_management_desc: "Λογιστική, ταμείο & χρηματοροές",
+      business_analytics: "Επιχειρηματικές Αναλύσεις",
+      business_analytics_desc: "Dashboards, KPIs & προβλέψεις",
+      aade_compliance: "AADE Συμμόρφωση",
+      aade_compliance_desc: "MyDATA, φορολογικές υποχρεώσεις",
+      hr_management: "Διαχείριση Προσωπικού",
+      hr_management_desc: "HR, μισθοδοσία & παρουσίες",
+      multi_company_security: "Πολυ-εταιρικό σύστημα ασφαλείας ✓",
+      axiologic_integrated: "Axiologic - Ενοποιημένη Επιχειρηματική Διαχείριση",
+      development_phases:
+        "Milestone 1: CRM + Τιμολόγηση • ERP Core: Αποθέματα + Οικονομικά • ERP Expansion: HR + Analytics",
+    },
+    auth: {
+      welcome: "Καλώς ήρθατε",
+      sign_in_prompt: "Συνδεθείτε στον λογαριασμό σας",
+      company_description: "Διαχείριση πελατών και επιχειρήσεων",
+      all_rights_reserved: "Όλα τα δικαιώματα κατοχυρωμένα.",
+      select_language: "Επιλογή γλώσσας",
+      select_theme: "Επιλογή θέματος",
+    },
   },
   en: {
     common: {
@@ -101,6 +195,7 @@ const DEFAULT_RESOURCES: LanguageResources = {
       select_option: "Select an option",
       no_results: "No results found",
       clear_all: "Clear all",
+      retry: "Try again",
     },
     forms: {
       field_required: "Field is required",
@@ -133,6 +228,99 @@ const DEFAULT_RESOURCES: LanguageResources = {
       bank_label: "Bank",
       iban_label: "IBAN",
       vat_rate_label: "VAT Rate",
+    },
+    navigation: {
+      dashboard: "Dashboard",
+      customers: "Customers",
+      suppliers: "Suppliers",
+      products: "Products",
+      invoices: "Invoices",
+      reports: "Reports",
+      test_flow: "Test Workflow",
+      settings: "Settings",
+      app_name: "Axiologic",
+      welcome_user: "Welcome, {{name}}",
+      logout: "Logout",
+      logging_out: "Logging out...",
+      access_denied: "Access denied. Please contact your administrator.",
+    },
+    dashboard: {
+      welcome_user: "Welcome, {{name}}!",
+      company_overview: "Business overview • Company: {{company}}",
+      company_not_set: "Not set",
+      development_progress: "Development Progress",
+      milestone_1_progress: "Milestone 1: CRM + Invoicing (75% Complete)",
+      erp_core_next: "ERP Core: Inventory + Finance (Next)",
+      total_customers: "Total Customers",
+      monthly_invoices: "Monthly Invoices",
+      monthly_revenue: "Monthly Revenue",
+      active_opportunities: "Active Opportunities",
+      recent_activities: "Recent Activities",
+      quick_actions: "Quick Actions",
+      new_invoice: "New Invoice",
+      new_invoice_desc: "Create and send to AADE",
+      new_customer: "New Customer",
+      new_customer_desc: "Register business/supplier",
+      new_opportunity: "New Opportunity",
+      new_opportunity_desc: "Register sales opportunity",
+      // Error messages
+      error_loading_stats: "Error loading statistics",
+      data_temporarily_unavailable: "Data temporarily unavailable",
+      retry_in_moment: "Please try again in a moment",
+      contact_support: "Contact support if the problem persists",
+      loading_stats: "Loading statistics...",
+      stats_unavailable: "Statistics unavailable",
+      schedule: "Schedule",
+      schedule_desc: "New appointment or activity",
+      system_modules: "System Modules - Development Roadmap",
+      milestone_1_title: "Milestone 1: CRM + Invoicing",
+      milestone_1_desc: "Core business operations",
+      erp_core_title: "ERP Core: Inventory + Finance",
+      erp_core_desc: "Integrated business management",
+      erp_expansion_title: "ERP Expansion: Advanced Features",
+      erp_expansion_desc: "Advanced analytics & automation",
+      module_active: "Active",
+      module_developing: "Development",
+      module_planned: "Planned",
+      open_module: "Open module",
+      in_development: "In development",
+      next_phase: "Next phase",
+      view_all_activities: "View all activities →",
+      no_recent_activities: "No recent activities",
+      no_recent_activities_desc:
+        "When you create invoices, customers, or other activities, they will appear here",
+      error_loading_activities: "Error loading activities",
+      business_management: "Business Management",
+      business_management_desc:
+        "Customers, suppliers, contacts & relationships",
+      greek_invoicing: "Greek Invoicing",
+      greek_invoicing_desc: "16 document types & AADE integration",
+      sales_pipeline: "Sales & Pipeline",
+      sales_pipeline_desc: "Opportunities, quotes & sales forecasting",
+      product_catalog: "Product Catalog",
+      product_catalog_desc: "Products, services & pricing",
+      inventory_management: "Inventory Management",
+      inventory_management_desc: "Warehouses, movement & automation",
+      financial_management: "Financial Management",
+      financial_management_desc: "Accounting, cash flow & finance",
+      business_analytics: "Business Analytics",
+      business_analytics_desc: "Dashboards, KPIs & forecasting",
+      aade_compliance: "AADE Compliance",
+      aade_compliance_desc: "MyDATA, tax obligations",
+      hr_management: "HR Management",
+      hr_management_desc: "HR, payroll & attendance",
+      multi_company_security: "Multi-company security system ✓",
+      axiologic_integrated: "Axiologic - Integrated Business Management",
+      development_phases:
+        "Milestone 1: CRM + Invoicing • ERP Core: Inventory + Finance • ERP Expansion: HR + Analytics",
+    },
+    auth: {
+      welcome: "Welcome",
+      sign_in_prompt: "Sign in to your account",
+      company_description: "Customer and Business Management",
+      all_rights_reserved: "All rights reserved.",
+      select_language: "Select language",
+      select_theme: "Select theme",
     },
   },
 };
@@ -198,34 +386,42 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   storageKey = LANGUAGE_STORAGE_KEY,
   fallbackLanguage = "en",
 }) => {
-  // Initialize language with detection
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === "undefined") return defaultLanguage;
+  // Initialize language with stable SSR value
+  const [language, setLanguageState] = useState<Language>(defaultLanguage);
+  const [translationResources, setTranslationResources] =
+    useState<LanguageResources>(resources);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isClient, setIsClient] = useState(false);
 
-    // Try to get from localStorage first
-    const stored = localStorage.getItem(storageKey);
-    if (stored && (stored === "el" || stored === "en")) {
-      return stored as Language;
-    }
+  // Fix hydration mismatch by updating language after mount
+  useEffect(() => {
+    setIsClient(true);
 
-    // Auto-detect language if enabled
-    if (detectLanguage) {
-      const detected =
-        detectLanguageFromPath() ||
-        detectLanguageFromHeaders() ||
-        detectLanguageFromNavigator();
+    // Only check stored/detected language after client mount
+    if (typeof window !== "undefined") {
+      // Try to get from localStorage first
+      const stored = localStorage.getItem(storageKey);
+      if (stored && (stored === "el" || stored === "en")) {
+        setLanguageState(stored as Language);
+        return;
+      }
 
-      if (detected) {
-        localStorage.setItem(storageKey, detected);
-        return detected;
+      // Auto-detect language if enabled
+      if (detectLanguage) {
+        const detected =
+          detectLanguageFromPath() ||
+          detectLanguageFromHeaders() ||
+          detectLanguageFromNavigator();
+
+        if (detected) {
+          localStorage.setItem(storageKey, detected);
+          setLanguageState(detected);
+          return;
+        }
       }
     }
-
-    return defaultLanguage;
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>();
+  }, [detectLanguage, storageKey]);
 
   // Language preferences
   const [preferences, setPreferences] = useState<UserLanguagePreferences>(
@@ -288,7 +484,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
 
       try {
         // Get translation from current language
-        const currentLangResources = resources[language];
+        const currentLangResources = translationResources[language];
         if (currentLangResources) {
           const namespace = currentLangResources[ns];
           if (namespace) {
@@ -313,7 +509,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         }
 
         // Fallback to fallback language
-        const fallbackLangResources = resources[fallbackLanguage];
+        const fallbackLangResources = translationResources[fallbackLanguage];
         if (fallbackLangResources) {
           const namespace = fallbackLangResources[ns];
           if (namespace) {
@@ -331,7 +527,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
         return defaultValue;
       }
     },
-    [language, resources, fallbackLanguage]
+    [language, translationResources, fallbackLanguage]
   );
 
   // Save preferences to localStorage
@@ -345,11 +541,11 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       language,
       setLanguage,
       t,
-      resources,
+      resources: translationResources,
       isLoading,
       error,
     }),
-    [language, setLanguage, t, resources, isLoading, error]
+    [language, setLanguage, t, translationResources, isLoading, error]
   );
 
   return (

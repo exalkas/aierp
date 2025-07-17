@@ -176,7 +176,7 @@ class Invoice(Base):
     invoice_items = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
     parent_document = relationship("Invoice", remote_side=[id], foreign_keys=[parent_document_id])
     original_document = relationship("Invoice", remote_side=[id], foreign_keys=[original_document_id])
-    child_documents = relationship("Invoice", foreign_keys=[parent_document_id])
+    child_documents = relationship("Invoice", foreign_keys=[parent_document_id], overlaps="parent_document")
     workflow_instance = relationship("DocumentWorkflowInstance", back_populates="document", uselist=False)
     
     # Indexes for efficient queries

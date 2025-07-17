@@ -221,7 +221,7 @@ class Activity(Base):
     assigned_user = relationship("User", foreign_keys=[assigned_user_id])
     created_by_user = relationship("User", foreign_keys=[created_by_user_id])
     parent_activity = relationship("Activity", remote_side=[id], foreign_keys=[parent_activity_id])
-    child_activities = relationship("Activity", foreign_keys=[parent_activity_id])
+    child_activities = relationship("Activity", foreign_keys=[parent_activity_id], overlaps="parent_activity")
     
     # Indexes for efficient queries
     __table_args__ = (

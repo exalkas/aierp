@@ -241,7 +241,7 @@ const NotificationContext = createContext<{
   getNotificationsByCategory: (category: string) => Notification[];
   getUnreadNotifications: () => Notification[];
   getUrgentNotifications: () => Notification[];
-  // Greek ERP specific notifications
+  // Axiologic specific notifications
   addComplianceAlert: (message: string, metadata?: any) => void;
   addAADENotification: (message: string, reference?: string) => void;
   addFinancialAlert: (
@@ -337,7 +337,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     return state.notifications.filter((n) => n.priority === "urgent");
   };
 
-  // Greek ERP specific notifications
+  // Axiologic specific notifications
   const addComplianceAlert = (message: string, metadata?: any) => {
     addNotification({
       type: "compliance",

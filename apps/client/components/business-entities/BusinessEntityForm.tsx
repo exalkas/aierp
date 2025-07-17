@@ -212,7 +212,7 @@ export default function BusinessEntityForm({
 
       const url =
         mode === "create"
-          ? "/api/v1/business-entities"
+          ? "/api/v1/business-entities/"
           : `/api/v1/business-entities/${entityId}`;
 
       const method = mode === "create" ? "POST" : "PUT";

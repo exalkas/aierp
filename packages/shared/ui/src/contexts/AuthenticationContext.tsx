@@ -1,5 +1,5 @@
 /**
- * Authentication Context for Multi-App Greek ERP/CRM System
+ * Authentication Context for Multi-App Axiologic System
  * Handles JWT authentication, token management, and user session
  * Used by all 6 apps: admin, client, setup, staff-support, user-support, marketing
  */
