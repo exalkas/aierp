@@ -35,32 +35,57 @@ export default function CustomersPage() {
     router.push(`/dashboard/customers/${entity.id}`);
   };
 
-  // Load customer statistics (placeholder for now)
+  // Load customer statistics from API
   const loadCustomerStats = async () => {
+    if (!tokens?.accessToken) {
+      setStatsError("Authentication required");
+      return;
+    }
+
     try {
       setStatsLoading(true);
       setStatsError(null);
 
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch(
+        "/api/v1/business-entities/stats/customers",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      // Mock data for now
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       setStats({
-        totalCustomers: 24,
-        activeCustomers: 18,
-        totalSales: 45000,
-        averageOrderValue: 1250,
+        totalCustomers: data.total_customers,
+        activeCustomers: data.active_customers,
+        totalSales: data.total_sales,
+        averageOrderValue: data.average_order_value,
       });
     } catch (error) {
-      setStatsError("Failed to load customer statistics");
+      console.error("Error loading customer statistics:", error);
+      setStatsError(
+        error instanceof Error
+          ? error.message
+          : "Failed to load customer statistics"
+      );
     } finally {
       setStatsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCustomerStats();
-  }, []);
+    if (tokens?.accessToken) {
+      loadCustomerStats();
+    }
+  }, [tokens?.accessToken]);
 
   const statsCards = [
     {

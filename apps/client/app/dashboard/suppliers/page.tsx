@@ -35,32 +35,57 @@ export default function SuppliersPage() {
     router.push(`/dashboard/suppliers/${entity.id}`);
   };
 
-  // Load supplier statistics (placeholder for now)
+  // Load supplier statistics from API
   const loadSupplierStats = async () => {
+    if (!tokens?.accessToken) {
+      setStatsError("Authentication required");
+      return;
+    }
+
     try {
       setStatsLoading(true);
       setStatsError(null);
 
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch(
+        "/api/v1/business-entities/stats/suppliers",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      // Mock data for now
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       setStats({
-        totalSuppliers: 12,
-        activeSuppliers: 9,
-        totalPurchases: 28000,
-        averageRating: 4.2,
+        totalSuppliers: data.total_suppliers,
+        activeSuppliers: data.active_suppliers,
+        totalPurchases: data.total_purchases,
+        averageRating: data.average_rating,
       });
     } catch (error) {
-      setStatsError("Failed to load supplier statistics");
+      console.error("Error loading supplier statistics:", error);
+      setStatsError(
+        error instanceof Error
+          ? error.message
+          : "Failed to load supplier statistics"
+      );
     } finally {
       setStatsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadSupplierStats();
-  }, []);
+    if (tokens?.accessToken) {
+      loadSupplierStats();
+    }
+  }, [tokens?.accessToken]);
 
   const statsCards = [
     {
