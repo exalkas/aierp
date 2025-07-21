@@ -335,21 +335,42 @@ const setStoredUser = (user: AuthUser | null): void => {
   }
 };
 
-// App access configuration
+// App access configuration - support both uppercase and lowercase role formats
 const APP_ACCESS_CONFIG = {
-  [AppName.ADMIN]: ["super_admin", "admin"],
+  [AppName.ADMIN]: ["super_admin", "SUPER_ADMIN", "admin", "ADMIN"],
   [AppName.CLIENT]: [
     "super_admin",
+    "SUPER_ADMIN",
     "admin",
+    "ADMIN",
     "company_admin",
+    "COMPANY_ADMIN",
     "manager",
+    "MANAGER",
     "employee",
+    "EMPLOYEE",
     "viewer",
+    "VIEWER",
     "client",
+    "CLIENT",
   ],
-  [AppName.SETUP]: ["super_admin", "admin", "company_admin"],
-  [AppName.STAFF_SUPPORT]: ["super_admin", "admin"],
-  [AppName.USER_SUPPORT]: ["super_admin", "admin", "company_admin"],
+  [AppName.SETUP]: [
+    "super_admin",
+    "SUPER_ADMIN",
+    "admin",
+    "ADMIN",
+    "company_admin",
+    "COMPANY_ADMIN",
+  ],
+  [AppName.STAFF_SUPPORT]: ["super_admin", "SUPER_ADMIN", "admin", "ADMIN"],
+  [AppName.USER_SUPPORT]: [
+    "super_admin",
+    "SUPER_ADMIN",
+    "admin",
+    "ADMIN",
+    "company_admin",
+    "COMPANY_ADMIN",
+  ],
 };
 
 // Provider Props

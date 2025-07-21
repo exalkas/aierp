@@ -15,6 +15,7 @@ interface SwitchProps {
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void; // Alias for modern API compatibility
   loading?: boolean;
   icon?: React.ReactNode;
   checkedIcon?: React.ReactNode;
@@ -184,6 +185,7 @@ export const Switch: React.FC<SwitchProps> = ({
   checked: controlledChecked,
   defaultChecked = false,
   onChange,
+  onCheckedChange,
   loading = false,
   icon,
   checkedIcon,
@@ -217,6 +219,7 @@ export const Switch: React.FC<SwitchProps> = ({
     }
 
     onChange?.(newChecked);
+    onCheckedChange?.(newChecked); // Support modern API
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

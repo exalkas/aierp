@@ -14,6 +14,14 @@ This guide provides step-by-step instructions for setting up the Greek ERP/CRM d
 
 ### Step 1: Create PostgreSQL Database
 
+## 🔄 What Each Script Does:
+
+| Script             | Database          | Tables           | Data     |
+| ------------------ | ----------------- | ---------------- | -------- |
+| complete-setup.ps1 | ✅ Checks/Creates | ✅ Drops/Creates | ✅ Seeds |
+| reset-database.ps1 | ❌ Assumes exists | ✅ Drops/Creates | ✅ Seeds |
+| create-db-user.sql | ✅ Creates        | ❌ None          | ❌ None  |
+
 **Windows (PowerShell):**
 
 ```powershell
@@ -89,7 +97,7 @@ alembic upgrade head
 
 # This will apply all migrations in order:
 # 0001 - Initial Greek ERP schema (companies, users, business entities, etc.)
-# 0002 - Document state machine models  
+# 0002 - Document state machine models
 # 0003 - CRM and ERP models (leads, opportunities, activities, etc.)
 # 0004 - Voice command system
 # 0005 - Master database models (Greek reference data, system configuration)

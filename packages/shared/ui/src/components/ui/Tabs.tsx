@@ -293,4 +293,124 @@ export const Tabs: React.FC<TabsProps> = ({
   );
 };
 
+// Modern compound component API for our CRM components
+export interface TabsContextValue {
+  value: string;
+  onValueChange?: (value: string) => void;
+}
+
+const TabsContext = React.createContext<TabsContextValue | undefined>(
+  undefined
+);
+
+export interface ModernTabsProps {
+  value: string;
+  onValueChange?: (value: string) => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const ModernTabs: React.FC<ModernTabsProps> = ({
+  value,
+  onValueChange,
+  children,
+  className = "",
+}) => {
+  return (
+    <TabsContext.Provider value={{ value, onValueChange }}>
+      <div className={`w-full ${className}`}>{children}</div>
+    </TabsContext.Provider>
+  );
+};
+
+export interface TabsListProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const TabsList: React.FC<TabsListProps> = ({
+  className = "",
+  children,
+}) => {
+  return (
+    <div
+      className={`flex border-b border-gray-200 dark:border-gray-700 ${className}`}
+      role="tablist"
+    >
+      {children}
+    </div>
+  );
+};
+
+export interface TabsTriggerProps {
+  value: string;
+  className?: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+export const TabsTrigger: React.FC<TabsTriggerProps> = ({
+  value,
+  className = "",
+  children,
+  disabled = false,
+}) => {
+  const context = React.useContext(TabsContext);
+  const isActive = context?.value === value;
+
+  const handleClick = () => {
+    if (!disabled && context?.onValueChange) {
+      context.onValueChange(value);
+    }
+  };
+
+  return (
+    <button
+      className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
+        isActive
+          ? "border-blue-500 text-blue-600"
+          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      } ${
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+      } ${className}`}
+      onClick={handleClick}
+      disabled={disabled}
+      role="tab"
+      aria-selected={isActive}
+      aria-controls={`tabpanel-${value}`}
+      id={`tab-${value}`}
+    >
+      {children}
+    </button>
+  );
+};
+
+export interface TabsContentProps {
+  value: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const TabsContent: React.FC<TabsContentProps> = ({
+  value,
+  className = "",
+  children,
+}) => {
+  const context = React.useContext(TabsContext);
+  const isActive = context?.value === value;
+
+  if (!isActive) return null;
+
+  return (
+    <div
+      className={`mt-4 ${className}`}
+      role="tabpanel"
+      aria-labelledby={`tab-${value}`}
+      id={`tabpanel-${value}`}
+    >
+      {children}
+    </div>
+  );
+};
+
 export default Tabs;

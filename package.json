@@ -40,6 +40,7 @@
     "build:shared-api": "npm run build --workspace=packages/shared/api",
     "watch:shared-ui": "npm run dev --workspace=packages/shared/ui",
     "dev:with-shared-ui": "concurrently \"npm run watch:shared-ui\" \"npm run dev:client\"",
+    "dev:full-watch": "concurrently \"npm run watch:shared-ui\" \"npm run dev:client\" \"npm run dev:python\" \"npm run dev:auth\"",
     "test": "npm run test --workspaces ; npm run test:python",
     "test:python": "poetry run pytest",
     "lint": "npm run lint:js ; npm run lint:python",

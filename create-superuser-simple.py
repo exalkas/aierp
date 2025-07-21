@@ -63,21 +63,29 @@ async def check_database_connection():
         return False
 
 async def create_company(conn, company_data):
-    """Create a new company"""
+    """Create a new company with new schema"""
     company_id = str(uuid4())
     
     try:
         await conn.execute("""
             INSERT INTO companies (
-                id, name, afm, doy, address, city, postal_code, 
-                phone, email, website, legal_form, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                id, name, display_name, business_activity, afm, doy, legal_form,
+                email, address_street, address_number, address_city,
+                address_postal_code, address_region, address_country, vat_number, vat_regime,
+                default_currency, default_language, timezone, accounting_start_date,
+                fiscal_year_start, subscription_plan, subscription_status,
+                is_active, is_verified, setup_completed, database_name, database_created,
+                created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
         """, 
-        company_id, company_data['name'], company_data['afm'], 
-        company_data['doy'], company_data['address'], company_data['city'],
-        company_data['postal_code'], company_data['phone'], 
-        company_data['email'], company_data['website'], 
-        company_data['legal_form'], datetime.now()
+        company_id, company_data['name'], company_data['name'], 
+        "Software Development", company_data['afm'], company_data['doy'], company_data['legal_form'],
+        company_data['email'], company_data['address'], "1", company_data['city'],
+        company_data['postal_code'], "Attica", "GR", "EL" + company_data['afm'], "standard",
+        "EUR", "el", "Europe/Athens", datetime.now(),
+        "01-01", "basic", "active",
+        True, True, True, f"company_{company_data['afm']}", True,
+        datetime.now()
         )
         
         log_success(f"Company '{company_data['name']}' created")
@@ -96,13 +104,14 @@ async def create_superuser(conn, company_id, user_data):
         await conn.execute("""
             INSERT INTO users (
                 id, company_id, username, email, password_hash, 
-                first_name, last_name, phone, role, is_active, 
-                is_superuser, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                first_name, last_name, phone, role, status, is_active, 
+                is_verified, is_super_user, can_be_deleted, can_change_password, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         """, 
         user_id, company_id, user_data['username'], user_data['email'],
         password_hash, user_data['first_name'], user_data['last_name'],
-        user_data['phone'], 'admin', True, True, datetime.now()
+        user_data['phone'], 'SUPER_ADMIN', 'active', True, 
+        True, True, False, True, datetime.now()
         )
         
         log_success(f"Superuser '{user_data['username']}' created")
@@ -119,21 +128,21 @@ def get_company_input():
     
     company_data = {}
     
-    company_data['name'] = input("Company Name: ").strip()
-    while not company_data['name']:
-        company_data['name'] = input("Company Name (required): ").strip()
+    company_data['name'] = input("Company Name [alkas]: ").strip() or "alkas"
     
-    company_data['afm'] = input("AFM (9 digits): ").strip()
-    while not validate_afm(company_data['afm']):
+    company_data['afm'] = input("AFM (9 digits) [047180058]: ").strip() or "047180058"
+    if not validate_afm(company_data['afm']):
         company_data['afm'] = input("AFM (9 digits, required): ").strip()
+        while not validate_afm(company_data['afm']):
+            company_data['afm'] = input("AFM (9 digits, required): ").strip()
     
-    company_data['doy'] = input("DOY Code (e.g., 1101): ").strip() or "1101"
-    company_data['address'] = input("Address: ").strip()
-    company_data['city'] = input("City: ").strip()
-    company_data['postal_code'] = input("Postal Code: ").strip()
-    company_data['phone'] = input("Phone: ").strip()
-    company_data['email'] = input("Email: ").strip()
-    company_data['website'] = input("Website: ").strip()
+    company_data['doy'] = input("DOY Code [1101]: ").strip() or "1101"
+    company_data['address'] = input("Address [abc]: ").strip() or "abc"
+    company_data['city'] = input("City [rafina]: ").strip() or "rafina"
+    company_data['postal_code'] = input("Postal Code [19009]: ").strip() or "19009"
+    company_data['phone'] = input("Phone [123]: ").strip() or "123"
+    company_data['email'] = input("Email [alkas@alkas.gr]: ").strip() or "alkas@alkas.gr"
+    company_data['website'] = input("Website [alkas.gr]: ").strip() or "alkas.gr"
     
     print("\nLegal Form Options:")
     print("1. AE (Ανώνυμη Εταιρία)")
@@ -144,8 +153,8 @@ def get_company_input():
     print("6. Other")
     
     legal_forms = {"1": "AE", "2": "EPE", "3": "OE", "4": "EE", "5": "IKE", "6": "Other"}
-    choice = input("Select legal form (1-6): ").strip()
-    company_data['legal_form'] = legal_forms.get(choice, "Other")
+    choice = input("Select legal form (1-6) [1]: ").strip() or "1"
+    company_data['legal_form'] = legal_forms.get(choice, "AE")
     
     return company_data
 
@@ -156,21 +165,19 @@ def get_user_input():
     
     user_data = {}
     
-    user_data['username'] = input("Username: ").strip()
-    while len(user_data['username']) < 3:
-        user_data['username'] = input("Username (min 3 chars): ").strip()
+    user_data['username'] = input("Username [alkas]: ").strip() or "alkas"
     
-    user_data['email'] = input("Email: ").strip()
-    while not validate_email(user_data['email']):
+    user_data['email'] = input("Email [alkas@alkas.gr]: ").strip() or "alkas@alkas.gr"
+    if not validate_email(user_data['email']):
         user_data['email'] = input("Email (valid format): ").strip()
+        while not validate_email(user_data['email']):
+            user_data['email'] = input("Email (valid format): ").strip()
     
-    user_data['password'] = getpass.getpass("Password: ").strip()
-    while len(user_data['password']) < 8:
-        user_data['password'] = getpass.getpass("Password (min 8 chars): ").strip()
+    user_data['password'] = getpass.getpass("Password []: ").strip() or ""
     
-    user_data['first_name'] = input("First Name: ").strip()
-    user_data['last_name'] = input("Last Name: ").strip()
-    user_data['phone'] = input("Phone: ").strip()
+    user_data['first_name'] = input("First Name [alkis]: ").strip() or "alkis"
+    user_data['last_name'] = input("Last Name [kas]: ").strip() or "kas"
+    user_data['phone'] = input("Phone [123]: ").strip() or "123"
     
     return user_data
 

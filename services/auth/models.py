@@ -42,16 +42,48 @@ class Company(Base):
     doy = Column(String(10), nullable=False)  # Tax Office Code
     
     # Contact information
-    address = Column(Text)
-    city = Column(String(100))
-    postal_code = Column(String(10))
+    email = Column(String(255), nullable=False)
     phone = Column(String(20))
-    email = Column(String(255))
     website = Column(String(255))
     
-    # Business details
-    vat_number = Column(String(20))
-    legal_form = Column(String(50))
+    # Address information (updated schema)
+    address_street = Column(String(255), nullable=False)
+    address_number = Column(String(20), nullable=False)
+    address_city = Column(String(100), nullable=False)
+    address_postal_code = Column(String(10), nullable=False)
+    address_region = Column(String(100), nullable=False)
+    address_country = Column(String(2), nullable=False, default='GR')
+    
+    # Business information
+    display_name = Column(String(255), nullable=False)
+    description = Column(Text)
+    business_activity = Column(String(255), nullable=False)
+    vat_number = Column(String(20), nullable=False, unique=True)
+    vat_regime = Column(String(50), nullable=False)
+    
+    # System configuration
+    default_currency = Column(String(3), nullable=False, default='EUR')
+    default_language = Column(String(2), nullable=False, default='el')
+    timezone = Column(String(50), nullable=False, default='Europe/Athens')
+    
+    # Business configuration
+    accounting_start_date = Column(DateTime, nullable=False)
+    fiscal_year_start = Column(String(5), nullable=False, default='01-01')
+    
+    # Subscription information
+    subscription_plan = Column(String(50), nullable=False)
+    subscription_status = Column(String(20), nullable=False)
+    
+    # Status flags
+    is_verified = Column(Boolean, default=False, nullable=False)
+    setup_completed = Column(Boolean, default=False, nullable=False)
+    
+    # Database information
+    database_name = Column(String(100), nullable=False)
+    database_created = Column(Boolean, default=False, nullable=False)
+    
+    # Business details  
+    legal_form = Column(String(50), nullable=False)
     
     # Status
     is_active = Column(Boolean, default=True, nullable=False)
@@ -94,7 +126,11 @@ class User(Base):
     
     # Account status
     is_active = Column(Boolean, default=True, nullable=False)
-    is_superuser = Column(Boolean, default=False, nullable=False)
+    is_super_user = Column(Boolean, default=False, nullable=False)
+    
+    # Security and account locking
+    failed_login_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime)
     
     # Session management
     last_login = Column(DateTime)
@@ -169,12 +205,12 @@ class User(Base):
             "phone": self.phone,
             "role": self.role,
             "is_active": self.is_active,
-            "is_superuser": self.is_superuser,
+            "is_super_user": self.is_super_user,
             "last_login": self.last_login.isoformat() if self.last_login else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "permissions": self.get_role_permissions(),
-            "can_be_deleted": not self.is_superuser,
+            "can_be_deleted": not self.is_super_user,
             "can_change_password": True
         }
         

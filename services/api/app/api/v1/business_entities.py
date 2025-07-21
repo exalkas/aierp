@@ -243,13 +243,27 @@ def get_current_user(user_company = Depends(get_current_user_and_company)) -> Us
 
 # API Endpoints
 
-@router.post("/", response_model=BusinessEntityResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/test", status_code=status.HTTP_200_OK)
+async def test_business_entity_endpoint():
+    """Test endpoint to verify routing works"""
+    return {"message": "Business entity endpoint is working", "timestamp": datetime.now()}
+
+@router.post("", response_model=BusinessEntityResponse, status_code=status.HTTP_201_CREATED)
 async def create_business_entity(
     entity_data: BusinessEntityCreateRequest,
     service: BusinessEntityService = Depends(get_business_entity_service),
     current_user: User = Depends(get_current_user)
 ):
     """Create a new business entity"""
+    import time
+    
+    start_time = time.time()
+    
+    print(f"[ENDPOINT] POST /business-entities/ started at {time.time()}")
+    print(f"[ENDPOINT] POST /business-entities endpoint reached with data: {entity_data}")
+    print(f"[ENDPOINT] Current user: {current_user.username if current_user else 'None'}")
+    
+    print(f"[ENDPOINT] Converting entity data at {time.time()}")
     
     entity_dict = entity_data.dict(exclude_unset=True)
     
@@ -257,13 +271,22 @@ async def create_business_entity(
     if "roles" in entity_dict:
         entity_dict["roles"] = [role.value for role in entity_dict["roles"]]
     
+    print(f"[ENDPOINT] About to call service.create_business_entity at {time.time()}")
+    
     entity = await service.create_business_entity(
         entity_data=entity_dict,
         requesting_user=current_user,
         validate_greek_fields=True
     )
     
-    return BusinessEntityResponse.from_orm(entity)
+    print(f"[ENDPOINT] Service call completed at {time.time()}")
+    
+    result = BusinessEntityResponse.from_orm(entity)
+    
+    duration = (time.time() - start_time) * 1000
+    print(f"[ENDPOINT] POST /business-entities/ completed ({duration:.2f}ms) at {time.time()}")
+    
+    return result
 
 # Helper function to avoid code duplication
 async def _list_business_entities_impl(

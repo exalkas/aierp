@@ -184,14 +184,17 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
       : options;
 
     const groupedOptions = groupBy
-      ? filteredOptions.reduce((groups, option) => {
-          const group = groupBy(option);
-          if (!groups[group]) {
-            groups[group] = [];
-          }
-          groups[group].push(option);
-          return groups;
-        }, {} as Record<string, SelectOption[]>)
+      ? filteredOptions.reduce(
+          (groups, option) => {
+            const group = groupBy(option);
+            if (!groups[group]) {
+              groups[group] = [];
+            }
+            groups[group].push(option);
+            return groups;
+          },
+          {} as Record<string, SelectOption[]>
+        )
       : null;
 
     const handleToggle = () => {
@@ -457,5 +460,104 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
 );
 
 Select.displayName = "Select";
+
+// Modern compound component API for our CRM components
+export interface SelectTriggerProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
+  ({ className = "", children, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={`${baseClasses} ${variantClasses.default} flex items-center justify-between ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+// Enhanced Select component with modern API
+export interface ModernSelectProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const ModernSelect: React.FC<ModernSelectProps> = ({
+  value,
+  onValueChange,
+  children,
+  className = "",
+}) => {
+  return (
+    <div className={`relative ${className}`} data-value={value}>
+      {children}
+    </div>
+  );
+};
+
+SelectTrigger.displayName = "SelectTrigger";
+
+export interface SelectValueProps {
+  placeholder?: string;
+  className?: string;
+}
+
+export const SelectValue: React.FC<SelectValueProps> = ({
+  placeholder = "Select an option...",
+  className = "",
+}) => {
+  return <span className={`text-gray-500 ${className}`}>{placeholder}</span>;
+};
+
+export interface SelectContentProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export const SelectContent: React.FC<SelectContentProps> = ({
+  className = "",
+  children,
+}) => {
+  return (
+    <div
+      className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+export interface SelectItemProps {
+  value: string;
+  className?: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+export const SelectItem: React.FC<SelectItemProps> = ({
+  value,
+  className = "",
+  children,
+  disabled = false,
+}) => {
+  return (
+    <div
+      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      } ${className}`}
+      data-value={value}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default Select;

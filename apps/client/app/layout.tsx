@@ -5,6 +5,7 @@ import {
   TranslationProvider,
   AuthProvider,
   ThemeProvider,
+  GreekLocaleProvider,
 } from "@erp/shared-ui";
 import { AppName } from "@erp/shared-ui/constants";
 
@@ -36,7 +37,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <TranslationProvider>
-            <AuthProvider app={AppName.CLIENT}>{children}</AuthProvider>
+            <GreekLocaleProvider enableReferenceDataFetch={true}>
+              <AuthProvider app={AppName.CLIENT}>{children}</AuthProvider>
+            </GreekLocaleProvider>
           </TranslationProvider>
         </ThemeProvider>
       </body>

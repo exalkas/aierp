@@ -88,10 +88,10 @@ export const AFMInput = forwardRef<HTMLInputElement, AFMInputProps>(
       if (helperText) return helperText;
 
       if (validateCompanyAFM) {
-        return t("afm_company_helper");
+        return t("afm_company_helper", { ns: "greek" });
       }
 
-      return t("afm_individual_helper");
+      return t("afm_individual_helper", { ns: "greek" });
     };
 
     const getPlaceholder = () => {

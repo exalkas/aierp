@@ -57,7 +57,7 @@ class JWTManager:
             "full_name": user.full_name,
             "role": user.role,
             "is_active": user.is_active,
-            "is_superuser": user.is_superuser,
+            "is_super_user": user.is_super_user,
             
             # Company context (essential for multi-tenant)
             "company_id": str(company.id),
@@ -77,10 +77,34 @@ class JWTManager:
         }
         
         try:
+            print(f"[AUTH JWT DEBUG] Creating access token:", {
+                "user": user.username,
+                "email": user.email,
+                "company": company.name,
+                "algorithm": self.algorithm,
+                "secret_key_length": len(self.secret_key),
+                "secret_key_start": self.secret_key[:10] + "...",
+                "payload_keys": list(payload.keys()),
+                "expires": payload.get("exp"),
+            })
+            
             token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+            
+            print(f"[AUTH JWT DEBUG] Token created successfully:", {
+                "token_length": len(token),
+                "token_start": token[:20] + "...",
+                "token_end": "..." + token[-20:],
+                "token_parts": token.count('.') + 1,
+            })
+            
             logger.info(f"Access token created for user {user.username} ({user.email})")
             return token
         except Exception as e:
+            print(f"[AUTH JWT DEBUG] Failed to create token:", {
+                "error": str(e),
+                "secret_length": len(self.secret_key),
+                "algorithm": self.algorithm,
+            })
             logger.error(f"Failed to create access token: {e}")
             raise
     

@@ -9,6 +9,7 @@ import {
   useTranslation,
   ThemeProvider,
   useTheme,
+  GreekLocaleProvider,
   AppName,
   Sidebar,
   LanguageSelector,
@@ -30,6 +31,7 @@ import {
   Store,
   ChevronLeft,
   Menu,
+  Database,
 } from "lucide-react";
 
 // Simple mock for company context until we can fix the imports
@@ -150,6 +152,16 @@ function Navigation({ children }: { children: React.ReactNode }) {
       icon: <Building2 size={20} />,
       onClick: () => {
         router.push("/dashboard/suppliers");
+        if (isMobile) setMobileMenuOpen(false);
+      },
+    },
+    {
+      id: "crm",
+      label: t("crm_system", { ns: "navigation" }),
+      href: "/dashboard/crm",
+      icon: <Database size={20} />,
+      onClick: () => {
+        router.push("/dashboard/crm");
         if (isMobile) setMobileMenuOpen(false);
       },
     },
@@ -490,17 +502,24 @@ function ProtectedLayoutContent({ children }: { children: React.ReactNode }) {
     return <LoadingSpinner />;
   }
 
-  // Check user role access (simplified for now)
+  // Check user role access - support both uppercase and lowercase formats
   if (
     user &&
     ![
       "super_admin",
+      "SUPER_ADMIN",
       "admin",
+      "ADMIN",
       "company_admin",
+      "COMPANY_ADMIN",
       "manager",
+      "MANAGER",
       "employee",
+      "EMPLOYEE",
       "viewer",
+      "VIEWER",
       "client",
+      "CLIENT",
     ].includes(user.role)
   ) {
     return (
@@ -527,9 +546,11 @@ export default function ProtectedLayout({
   return (
     <TranslationProvider>
       <ThemeProvider>
-        <AuthProvider app={AppName.CLIENT}>
-          <ProtectedLayoutContent>{children}</ProtectedLayoutContent>
-        </AuthProvider>
+        <GreekLocaleProvider enableReferenceDataFetch={true}>
+          <AuthProvider app={AppName.CLIENT}>
+            <ProtectedLayoutContent>{children}</ProtectedLayoutContent>
+          </AuthProvider>
+        </GreekLocaleProvider>
       </ThemeProvider>
     </TranslationProvider>
   );

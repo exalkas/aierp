@@ -149,6 +149,88 @@ def validate_afm(afm: str) -> Dict[str, Any]:
         result["error"] = f"AFM validation error: {str(e)}"
         return result
 
+def validate_amka(amka: str) -> Dict[str, Any]:
+    """
+    Validate Greek AMKA (Social Security Number)
+    
+    Args:
+        amka: AMKA string to validate
+        
+    Returns:
+        Dict with validation result, is_valid boolean, and error message if any
+    """
+    result = {
+        "is_valid": False,
+        "amka": amka,
+        "error": None,
+        "normalized_amka": None
+    }
+    
+    if not amka:
+        result["error"] = "AMKA is required"
+        return result
+    
+    # Remove spaces and convert to string
+    amka = str(amka).replace(" ", "").strip()
+    
+    # Check length
+    if len(amka) != 11:
+        result["error"] = "AMKA must be exactly 11 digits"
+        return result
+    
+    # Check if all characters are digits
+    if not amka.isdigit():
+        result["error"] = "AMKA must contain only digits"
+        return result
+    
+    # AMKA validation algorithm
+    try:
+        # Convert to list of integers
+        digits = [int(d) for d in amka]
+        
+        # Basic validation - check date components
+        # First 6 digits represent birth date (DDMMYY)
+        day = digits[0] * 10 + digits[1]
+        month = digits[2] * 10 + digits[3]
+        year = digits[4] * 10 + digits[5]
+        
+        # Validate day (01-31)
+        if day < 1 or day > 31:
+            result["error"] = "Invalid AMKA - invalid day"
+            return result
+        
+        # Validate month (01-12)
+        if month < 1 or month > 12:
+            result["error"] = "Invalid AMKA - invalid month"
+            return result
+        
+        # Calculate check digit using Luhn algorithm
+        sum_total = 0
+        for i in range(10):
+            digit = digits[i]
+            if i % 2 == 0:  # Even positions (0-indexed)
+                digit *= 2
+                if digit > 9:
+                    digit = digit // 10 + digit % 10
+            sum_total += digit
+        
+        check_digit = (10 - (sum_total % 10)) % 10
+        
+        # Validate check digit
+        if check_digit != digits[10]:
+            result["error"] = "Invalid AMKA - check digit mismatch"
+            return result
+        
+        # AMKA is valid
+        result["is_valid"] = True
+        result["normalized_amka"] = amka
+        
+        return result
+        
+    except Exception as e:
+        result["error"] = f"AMKA validation error: {str(e)}"
+        return result
+
 def validate_doy(doy: str) -> Dict[str, Any]:
     """
     Validate Greek DOY (Tax Office) code

@@ -14,15 +14,17 @@ import uvicorn
 
 from app.core.config import settings
 from app.core.database import engine, create_tables
-from app.core.logging import setup_logging
+from app.core.logging import api_logger
 from app.api.v1.router import api_router
 from app.middleware.company_isolation import CompanyIsolationMiddleware
 from app.middleware.audit_logging import AuditLoggingMiddleware
 from app.middleware.greek_compliance import GreekComplianceMiddleware
-
-# Setup logging
-setup_logging()
-logger = logging.getLogger(__name__)
+from app.middleware.error_handling import ErrorHandlingMiddleware
+from app.middleware.request_logging import (
+    RequestLoggingMiddleware, 
+    PerformanceLoggingMiddleware, 
+    SecurityLoggingMiddleware
+)
 
 security = HTTPBearer()
 
@@ -30,15 +32,21 @@ security = HTTPBearer()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
-    logger.info("Starting Greek ERP/CRM API Service...")
+    api_logger.info("Starting Greek ERP/CRM API Service...", {
+        "version": "1.0.0",
+        "environment": settings.ENVIRONMENT
+    })
     
     # Create database tables
     await create_tables()
     
-    logger.info("API Service started successfully")
+    api_logger.info("API Service started successfully", {
+        "cors_origins": settings.CORS_ORIGINS,
+        "database_url": settings.DATABASE_URL.split('@')[1] if '@' in str(settings.DATABASE_URL) else "configured"
+    })
     yield
     
-    logger.info("Shutting down Greek ERP/CRM API Service...")
+    api_logger.info("Shutting down Greek ERP/CRM API Service...")
 
 
 # Create FastAPI application
@@ -65,10 +73,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Custom middleware for Greek business requirements
-app.add_middleware(GreekComplianceMiddleware)
-app.add_middleware(AuditLoggingMiddleware)
-app.add_middleware(CompanyIsolationMiddleware)
+# Custom middleware for Greek business requirements - TESTING ONE BY ONE
+app.add_middleware(GreekComplianceMiddleware)  # 🔥 TESTING THE SUSPECTED CULPRIT
+app.add_middleware(AuditLoggingMiddleware)  # ✅ CONFIRMED WORKING
+app.add_middleware(CompanyIsolationMiddleware)  # ✅ CONFIRMED WORKING
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")

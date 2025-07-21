@@ -175,6 +175,8 @@ class BusinessEntity(Base):
     # Relationships
     assigned_user = relationship("User", foreign_keys=[assigned_user_id])
     contacts = relationship("Contact", back_populates="business_entity")
+    contact_methods = relationship("ContactMethod", foreign_keys="ContactMethod.business_entity_id", back_populates="business_entity")
+    contact_company_history = relationship("ContactCompanyHistory", foreign_keys="ContactCompanyHistory.business_entity_id", back_populates="business_entity")
     invoices = relationship("Invoice", back_populates="business_entity")
     
     # Many-to-many relationship for roles

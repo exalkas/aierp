@@ -6,6 +6,9 @@ from .company import Company
 from .user import User
 from .business_entity import BusinessEntity, BusinessEntityType, BusinessEntityStatus, BusinessEntityRole, PaymentTerms
 from .contact import Contact, ContactType, ContactStatus
+from .contact_method import ContactMethod, ContactMethodType, ContactMethodStatus
+from .contact_method_subtype import ContactMethodSubType, SYSTEM_DEFAULT_SUBTYPES
+from .contact_company_history import ContactCompanyHistory, RelationshipType, RelationshipStatus
 from .product import (
     Product, ProductCategory, ProductAttribute, ProductAttributeValue, 
     ProductVariant, ProductInventory, VatCategory, ProductType, ProductStatus
@@ -77,6 +80,11 @@ from .system_configuration import (
     SubscriptionPlan, SubscriptionStatus
 )
 
+# Dynamic Entities Models
+from .dynamic_entity import DynamicEntity, EntityScope, EntityStatus
+from .dynamic_field import DynamicField, FieldType, FieldWidgetType
+from .entity_layout import EntityLayout, LayoutType, LayoutStatus, ResponsiveBreakpoint
+
 __all__ = [
     # Core Models
     "Company",
@@ -89,6 +97,14 @@ __all__ = [
     "Contact",
     "ContactType", 
     "ContactStatus",
+    "ContactMethod",
+    "ContactMethodType",
+    "ContactMethodStatus",
+    "ContactMethodSubType",
+    "SYSTEM_DEFAULT_SUBTYPES",
+    "ContactCompanyHistory",
+    "RelationshipType",
+    "RelationshipStatus",
     "Product",
     "ProductCategory",
     "ProductAttribute",
@@ -214,4 +230,16 @@ __all__ = [
     "ConfigurationType",
     "SubscriptionPlan",
     "SubscriptionStatus",
+    
+    # Dynamic Entities Models
+    "DynamicEntity",
+    "EntityScope", 
+    "EntityStatus",
+    "DynamicField",
+    "FieldType",
+    "FieldWidgetType",
+    "EntityLayout",
+    "LayoutType",
+    "LayoutStatus",
+    "ResponsiveBreakpoint",
 ] 

@@ -120,9 +120,13 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
       switch (field) {
         case "street":
           if (required && !fieldValue.trim()) {
-            newErrors.street = t("greekAddress.validation.streetRequired");
+            newErrors.street = t("validation.streetRequired", {
+              ns: "greekAddress",
+            });
           } else if (fieldValue.length < 3) {
-            newErrors.street = t("greekAddress.validation.streetTooShort");
+            newErrors.street = t("validation.streetTooShort", {
+              ns: "greekAddress",
+            });
           } else {
             delete newErrors.street;
           }
@@ -130,9 +134,13 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         case "number":
           if (required && !fieldValue.trim()) {
-            newErrors.number = t("greekAddress.validation.numberRequired");
+            newErrors.number = t("validation.numberRequired", {
+              ns: "greekAddress",
+            });
           } else if (fieldValue && !/^[0-9]+[Α-Ω]?$/.test(fieldValue)) {
-            newErrors.number = t("greekAddress.validation.numberInvalid");
+            newErrors.number = t("validation.numberInvalid", {
+              ns: "greekAddress",
+            });
           } else {
             delete newErrors.number;
           }
@@ -140,13 +148,13 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         case "postalCode":
           if (required && !fieldValue.trim()) {
-            newErrors.postalCode = t(
-              "greekAddress.validation.postalCodeRequired"
-            );
+            newErrors.postalCode = t("validation.postalCodeRequired", {
+              ns: "greekAddress",
+            });
           } else if (fieldValue && !validateGreekPostalCode(fieldValue)) {
-            newErrors.postalCode = t(
-              "greekAddress.validation.postalCodeInvalid"
-            );
+            newErrors.postalCode = t("validation.postalCodeInvalid", {
+              ns: "greekAddress",
+            });
           } else if (fieldValue && value.city) {
             // Validate postal code matches city
             const city = GREEK_CITIES.find((c) => c.name === value.city);
@@ -154,9 +162,9 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
               const [min, max] = city.postalRange.split("-").map(Number);
               const code = parseInt(fieldValue);
               if (code < min || code > max) {
-                newErrors.postalCode = t(
-                  "greekAddress.validation.postalCodeMismatch"
-                );
+                newErrors.postalCode = t("validation.postalCodeMismatch", {
+                  ns: "greekAddress",
+                });
               } else {
                 delete newErrors.postalCode;
               }
@@ -168,7 +176,9 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         case "city":
           if (required && !fieldValue.trim()) {
-            newErrors.city = t("greekAddress.validation.cityRequired");
+            newErrors.city = t("validation.cityRequired", {
+              ns: "greekAddress",
+            });
           } else {
             delete newErrors.city;
           }
@@ -176,7 +186,9 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         case "region":
           if (required && !fieldValue.trim()) {
-            newErrors.region = t("greekAddress.validation.regionRequired");
+            newErrors.region = t("validation.regionRequired", {
+              ns: "greekAddress",
+            });
           } else {
             delete newErrors.region;
           }
@@ -282,8 +294,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
     <div className={`greek-address-input ${className}`}>
       {showAddressType && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t("greekAddress.addressType")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t("addressType", { ns: "greekAddress" })}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {["home", "business", "billing", "shipping"].map((type) => (
@@ -296,8 +308,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
                   flex items-center justify-center px-3 py-2 text-sm rounded-lg border transition-colors
                   ${
                     value.addressType === type
-                      ? "bg-blue-50 border-blue-200 text-blue-700"
-                      : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                      ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-400 text-blue-700 dark:text-blue-300"
+                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   }
                   ${
                     disabled
@@ -307,7 +319,9 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
                 `}
               >
                 {getAddressTypeIcon(type)}
-                <span className="ml-2">{t(`greekAddress.types.${type}`)}</span>
+                <span className="ml-2">
+                  {t(`types.${type}`, { ns: "greekAddress" })}
+                </span>
               </button>
             ))}
           </div>
@@ -325,8 +339,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
       >
         {/* Street Address */}
         <div className={isHorizontal ? "col-span-2" : ""}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("greekAddress.street")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("street", { ns: "greekAddress" })}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -335,12 +349,21 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
             onChange={(e) => handleFieldChange("street", e.target.value)}
             onBlur={() => handleFieldBlur("street")}
             disabled={disabled}
-            placeholder={t("greekAddress.streetPlaceholder")}
+            placeholder={t("streetPlaceholder", { ns: "greekAddress" })}
             autoComplete={autoComplete ? "address-line1" : "off"}
             className={`
               w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-              ${errors.street ? "border-red-300 bg-red-50" : "border-gray-300"}
-              ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+              text-gray-900 dark:text-gray-100
+              ${
+                errors.street
+                  ? "border-red-300 dark:border-red-400 bg-red-50 dark:bg-red-900/20"
+                  : "border-gray-300 dark:border-gray-600"
+              }
+              ${
+                disabled
+                  ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                  : "bg-white dark:bg-gray-800"
+              }
             `}
           />
           {errors.street && touched.street && (
@@ -350,8 +373,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         {/* Street Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("greekAddress.number")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("number", { ns: "greekAddress" })}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -364,8 +387,17 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
             autoComplete={autoComplete ? "address-line2" : "off"}
             className={`
               w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-              ${errors.number ? "border-red-300 bg-red-50" : "border-gray-300"}
-              ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+              text-gray-900 dark:text-gray-100
+              ${
+                errors.number
+                  ? "border-red-300 dark:border-red-400 bg-red-50 dark:bg-red-900/20"
+                  : "border-gray-300 dark:border-gray-600"
+              }
+              ${
+                disabled
+                  ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                  : "bg-white dark:bg-gray-800"
+              }
             `}
           />
           {errors.number && touched.number && (
@@ -377,8 +409,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
         {showOptionalFields && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("greekAddress.floor")}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("floor", { ns: "greekAddress" })}
               </label>
               <input
                 type="text"
@@ -387,15 +419,20 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
                 disabled={disabled}
                 placeholder="1ος"
                 className={`
-                  w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+                  w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                  text-gray-900 dark:text-gray-100
+                  ${
+                    disabled
+                      ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                      : "bg-white dark:bg-gray-800"
+                  }
                 `}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("greekAddress.apartment")}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("apartment", { ns: "greekAddress" })}
               </label>
               <input
                 type="text"
@@ -404,8 +441,13 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
                 disabled={disabled}
                 placeholder="12"
                 className={`
-                  w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+                  w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                  text-gray-900 dark:text-gray-100
+                  ${
+                    disabled
+                      ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                      : "bg-white dark:bg-gray-800"
+                  }
                 `}
               />
             </div>
@@ -414,8 +456,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         {/* Postal Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("greekAddress.postalCode")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("postalCode", { ns: "greekAddress" })}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -429,12 +471,17 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
             autoComplete={autoComplete ? "postal-code" : "off"}
             className={`
               w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              text-gray-900 dark:text-gray-100
               ${
                 errors.postalCode
-                  ? "border-red-300 bg-red-50"
-                  : "border-gray-300"
+                  ? "border-red-300 dark:border-red-400 bg-red-50 dark:bg-red-900/20"
+                  : "border-gray-300 dark:border-gray-600"
               }
-              ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+              ${
+                disabled
+                  ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                  : "bg-white dark:bg-gray-800"
+              }
             `}
           />
           {errors.postalCode && touched.postalCode && (
@@ -444,8 +491,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         {/* City */}
         <div className={isHorizontal ? "col-span-1" : ""}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("greekAddress.city")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("city", { ns: "greekAddress" })}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <div className="relative">
@@ -455,16 +502,25 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
               onChange={(e) => handleFieldChange("city", e.target.value)}
               onBlur={() => handleFieldBlur("city")}
               disabled={disabled}
-              placeholder={t("greekAddress.cityPlaceholder")}
+              placeholder={t("cityPlaceholder", { ns: "greekAddress" })}
               autoComplete={autoComplete ? "address-level2" : "off"}
               className={`
                 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                ${errors.city ? "border-red-300 bg-red-50" : "border-gray-300"}
-                ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+                text-gray-900 dark:text-gray-100
+                ${
+                  errors.city
+                    ? "border-red-300 dark:border-red-400 bg-red-50 dark:bg-red-900/20"
+                    : "border-gray-300 dark:border-gray-600"
+                }
+                ${
+                  disabled
+                    ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                    : "bg-white dark:bg-gray-800"
+                }
               `}
             />
             {suggestions.length > 0 && value.postalCode && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
                 {suggestions.map((city, index) => (
                   <button
                     key={index}
@@ -474,10 +530,12 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
                       handleFieldChange("region", city.region);
                       setSuggestions([]);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
+                    className="w-full px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg text-gray-900 dark:text-gray-100"
                   >
                     <div className="font-medium">{city.name}</div>
-                    <div className="text-xs text-gray-500">{city.region}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {city.region}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -490,8 +548,8 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
 
         {/* Region */}
         <div className={isHorizontal ? "col-span-1" : ""}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("greekAddress.region")}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("region", { ns: "greekAddress" })}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <input
@@ -500,12 +558,21 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
             onChange={(e) => handleFieldChange("region", e.target.value)}
             onBlur={() => handleFieldBlur("region")}
             disabled={disabled}
-            placeholder={t("greekAddress.regionPlaceholder")}
+            placeholder={t("regionPlaceholder", { ns: "greekAddress" })}
             autoComplete={autoComplete ? "address-level1" : "off"}
             className={`
               w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-              ${errors.region ? "border-red-300 bg-red-50" : "border-gray-300"}
-              ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+              text-gray-900 dark:text-gray-100
+              ${
+                errors.region
+                  ? "border-red-300 dark:border-red-400 bg-red-50 dark:bg-red-900/20"
+                  : "border-gray-300 dark:border-gray-600"
+              }
+              ${
+                disabled
+                  ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                  : "bg-white dark:bg-gray-800"
+              }
             `}
           />
           {errors.region && touched.region && (
@@ -516,18 +583,23 @@ export const GreekAddressInput: React.FC<GreekAddressInputProps> = ({
         {/* Landmark/Notes */}
         {showOptionalFields && (
           <div className={isHorizontal ? "col-span-full" : ""}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t("greekAddress.landmark")}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("landmark", { ns: "greekAddress" })}
             </label>
             <input
               type="text"
               value={value.landmark || ""}
               onChange={(e) => handleFieldChange("landmark", e.target.value)}
               disabled={disabled}
-              placeholder={t("greekAddress.landmarkPlaceholder")}
+              placeholder={t("landmarkPlaceholder", { ns: "greekAddress" })}
               className={`
-                w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                ${disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
+                w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                text-gray-900 dark:text-gray-100
+                ${
+                  disabled
+                    ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
+                    : "bg-white dark:bg-gray-800"
+                }
               `}
             />
           </div>

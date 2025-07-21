@@ -1,15 +1,17 @@
 """
 Authentication Service
 Comprehensive authentication service with all authentication endpoints
+Enhanced with structured logging and comprehensive error handling
 """
 
 from fastapi import HTTPException, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import and_, select
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, Dict, Any
 import secrets
-import logging
+import time
 from uuid import uuid4
 
 from database import get_db
@@ -24,8 +26,10 @@ from schemas import (
 )
 from config import settings
 from email_service import send_password_reset_email, send_verification_email
+from structured_logger import auth_logger, LogLevel
 
-logger = logging.getLogger(__name__)
+# Use auth_logger for all logging operations 
+logger = auth_logger
 
 
 class AuthenticationService:
@@ -36,60 +40,113 @@ class AuthenticationService:
     
     async def login(self, login_data: LoginRequest, db: AsyncSession) -> LoginResponse:
         """
-        Authenticate user and return JWT tokens
+        Authenticate user and return JWT tokens with comprehensive logging and error handling
         """
+        start_time = time.time()
+        request_id = auth_logger.request_started(
+            "POST", "/auth/login",
+            {"email": login_data.email, "remember_me": login_data.remember_me}
+        )
+        
         try:
-            # Find user by email
-            query = select(User).where(
-                and_(
-                    User.email == login_data.email.lower(),
-                    User.is_active == True
+            with auth_logger.time_operation("Database user lookup", {"email": login_data.email}):
+                # Find user by email
+                query = select(User).where(
+                    and_(
+                        User.email == login_data.email.lower(),
+                        User.is_active == True
+                    )
                 )
-            )
-            result = await db.execute(query)
-            user = result.scalar_one_or_none()
+                result = await db.execute(query)
+                user = result.scalar_one_or_none()
             
             if not user:
-                logger.warning(f"Login attempt with non-existent email: {login_data.email}")
+                auth_logger.auth_failure(
+                    login_data.email, 
+                    "User not found or inactive",
+                    {"request_id": request_id, "ip": getattr(login_data, 'ip_address', 'unknown')}
+                )
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid email or password"
+                    detail="Invalid email or password",
+                    headers={"X-Error-Code": "AUTH_USER_NOT_FOUND"}
                 )
             
             # Verify password
             if not user.verify_password(login_data.password):
-                logger.warning(f"Failed login attempt for user: {user.email}")
+                auth_logger.auth_failure(
+                    login_data.email,
+                    "Invalid password",
+                    {"request_id": request_id, "user_id": str(user.id)}
+                )
+                
+                # Increment failed login attempts
+                user.failed_login_attempts = (user.failed_login_attempts or 0) + 1
+                
+                # Lock account after 5 failed attempts
+                if user.failed_login_attempts >= 5:
+                    user.locked_until = datetime.utcnow() + timedelta(minutes=30)
+                    auth_logger.warning(
+                        f"Account locked due to multiple failed attempts: {user.email}",
+                        {"user_id": str(user.id), "attempts": user.failed_login_attempts}
+                    )
+                
+                await db.commit()
+                
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid email or password"
+                    detail="Invalid email or password",
+                    headers={"X-Error-Code": "AUTH_INVALID_CREDENTIALS"}
                 )
             
+            # Check if account is locked
+            if user.locked_until and user.locked_until > datetime.utcnow():
+                auth_logger.auth_failure(
+                    login_data.email,
+                    "Account is locked",
+                    {"user_id": str(user.id), "locked_until": user.locked_until.isoformat()}
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_423_LOCKED,
+                    detail="Account is temporarily locked due to multiple failed login attempts",
+                    headers={"X-Error-Code": "AUTH_ACCOUNT_LOCKED"}
+                )
+
             # Get company information
-            company_query = select(Company).where(Company.id == user.company_id)
-            company_result = await db.execute(company_query)
-            company = company_result.scalar_one_or_none()
-            
+            with auth_logger.time_operation("Database company lookup", {"company_id": str(user.company_id)}):
+                company_query = select(Company).where(Company.id == user.company_id)
+                company_result = await db.execute(company_query)
+                company = company_result.scalar_one_or_none()
+
             if not company or not company.is_active:
-                logger.warning(f"Login attempt with inactive company: {user.email}")
+                auth_logger.auth_failure(
+                    login_data.email,
+                    "Company inactive or not found",
+                    {"user_id": str(user.id), "company_id": str(user.company_id)}
+                )
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Company account is inactive"
+                    detail="Company account is inactive",
+                    headers={"X-Error-Code": "AUTH_COMPANY_INACTIVE"}
                 )
             
-            # Update last login
+            # Reset failed login attempts on successful login
+            user.failed_login_attempts = 0
+            user.locked_until = None
             user.last_login = datetime.utcnow()
             
             # Generate tokens
-            access_token_expires = timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
-            if login_data.remember_me:
-                access_token_expires = timedelta(days=1)  # Extended session
-            
-            access_token = self.jwt_manager.create_access_token(
-                user=user, 
-                company=company,
-                expires_delta=access_token_expires
-            )
-            refresh_token = self.jwt_manager.create_refresh_token(user=user)
+            with auth_logger.time_operation("Token generation", {"user_id": str(user.id)}):
+                access_token_expires = timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+                if login_data.remember_me:
+                    access_token_expires = timedelta(days=1)  # Extended session
+                
+                access_token = self.jwt_manager.create_access_token(
+                    user=user, 
+                    company=company,
+                    expires_delta=access_token_expires
+                )
+                refresh_token = self.jwt_manager.create_refresh_token(user=user)
             
             # Create user dict BEFORE commit to avoid session issues
             user_dict = user.to_dict()
@@ -117,7 +174,7 @@ class AuthenticationService:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Login error: {e}")
+            auth_logger.error(f"Login error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error during login"

@@ -140,6 +140,8 @@ class Contact(Base):
     
     # Relationships
     business_entity = relationship("BusinessEntity", back_populates="contacts")
+    contact_methods = relationship("ContactMethod", foreign_keys="ContactMethod.contact_id", back_populates="contact")
+    contact_company_history = relationship("ContactCompanyHistory", foreign_keys="ContactCompanyHistory.contact_id", back_populates="contact")
     assigned_user = relationship("User", foreign_keys=[assigned_user_id])
     reports_to = relationship("Contact", remote_side=[id], foreign_keys=[reports_to_id])
     direct_reports = relationship("Contact", foreign_keys=[reports_to_id], overlaps="reports_to")

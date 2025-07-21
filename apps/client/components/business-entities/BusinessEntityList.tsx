@@ -319,7 +319,10 @@ export default function BusinessEntityList({
     );
   };
 
-  const getRoleBadges = (roles: string[]) => {
+  const getRoleBadges = (roles: string[] | undefined) => {
+    if (!roles || !Array.isArray(roles)) {
+      return null;
+    }
     return roles.map((role) => (
       <Badge key={role} variant="outline">
         {t(`role_${role}`, { ns: "business_entities" })}

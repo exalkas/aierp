@@ -12,7 +12,11 @@ from app.api.v1.document_workflow import router as workflow_router
 from app.api.v1.voice_commands import router as voice_router
 from app.api.v1.business_entities import router as business_entities_router
 from app.api.v1.contacts import router as contacts_router
+from app.api.v1.contact_methods import router as contact_methods_router
+from app.api.v1.contact_method_subtypes import router as contact_method_subtypes_router
 from app.api.v1.dashboard import router as dashboard_router
+from app.api.v1.greek_reference import router as greek_reference_router
+from app.api.v1.dynamic_entities import router as dynamic_entities_router
 
 # Security
 security = HTTPBearer()
@@ -35,8 +39,20 @@ api_router.include_router(business_entities_router, tags=["business-entities"])
 # Include contacts router
 api_router.include_router(contacts_router, tags=["contacts"])
 
+# Include contact methods router
+api_router.include_router(contact_methods_router, tags=["contact-methods"])
+
+# Include contact method subtypes router
+api_router.include_router(contact_method_subtypes_router, tags=["contact-method-subtypes"])
+
 # Include dashboard router
 api_router.include_router(dashboard_router, tags=["dashboard"])
+
+# Include Greek reference data router
+api_router.include_router(greek_reference_router, tags=["greek-reference"])
+
+# Include dynamic entities router
+api_router.include_router(dynamic_entities_router, tags=["dynamic-entities"])
 
 # Legacy/compatibility endpoints for frontend
 from fastapi import Request

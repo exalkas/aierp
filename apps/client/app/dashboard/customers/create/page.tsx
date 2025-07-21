@@ -1,19 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@erp/shared-ui";
 import BusinessEntityForm from "../../../../components/business-entities/BusinessEntityForm";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, Plus } from "lucide-react";
 import { Button } from "@erp/shared-ui";
 
 export default function CreateCustomerPage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const [createAnother, setCreateAnother] = useState(false);
 
   const handleSuccess = (entity: any) => {
-    // Redirect to customer detail page or customer list
-    router.push(`/dashboard/customers/${entity.id}`);
+    if (createAnother) {
+      // Stay on creation page - just show success message and reset form
+      console.log("✅ Customer created, staying on page for another creation");
+      // The form will handle showing success message
+      // Form will reset automatically for create mode
+    } else {
+      // Redirect to customers list page
+      router.push("/dashboard/customers");
+    }
   };
 
   const handleCancel = () => {
@@ -32,7 +40,7 @@ export default function CreateCustomerPage() {
           <Button
             variant="ghost"
             onClick={handleBack}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <ArrowLeft className="w-4 h-4" />
             {t("back_to_customers", { ns: "customers" })}
@@ -61,6 +69,8 @@ export default function CreateCustomerPage() {
           initialRole="customer"
           onSuccess={handleSuccess}
           onCancel={handleCancel}
+          createAnother={createAnother}
+          onCreateAnotherChange={setCreateAnother}
         />
       </div>
     </div>

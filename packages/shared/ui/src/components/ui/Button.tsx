@@ -20,7 +20,7 @@ export interface ButtonProps
 }
 
 export interface LoadingButtonProps extends ButtonProps {
-  loading: true;
+  loading: boolean;
   loadingText?: string;
 }
 
@@ -113,22 +113,18 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button className={classes} disabled={isDisabled} {...props}>
-      {loading && <LoadingSpinner size={size} />}
-      {!loading && leftIcon && <span className="mr-2">{leftIcon}</span>}
-      {!loading && children}
-      {!loading && rightIcon && <span className="ml-2">{rightIcon}</span>}
+      <span className="flex items-center justify-center gap-2">
+        {loading && <LoadingSpinner size={size} />}
+        {!loading && leftIcon && leftIcon}
+        {children}
+        {!loading && rightIcon && rightIcon}
+      </span>
     </button>
   );
 };
 
-export const LoadingButton: React.FC<LoadingButtonProps> = ({
-  loadingText,
-  children,
-  ...props
-}) => {
-  const { t } = useTranslation();
-
-  return <Button {...props}>{loadingText || t("loading")}</Button>;
+export const LoadingButton: React.FC<LoadingButtonProps> = (props) => {
+  return <Button {...props} />;
 };
 
 export const IconButton: React.FC<IconButtonProps> = ({

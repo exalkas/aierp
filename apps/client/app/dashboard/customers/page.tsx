@@ -172,13 +172,13 @@ export default function CustomersPage() {
               {t("customers_description", { ns: "customers" })}
             </p>
           </div>
-          <Button
+          {/* <Button
             onClick={handleCreateCustomer}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600"
           >
             <Plus className="w-4 h-4" />
             {t("add_new_customer", { ns: "customers" })}
-          </Button>
+          </Button> */}
         </div>
       </div>
 

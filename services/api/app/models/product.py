@@ -4,7 +4,7 @@ Production-level flexible product system with dynamic attributes, variants, and 
 """
 
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON, Index, ForeignKey, Enum, Numeric, Integer, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import uuid
@@ -544,7 +544,7 @@ class ProductVariant(Base):
     image_urls = Column(JSON, default=list)
     
     # Attribute combination for this variant
-    attribute_values = Column(JSON, nullable=False)  # {"color": "red", "size": "large"}
+    attribute_values = Column(JSONB, nullable=False)  # {"color": "red", "size": "large"}
     
     # Supplier information
     supplier_code = Column(String(50))

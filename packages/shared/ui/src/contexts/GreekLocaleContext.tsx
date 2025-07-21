@@ -117,14 +117,23 @@ interface GreekLocaleProviderProps {
   initialLanguage?: Language;
   settings?: Partial<GreekLocaleSettings>;
   apiEndpoint?: string;
+  enableReferenceDataFetch?: boolean;
 }
 
 export const GreekLocaleProvider: React.FC<GreekLocaleProviderProps> = ({
   children,
   initialLanguage = "el",
   settings: initialSettings = {},
-  apiEndpoint = "/api/greek-reference-data",
+  apiEndpoint = "/api/v1/greek-reference-data",
+  enableReferenceDataFetch = false, // Default to false for development
 }) => {
+  console.log("GreekLocaleProvider: Initializing with config:", {
+    initialLanguage,
+    apiEndpoint,
+    enableReferenceDataFetch,
+    hasCustomSettings: Object.keys(initialSettings).length > 0,
+  });
+
   const [language, setLanguage] = useState<Language>(initialLanguage);
   const [settings, setSettingsState] = useState<GreekLocaleSettings>({
     ...DEFAULT_SETTINGS,
@@ -150,30 +159,60 @@ export const GreekLocaleProvider: React.FC<GreekLocaleProviderProps> = ({
     setIsLoading(true);
     setError(null);
 
+    console.log(
+      "GreekLocaleProvider: Attempting to load reference data from:",
+      apiEndpoint
+    );
+
     try {
       const response = await fetch(apiEndpoint);
+      console.log(
+        "GreekLocaleProvider: API response status:",
+        response.status,
+        response.statusText
+      );
+
       if (!response.ok) {
-        throw new Error(
-          `Failed to load reference data: ${response.statusText}`
+        // Don't throw error for missing API - just log it and continue with null data
+        console.warn(
+          `GreekLocaleProvider: Reference data API not available (${response.status}: ${response.statusText}). Continuing with null reference data.`
         );
+        setReferenceData(null);
+        return;
       }
 
       const data = await response.json();
+      console.log(
+        "GreekLocaleProvider: Successfully loaded reference data:",
+        data
+      );
       setReferenceData(data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load reference data"
+      // Don't set error state for missing API - just log and continue
+      console.warn(
+        "GreekLocaleProvider: Could not load reference data, continuing without it:",
+        err
       );
-      console.error("Error loading Greek reference data:", err);
+      setReferenceData(null);
     } finally {
       setIsLoading(false);
     }
   }, [apiEndpoint]);
 
-  // Load reference data on mount
+  // Load reference data on mount (only if enabled)
   useEffect(() => {
-    loadReferenceData();
-  }, [loadReferenceData]);
+    if (enableReferenceDataFetch) {
+      console.log(
+        "GreekLocaleProvider: Reference data fetch is enabled, loading..."
+      );
+      loadReferenceData();
+    } else {
+      console.log(
+        "GreekLocaleProvider: Reference data fetch is disabled, skipping API call"
+      );
+      setReferenceData(null);
+    }
+  }, [loadReferenceData, enableReferenceDataFetch]);
 
   // Formatting functions
   const formatAFM = useCallback((afm: string): string => {

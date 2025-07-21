@@ -3,7 +3,6 @@ Audit Logging Middleware
 Comprehensive audit trail for Greek ERP/CRM compliance requirements
 """
 
-import logging
 import json
 import time
 from typing import Optional, Dict, Any
@@ -13,9 +12,6 @@ from datetime import datetime, timezone
 import uuid
 
 from app.core.config import settings
-
-logger = logging.getLogger(__name__)
-audit_logger = logging.getLogger("audit")
 
 
 class AuditLoggingMiddleware(BaseHTTPMiddleware):
@@ -47,42 +43,42 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
     }
     
     async def dispatch(self, request: Request, call_next):
-        """Process request with audit logging"""
+        """Log API requests with detailed timing"""
+        import time
         
-        # Generate request ID for tracing
+        # Generate unique request ID
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
         
-        # Start timing
+        # Capture request start time
         start_time = time.time()
         
-        # Extract request data
-        audit_data = await self._prepare_audit_data(request, request_id)
+        print(f"[AUDIT] Request started: {request.method} {request.url.path} [{request_id}] at {time.time()}")
         
         try:
+            print(f"[AUDIT] About to log with logger at {time.time()}")
+            # Log request details (simplified - no user info for now)
+            # logger.info(f"API Request started: {request.method} {request.url.path} [{request_id}]")
+            print(f"[AUDIT] Logger completed at {time.time()}")
+            print(f"[AUDIT] About to call next middleware at {time.time()}")
+            
             # Process request
             response = await call_next(request)
             
-            # Calculate processing time
-            processing_time = time.time() - start_time
+            # Calculate duration
+            duration = (time.time() - start_time) * 1000
             
-            # Log successful request
-            await self._log_request_success(
-                audit_data, response, processing_time
-            )
+            print(f"[AUDIT] Request completed: {request.method} {request.url.path} - {response.status_code} ({duration:.2f}ms) [{request_id}] at {time.time()}")
+            
+            # Log response
+            # logger.info(f"API Request: {request.method} {request.url.path} - {response.status_code} ({duration:.2f}ms) [{request_id}]")
             
             return response
             
         except Exception as e:
-            # Calculate processing time
-            processing_time = time.time() - start_time
-            
-            # Log failed request
-            await self._log_request_error(
-                audit_data, e, processing_time
-            )
-            
-            # Re-raise exception
+            duration = (time.time() - start_time) * 1000
+            print(f"[AUDIT ERROR] Request error: {request.method} {request.url.path} - ERROR ({duration:.2f}ms) [{request_id}]: {e}")
+            # logger.error(f"API Request error: {request.method} {request.url.path} - ERROR ({duration:.2f}ms) [{request_id}]: {e}")
             raise
     
     async def _prepare_audit_data(self, request: Request, request_id: str) -> Dict[str, Any]:
@@ -147,11 +143,11 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
                     pass  # Skip if can't decode response
         
         # Log audit trail
-        audit_logger.info(json.dumps(audit_data, ensure_ascii=False))
+        print(f"[AUDIT] {json.dumps(audit_data, ensure_ascii=False)}")
         
         # Log summary for regular application logs
-        logger.info(
-            f"API Request: {audit_data['method']} {audit_data['path']} - "
+        print(
+            f"[AUDIT] API Request: {audit_data['method']} {audit_data['path']} - "
             f"{audit_data['status_code']} ({audit_data['processing_time_ms']}ms) "
             f"[{audit_data['request_id']}]"
         )
@@ -172,11 +168,11 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
         })
         
         # Log audit trail
-        audit_logger.error(json.dumps(audit_data, ensure_ascii=False))
+        print(f"[AUDIT] ERROR: {json.dumps(audit_data, ensure_ascii=False)}")
         
         # Log summary for regular application logs
-        logger.error(
-            f"API Error: {audit_data['method']} {audit_data['path']} - "
+        print(
+            f"[AUDIT] API Error: {audit_data['method']} {audit_data['path']} - "
             f"{audit_data['error_type']}: {audit_data['error_message']} "
             f"({audit_data['processing_time_ms']}ms) [{audit_data['request_id']}]"
         )
@@ -232,7 +228,7 @@ class AuditLoggingMiddleware(BaseHTTPMiddleware):
                 return {"raw_body": body_str}
                 
         except Exception as e:
-            logger.warning(f"Failed to extract request body: {e}")
+            print(f"[AUDIT] WARNING: Failed to extract request body: {e}")
             return None
     
     def _sanitize_headers(self, headers: Dict[str, str]) -> Dict[str, str]:

@@ -86,13 +86,15 @@ class BusinessEntityService:
             entity_data.setdefault("language", "el")
             entity_data.setdefault("address_country", "GR")
             
+            # Extract roles before creating entity (roles are handled separately)
+            roles = entity_data.pop("roles", [])
+            
             # Create business entity
             business_entity = BusinessEntity(**entity_data)
             self.db.add(business_entity)
             self.db.flush()  # Get ID without committing
             
             # Assign default roles if specified
-            roles = entity_data.get("roles", [])
             if roles:
                 await self._assign_roles(business_entity.id, roles, requesting_user.id)
             

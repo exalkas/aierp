@@ -41,9 +41,12 @@ export { useGreekLocalization } from "./hooks/useGreekLocalization";
 
 // Basic UI Components ✅ PHASE 2 COMPLETE
 export { Button, LoadingButton, IconButton } from "./components/ui/Button";
+export { Label } from "./components/ui/Label";
+export { Separator } from "./components/ui/Separator";
 export { Input, PasswordInput } from "./components/ui/Input";
 export { SimplePasswordInput } from "./components/ui/SimplePasswordInput";
 export { Logo } from "./components/ui/Logo";
+export { Textarea } from "./components/ui/Textarea";
 export {
   Form,
   FormField,
@@ -66,7 +69,14 @@ export {
   AttachedButtonGroup,
   FullWidthButtonGroup,
 } from "./components/ui/ButtonGroup";
-export { Select } from "./components/ui/Select";
+export {
+  default as Select,
+  ModernSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./components/ui/Select";
 export { MultiSelect } from "./components/ui/MultiSelect";
 export { DatePicker } from "./components/ui/DatePicker";
 export { default as TimePicker } from "./components/ui/TimePicker";
@@ -107,8 +117,20 @@ export { NotificationCenter } from "./components/ui/NotificationCenter";
 export { StatusIndicator } from "./components/ui/StatusIndicator";
 
 // Advanced Navigation Components ✅ PHASE 7 COMPLETE
-export { Tabs } from "./components/ui/Tabs";
+export {
+  default as Tabs,
+  ModernTabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "./components/ui/Tabs";
 export { VerticalTabs } from "./components/ui/VerticalTabs";
+export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./components/ui/Accordion";
 export { Stepper } from "./components/ui/Stepper";
 export { Sidebar } from "./components/ui/Sidebar";
 export { Header } from "./components/ui/Header";
@@ -233,6 +255,12 @@ export { LoginForm } from "./components/auth/LoginForm";
 
 // Form Components ✅ PHASE 5 COMPLETE
 export { DynamicForm } from "./components/forms/DynamicForm";
+
+// Dynamic CRM Components ✅ INTEGRATION COMPLETE
+export { EntityBuilder } from "./components/entity-builder/EntityBuilder";
+export { FieldBuilder } from "./components/field-builder/FieldBuilder";
+export { LayoutDesigner } from "./components/layout-designer/LayoutDesigner";
+export { WidgetBuilder } from "./components/widget-system/WidgetBuilder";
 export { FormWizard } from "./components/forms/FormWizard";
 // Note: FormBuilder has TypeScript issues - will be fixed in future iteration
 // export { FormBuilder } from "./components/forms/FormBuilder";
@@ -291,3 +319,6 @@ export { useGreekValidation } from "./hooks/useGreekValidation";
 export { useForm } from "./hooks/useForm";
 export { useModal } from "./hooks/useModal";
 export { useDebounce } from "./hooks/useDebounce";
+
+// Contact Management
+export { default as ContactForm } from "./components/contacts/ContactForm";

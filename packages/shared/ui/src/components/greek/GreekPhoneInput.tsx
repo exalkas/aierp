@@ -120,14 +120,14 @@ export const GreekPhoneInput = forwardRef<
       if (helperText) return helperText;
 
       if (allowMobile && allowLandline) {
-        return t("greek_phone_helper_all");
+        return t("greek_phone_helper_all", { ns: "greek" });
       } else if (allowMobile) {
-        return t("greek_phone_helper_mobile");
+        return t("greek_phone_helper_mobile", { ns: "greek" });
       } else if (allowLandline) {
-        return t("greek_phone_helper_landline");
+        return t("greek_phone_helper_landline", { ns: "greek" });
       }
 
-      return t("greek_phone_helper");
+      return t("greek_phone_helper", { ns: "greek" });
     };
 
     const getPlaceholder = () => {

@@ -1,115 +1,65 @@
 """
-Logging configuration for Greek ERP/CRM API Service
-Comprehensive logging setup for audit trails and compliance
+Logging Configuration for API Service
+Integrates with the shared structured logger
 """
 
-import logging
-import logging.config
 import sys
+import os
 from pathlib import Path
 
-from .config import settings
+# Add the shared utils to Python path if needed
+shared_utils_path = Path(__file__).parent.parent.parent.parent.parent / "packages" / "shared" / "utils" / "src"
+if shared_utils_path.exists():
+    sys.path.insert(0, str(shared_utils_path))
 
-
-def setup_logging():
-    """Configure logging for the application"""
+try:
+    from structured_logger import create_logger, LogLevel
     
-    # Create logs directory
-    logs_dir = Path("logs")
-    logs_dir.mkdir(exist_ok=True)
+    # Create API service logger
+    api_logger = create_logger(
+        "api-service", 
+        version="1.0.0",
+        min_level=LogLevel.DEBUG if os.getenv("DEBUG", "false").lower() == "true" else LogLevel.INFO
+    )
     
-    # Logging configuration
-    LOGGING_CONFIG = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "standard": {
-                "format": settings.LOG_FORMAT,
-                "datefmt": "%Y-%m-%d %H:%M:%S"
-            },
-            "detailed": {
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(module)s - %(funcName)s:%(lineno)d - %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S"
-            },
-            "audit": {
-                "format": "%(asctime)s - AUDIT - %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S"
-            }
-        },
-        "handlers": {
-            "console": {
-                "level": settings.LOG_LEVEL,
-                "class": "logging.StreamHandler",
-                "formatter": "standard",
-                "stream": sys.stdout
-            },
-            "file": {
-                "level": "INFO",
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "detailed",
-                "filename": "logs/api.log",
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
-                "encoding": "utf-8"
-            },
-            "error_file": {
-                "level": "ERROR",
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "detailed",
-                "filename": "logs/error.log",
-                "maxBytes": 10485760,  # 10MB
-                "backupCount": 5,
-                "encoding": "utf-8"
-            },
-            "audit_file": {
-                "level": "INFO",
-                "class": "logging.handlers.RotatingFileHandler",
-                "formatter": "audit",
-                "filename": "logs/audit.log",
-                "maxBytes": 52428800,  # 50MB
-                "backupCount": 10,
-                "encoding": "utf-8"
-            }
-        },
-        "loggers": {
-            "": {  # Root logger
-                "level": settings.LOG_LEVEL,
-                "handlers": ["console", "file", "error_file"],
-                "propagate": False
-            },
-            "audit": {  # Audit logger
-                "level": "INFO",
-                "handlers": ["audit_file"],
-                "propagate": False
-            },
-            "uvicorn.access": {
-                "level": "INFO",
-                "handlers": ["console"],
-                "propagate": False
-            },
-            "uvicorn.error": {
-                "level": "INFO",
-                "handlers": ["console", "error_file"],
-                "propagate": False
-            },
-            "fastapi": {
-                "level": "INFO",
-                "handlers": ["console", "file"],
-                "propagate": False
-            },
-            "sqlalchemy.engine": {
-                "level": "WARNING",  # Reduce SQL query logging in production
-                "handlers": ["file"],
-                "propagate": False
-            }
-        }
-    }
+except ImportError:
+    # Fallback to basic logging if structured logger not available
+    import logging
     
-    # Apply logging configuration
-    logging.config.dictConfig(LOGGING_CONFIG)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     
-    # Log startup message
-    logger = logging.getLogger(__name__)
-    logger.info("Logging configured successfully")
-    logger.info(f"Log level: {settings.LOG_LEVEL}")
-    logger.info(f"Environment: {settings.ENVIRONMENT}") 
+    class FallbackLogger:
+        def __init__(self, name):
+            self.logger = logging.getLogger(name)
+        
+        def debug(self, message, context=None):
+            self.logger.debug(f"{message} {context or ''}")
+        
+        def info(self, message, context=None):
+            self.logger.info(f"{message} {context or ''}")
+        
+        def warning(self, message, context=None, error=None):
+            self.logger.warning(f"{message} {context or ''}")
+        
+        def error(self, message, context=None, error=None):
+            self.logger.error(f"{message} {context or ''}")
+        
+        def critical(self, message, context=None, error=None):
+            self.logger.critical(f"{message} {context or ''}")
+        
+        def child(self, context):
+            return self
+        
+        def request_started(self, method, path, context=None):
+            import uuid
+            request_id = str(uuid.uuid4())
+            self.info(f"Request started: {method} {path}", context)
+            return request_id
+        
+        def request_completed(self, request_id, status_code, duration, context=None):
+            self.info(f"Request completed: {status_code} ({duration:.2f}s)", context)
+    
+    api_logger = FallbackLogger("api-service") 
