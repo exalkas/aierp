@@ -18,6 +18,13 @@ if env_file.exists():
                 os.environ.setdefault(key, value)
 
 
+def required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise ValueError(f"{name} must be set in the environment or ignored .env file")
+    return value
+
+
 class Settings:
     """Simple settings class that reads from environment variables"""
     
@@ -28,10 +35,7 @@ class Settings:
         self.ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
         
         # Database Configuration (shared with API service)
-        self.DATABASE_URL = os.getenv(
-            "DATABASE_URL", 
-            "postgresql://erp_admin_315:replace_with_local_database_password@localhost:5432/erp_maritime_hellenic_4007"
-        )
+        self.DATABASE_URL = required_env("DATABASE_URL")
         
         # JWT Configuration - no fallbacks, must be set in environment
         self.JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")

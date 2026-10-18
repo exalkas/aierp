@@ -1,3 +1,17 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
+def required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise ValueError(f"{name} must be set in the environment or ignored .env file")
+    return value
+
+
+
 #!/usr/bin/env python3
 """
 Greek ERP/CRM Superuser Creation Script
@@ -27,13 +41,7 @@ except ImportError as e:
     sys.exit(1)
 
 # Configuration
-DB_CONFIG = {
-    'user': 'greek_erp_user',
-    'password': '',
-    'host': 'localhost',
-    'port': 5432,
-    'database': 'greek_erp_master'
-}
+DB_CONFIG = {"dsn": required_env("DATABASE_URL")}
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

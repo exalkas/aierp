@@ -1,331 +1,71 @@
-# 🚀 Greek ERP/CRM Unified Business Management System
+# Greek ERP/CRM
 
-A revolutionary Enterprise Resource Planning and Customer Relationship Management system that **eliminates traditional CRM/ERP silos**. Built specifically for Greek businesses with unified business entity management, 360° relationship visibility, and AI integration.
+A business-management application in development for Greek businesses. It brings customer and supplier records, contacts, CRM workflows, and ERP features together around a shared business-entity model, so one organization can have multiple business roles.
 
-## 🎯 **Core Competitive Advantage: Unified CRM+ERP**
+Built with Next.js, React, TypeScript, Python/FastAPI, SQLAlchemy, and PostgreSQL. The repository includes a main client, administration and support applications at different stages of development, shared UI packages, authentication and API services, database utilities, and optional AI/voice service scaffolding.
 
-**The Problem We Solve**: Traditional systems force users to context-switch between separate CRM and ERP systems:
+## Status
 
-- **CRM System**: "ABC Company" (Account) with contacts and opportunities
-- **ERP System**: "ABC Company" (Customer) with invoices and payments
-- **Result**: Fragmented view, duplicate data entry, missed opportunities
+The existing code covers customer/supplier interfaces, business entities, shared components, authentication, and database models and migrations. The planning documents describe a broader product; they do not establish that every feature is complete. Tax integrations, optional AI services, and production operation need separate configuration and validation.
 
-**Our Solution**: **Universal Business Entity** with 360° relationship view:
+## Layout
 
-- **Single Source of Truth**: One "ABC Company" entity with multiple roles (Customer • Supplier • Partner)
-- **Complete Context**: When invoicing, see communication history, opportunities, support tickets, payment behavior
-- **No Context Switching**: CRM and ERP data unified in one interface
-- **Smart Relationships**: Same entity can be customer AND supplier with proper role management
+| Folder | Purpose |
+| --- | --- |
+| `apps/client/` | Main business application |
+| `apps/admin/`, `apps/setup/` | Administration and onboarding |
+| `apps/user-support/`, `apps/staff-support/`, `apps/marketing/` | Support and marketing applications |
+| `packages/shared/`, `packages/standard-modules/` | Shared UI, authentication, CRM, ERP, and reporting packages |
+| `services/api/`, `services/auth/` | Main API and authentication |
+| `services/files/`, `services/integrations/` | File and integration service scaffolding |
+| `packages/ai-services/` | Optional support and voice services |
+| `scripts/`, `docs/` | Database utilities and development documentation |
 
-## 🏗️ Project Structure
+## Local development
 
-```
-greek-erp-crm/
-├── apps/                      # Applications
-│   ├── client/               # Main business app (Unified CRM+ERP)
-│   ├── admin/                # Admin interface
-│   ├── user-support/         # Customer support portal
-│   ├── staff-support/        # Staff support management
-│   └── setup/                # Onboarding wizard
-├── packages/                  # Shared packages
-│   ├── shared/               # Common utilities
-│   │   ├── auth/            # Authentication system
-│   │   ├── ui/              # UI components library
-│   │   └── ...
-│   ├── standard-modules/     # Standard SaaS modules
-│   │   ├── dashboard/       # Dashboard components
-│   │   ├── crm/            # CRM modules
-│   │   └── ...
-│   ├── ai-services/         # AI Infrastructure
-│   │   ├── voice-service/   # Greek voice commands
-│   │   ├── ai-support-service/  # AI business assistant
-│   │   └── shared-ai/       # Shared AI utilities
-│   └── custom-modules/      # Enterprise custom modules
-│       ├── pet-management/  # Pet shop modules
-│       └── ...
-└── services/                # Backend services
-    ├── api/                 # FastAPI backend with unified models
-    ├── auth/                # Authentication service
-    ├── files/               # File storage service
-    └── integrations/        # Third-party integrations
+Install Node.js with npm, Python 3.11, Poetry, and PostgreSQL. The root Python environment also includes optional AI/audio dependencies, which can require additional platform-specific libraries.
+
+```sh
+npm install
+poetry install --no-root
 ```
 
-## 🌟 **Unified Architecture Features**
+Copy `env.example` to the ignored root `.env`. Set `DATABASE_URL`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SECRET_KEY`, and `JWT_SECRET_KEY` there using your own local database settings. The individual DB fields are used by the PowerShell database utilities; the Python services and administrator utilities use `DATABASE_URL`. Keep these values consistent.
 
-### **360° Business View**
+Generate independent signing secrets locally by running this command twice:
 
-- **Single Business Detail Page**: Complete relationship view (communications, invoices, opportunities, support)
-- **Smart Tab System**: Module-based tab visibility (CRM, ERP, Support, Compliance)
-- **Role-Based Context**: Interface adapts based on business entity roles
-- **Real-Time Integration**: Live data from all system modules
-
-### **Universal Business Entity Model**
-
-```typescript
-BusinessEntity {
-  roles: ["customer", "supplier", "partner", "prospect"];
-  communications: CommunicationHistory[];
-  opportunities: Opportunity[];
-  invoices: Invoice[];
-  payments: Payment[];
-  support: SupportTicket[];
-  healthScore: BusinessHealthScore;
-}
+```sh
+python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-### **Greek Market Leadership**
+Copy the configured `.env` into the core service folders that you use: `services/api/`, `services/auth/`, `services/files/`, and `services/integrations/`. Authentication and API services must use the same JWT signing key. The administrator-creation utilities read the root `.env`; set `SUPERUSER_PASSWORD` privately before using them.
 
-- **Complete AADE Integration**: Tax compliance in business overview
-- **Multi-Role Relationships**: Greek businesses often have complex relationships
-- **Professional Compliance**: Integration with Greek professional chambers
+Required credentials are read from environment variables; the services have no embedded database password or signing-secret fallback. Root Python utilities load `.env` with `python-dotenv`, and PowerShell database scripts load it with `scripts/load-local-env.ps1`. Existing exported environment variables take precedence. Empty template entries are instructions to supply local configuration, not working credentials.
 
-## 🚀 Getting Started
+Review database scripts before using a **new, disposable development database**. Some reset and migration utilities recreate tables or users. Generated data exports are deliberately excluded. The Windows setup utility and its SQL script require PostgreSQL client tools version 15 or newer and a configured `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
 
-### Prerequisites
+Start these in separate terminals from the repository root:
 
-- **Node.js 18+** (for frontend and npm workspaces)
-- **Python 3.11+** (for backend services)
-- **Poetry** (for Python dependency management)
-- **PostgreSQL 12+** (for database)
-- **Docker & Docker Compose** (for AI services)
-- **NVIDIA GPU** (optional, for AI voice commands)
-
-### 🏗️ **Hybrid Monorepo Architecture**
-
-This project uses a **hybrid monorepo** approach combining the best of both ecosystems:
-
-- **📦 npm workspaces** - JavaScript/TypeScript frontend apps and packages
-- **🐍 Poetry workspace** - Python backend services with shared dependencies
-- **🔄 Unified orchestration** - Single command interface for both ecosystems
-
-### Installation
-
-#### **🚀 Quick Setup (Recommended)**
-
-```bash
-# Install both JavaScript and Python dependencies
-npm run install:both
+```sh
+npm run dev:auth
+npm run dev:api
+npm run dev:client
 ```
 
-#### **📋 Manual Setup**
+Authentication normally runs on port 8001, the API on 8000, and the client on 3000. Development API docs are normally at `http://localhost:8000/api/docs` and authentication docs at `http://localhost:8001/docs`.
 
-```bash
-# 1. Install JavaScript dependencies (frontend apps + packages)
-npm run install:js
+Optional provider credentials belong only in the ignored local environment. Code should read the corresponding environment variable; never embed provider keys in source or expose them through frontend variables.
 
-# 2. Install Python dependencies (backend services)
-npm run install:python
+## Validation and plans
 
-# 3. Verify Poetry workspace
-poetry env info
-```
+See [ROADMAP.md](ROADMAP.md) for proposed follow-up work. Existing setup and architecture documents are retained as development references and may describe older configuration or incomplete features.
 
-### Development Workflow
+The publication checks cover secret removal, Python/JSON syntax, settings loading, and setup-script parsing. No Python automated test files were found in the tracked project; full frontend builds, database migrations, and end-to-end business workflows have not been validated in this preparation.
 
-#### **Start All Services**
+## Credentials and data
 
-```bash
-# Start all applications (frontend + backend)
-npm run dev:all
+Commit source code and safe templates only. Real passwords, signing secrets, tokens, private keys, local environments, database exports, logs, and customer data must remain excluded. Scan both the working files and complete Git history before pushing. Do not merge an old, uncleaned clone into the sanitized repository.
 
-# Or start frontend and backend separately
-npm run dev:js      # All frontend apps
-npm run dev:python  # All backend services
-```
+## License
 
-#### **Individual Services**
-
-```bash
-# Frontend Applications
-npm run dev:client         # Main business app (port 3000)
-npm run dev:admin          # Admin interface (port 3001)
-npm run dev:user-support   # Customer support (port 3002)
-npm run dev:staff-support  # Staff support (port 3003)
-npm run dev:setup          # Setup wizard (port 3004)
-
-# Backend Services (via Poetry)
-npm run dev:api            # Main API (port 8000)
-npm run dev:auth           # Auth service (port 8001)
-npm run dev:files          # File service (port 8002)
-npm run dev:integrations   # Integrations (port 8003)
-npm run dev:ai-support     # AI Support (port 8004)
-npm run dev:voice          # Voice AI (port 8005)
-```
-
-#### **Code Quality & Testing**
-
-```bash
-# Run all tests (JS + Python)
-npm run test
-
-# Format code (JS + Python)
-npm run format
-
-# Lint code (JS + Python)
-npm run lint
-```
-
-#### **AI Services** (requires GPU)
-
-```bash
-docker-compose -f docker-compose.ai-services.yml up -d
-```
-
-## 🎯 Applications
-
-### 📊 Client App (Port 3000) - **Unified CRM+ERP**
-
-- **360° Business Management**: Complete business relationship visibility
-- **Unified Navigation**: Businesses → Contacts → Opportunities → Orders → Invoices
-- **Role-Based Interface**: Smart interface adaptation based on business entity roles
-- **Greek Compliance**: Built-in AADE, VAT, and professional certification tracking
-- **AI Voice Commands**: Greek voice control for business operations
-
-### 👤 Admin App (Port 3001)
-
-- System administration with business entity management
-- Multi-tenant configuration and database isolation
-- User management with unified permissions
-- Analytics across all business relationships
-
-### 💬 User Support App (Port 3002)
-
-- Customer-facing support with business context
-- AI-powered assistance with relationship history
-- Knowledge base integrated with business data
-- Seamless escalation to staff support
-
-### 🛠️ Staff Support App (Port 3003)
-
-- Support management with complete business context
-- Ticket routing based on business relationship value
-- Escalation workflows with business priority
-- Performance analytics across all touchpoints
-
-### ⚙️ Setup App (Port 3004)
-
-- Unified business entity onboarding
-- Greek business compliance setup
-- AADE integration configuration
-- Migration from existing CRM/ERP systems
-
-## 🤖 AI Services
-
-### 🎙️ Voice Service (Port 8002)
-
-- **Greek Business Commands**: "Show me ABC Company's invoices"
-- **Whisper Integration**: Accurate Greek speech recognition
-- **Context-Aware Actions**: Voice commands with business entity context
-- **Unified Navigation**: Voice-controlled 360° business view
-
-### 🧠 AI Support Service (Port 8003)
-
-- **Business Intelligence**: Relationship health scoring and insights
-- **Predictive Analytics**: Payment behavior and opportunity scoring
-- **Greek Context**: Understanding of Greek business practices
-- **Smart Recommendations**: Business action suggestions
-
-## 🔧 Development
-
-### **Unified Data Models**
-
-The system uses unified models that eliminate traditional CRM/ERP boundaries:
-
-```python
-# Unified Business Entity (replaces separate Customer/Account models)
-class BusinessEntity(Base):
-    roles: List[BusinessEntityRole]  # customer, supplier, partner
-    contacts: List[Contact]
-    communications: List[Communication]
-    opportunities: List[Opportunity]
-    invoices: List[Invoice]
-    payments: List[Payment]
-
-# People within businesses (unified Contact model)
-class Contact(Base):
-    business_entity: BusinessEntity
-    communications: List[Communication]
-    interactions: List[Interaction]
-```
-
-### Adding a New Module
-
-1. Design with unified business entity context
-2. Integrate with 360° business view
-3. Support role-based visibility
-4. Include Greek compliance where applicable
-
-### Building and Testing
-
-```bash
-# Build all packages
-npm run build
-
-# Test unified architecture
-npm run test
-
-# Test business entity relationships
-npm run test:business-entities
-```
-
-## 🏆 **Competitive Advantages**
-
-### **1. Unified Data Architecture**
-
-- **Single Source of Truth**: No data duplication between CRM and ERP
-- **Consistent Terminology**: No confusion between "Account" and "Customer"
-- **Role-Based Relationships**: Same entity can be customer AND supplier
-
-### **2. 360° Business Intelligence**
-
-- **Complete Visibility**: All business interactions in one view
-- **Real-Time Insights**: Live financial and relationship health
-- **Predictive Analytics**: Identify opportunities and risks early
-
-### **3. Greek Market Leadership**
-
-- **Native Compliance**: AADE integration in business overview
-- **Complex Relationships**: Support for Greek business relationship patterns
-- **Professional Integration**: Chamber of Commerce and certification tracking
-
-### **4. User Experience Revolution**
-
-- **Context Preservation**: Never lose business relationship context
-- **Smart Navigation**: Interface adapts to business entity roles
-- **Unified Search**: Find any business information in < 10 seconds
-
-## 🇬🇷 Greek Business Features
-
-- **AADE MyDATA Integration**: Real-time tax submission and compliance
-- **Multi-VAT Support**: Location-aware Greek VAT rates (mainland/islands)
-- **Professional Chambers**: Integration with Greek professional bodies
-- **Banking Integration**: Greek bank connectivity and payments
-- **Multi-language**: Native Greek interface with English support
-
-## 📊 **Success Metrics**
-
-### **User Experience**
-
-- **Information Access**: < 10 seconds to find any business information
-- **Context Switches**: 90% reduction in CRM ↔ ERP navigation
-- **User Satisfaction**: 95% prefer unified view over separate systems
-
-### **Business Impact**
-
-- **Sales Efficiency**: 25% faster deal closure with complete business context
-- **Relationship Intelligence**: 40% improvement in business insights
-- **Revenue Growth**: 20% increase from better relationship management
-
-## 🚀 Next Steps
-
-1. **API Development**: Implement unified business entity endpoints
-2. **Frontend Integration**: Build 360° business view components
-3. **AI Enhancement**: Advanced business intelligence and voice commands
-4. **Greek Compliance**: Complete AADE and professional certification integration
-5. **Performance Optimization**: Sub-2-second 360° business view loading
-
----
-
-**🎯 Revolutionizing Greek Business Management - One Unified Relationship at a Time**
-
-_Built with ❤️ for Greek businesses who deserve better than fragmented systems_
+Released under the [MIT License](LICENSE), matching the existing Python metadata. Third-party dependencies retain their own licenses.

@@ -162,7 +162,6 @@ temp/
 # ==============================================
 # DOCKER
 # ==============================================
-.dockerignore
 
 # ==============================================
 # OS SPECIFIC
@@ -243,4 +242,19 @@ profiling/
 .git/
 .gitkeep 
 
-package-lock.json
+
+# Local credentials and generated exports
+.env.*
+*.env
+env_file
+!env.example
+!.env.example
+!.env.sample
+credentials/
+secrets/
+*credentials*.json
+*service-account*.json
+current_database_data.json
+*_backup.json
+*.dump
+*.sql.gz

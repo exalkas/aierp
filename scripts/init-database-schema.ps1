@@ -1,3 +1,10 @@
+& (Join-Path $PSScriptRoot "load-local-env.ps1")
+foreach ($requiredName in @("DB_NAME", "DB_USER", "DB_PASSWORD")) {
+    if ([string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable($requiredName, "Process"))) {
+        throw "$requiredName must be set in the environment or the ignored project .env file."
+    }
+}
+
 # Greek ERP/CRM Database Schema Initialization
 # Creates all tables, indexes, and functions
 
@@ -6,9 +13,9 @@ Write-Host "===================================" -ForegroundColor Green
 
 # PostgreSQL path and credentials
 $PSQL_PATH = "C:\Program Files\PostgreSQL\17\bin\psql.exe"
-$DB_NAME = "erp_maritime_hellenic_4007"
-$DB_USER = "erp_admin_315"
-$DB_PASSWORD = ""
+$DB_NAME = $env:DB_NAME
+$DB_USER = $env:DB_USER
+$DB_PASSWORD = $env:DB_PASSWORD
 
 # Check if PostgreSQL is installed
 if (-not (Test-Path $PSQL_PATH)) {

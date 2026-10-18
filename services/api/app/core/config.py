@@ -19,6 +19,13 @@ if env_file.exists():
                 os.environ.setdefault(key, value)
 
 
+def required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise ValueError(f"{name} must be set in the environment or ignored .env file")
+    return value
+
+
 class Settings:
     """Application settings with Greek business configuration"""
     
@@ -26,10 +33,10 @@ class Settings:
         # Application
         self.ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
         self.DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
-        self.SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-here")
+        self.SECRET_KEY = required_env("SECRET_KEY")
         
         # Database
-        self.DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/db")
+        self.DATABASE_URL = required_env("DATABASE_URL")
         self.DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "20"))
         self.DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "30"))
         

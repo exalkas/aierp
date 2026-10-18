@@ -39,8 +39,8 @@ class LoginResponse(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "access_token": "EXAMPLE_TOKEN",
-                "refresh_token": "EXAMPLE_TOKEN",
+                "access_token": "",
+                "refresh_token": "",
                 "token_type": "bearer",
                 "expires_in": 1800,
                 "user": {
@@ -66,7 +66,7 @@ class RefreshTokenRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "refresh_token": "EXAMPLE_TOKEN"
+                "refresh_token": ""
             }
         }
 
@@ -80,7 +80,7 @@ class RefreshTokenResponse(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "access_token": "EXAMPLE_TOKEN",
+                "access_token": "",
                 "token_type": "bearer",
                 "expires_in": 1800
             }
@@ -95,7 +95,7 @@ class LogoutRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "refresh_token": "EXAMPLE_TOKEN",
+                "refresh_token": "",
                 "logout_all_devices": False
             }
         }
@@ -162,7 +162,7 @@ class PasswordResetConfirm(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "token": "EXAMPLE_TOKEN",
+                "token": "",
                 "new_password": "New",
                 "confirm_password": "New"
             }
@@ -222,7 +222,7 @@ class EmailVerificationConfirm(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "token": "EXAMPLE_TOKEN"
+                "token": ""
             }
         }
 

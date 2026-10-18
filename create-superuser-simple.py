@@ -1,3 +1,17 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
+def required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise ValueError(f"{name} must be set in the environment or ignored .env file")
+    return value
+
+
+
 #!/usr/bin/env python3
 """
 Simple Greek ERP/CRM Superuser Creation Script
@@ -24,13 +38,7 @@ except ImportError as e:
     sys.exit(1)
 
 # Use the new credentials
-DB_CONFIG = {
-    'user': 'erp_admin_315',
-    'password': '',
-    'host': 'localhost',
-    'port': 5432,
-    'database': 'erp_maritime_hellenic_4007'
-}
+DB_CONFIG = {"dsn": required_env("DATABASE_URL")}
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -173,7 +181,7 @@ def get_user_input():
         while not validate_email(user_data['email']):
             user_data['email'] = input("Email (valid format): ").strip()
     
-    user_data['password'] = getpass.getpass("Password []: ").strip() or ""
+    user_data['password'] = required_env("SUPERUSER_PASSWORD")
     
     user_data['first_name'] = input("First Name [alkis]: ").strip() or "alkis"
     user_data['last_name'] = input("Last Name [kas]: ").strip() or "kas"

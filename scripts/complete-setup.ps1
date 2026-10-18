@@ -159,7 +159,7 @@ try {
     Write-Host "2. Start the development server: npm run dev:all" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Connection string for your .env:" -ForegroundColor Blue
-    Write-Host "DATABASE_URL=postgresql://$DB_USER@$($env:COMPUTERNAME).com@localhost:5432/$DB_NAME" -ForegroundColor Gray
+    Write-Host "Set DATABASE_URL in your ignored .env file." -ForegroundColor Gray
     
 } catch {
     Write-Host ""
